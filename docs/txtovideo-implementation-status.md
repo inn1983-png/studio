@@ -7,8 +7,8 @@
 | 轮次 | Phase | 状态 | 说明 |
 | --- | --- | --- | --- |
 | 第一轮 | Phase 0：品牌统一与入口收口 | 已完成 | README、品牌文案、主导航、实验功能收口、License 一致性已处理 |
-| 第二轮 | Phase 1：短剧数据结构文档和最小数据模型 | 已完成，待最终推送 | 已新增 Txtovideo 专用模型、迁移和数据结构文档，并完成迁移验证 |
-| 第三轮 | Phase 2：短剧工作台 MVP 页面 | 未开始 | 下一步 |
+| 第二轮 | Phase 1：短剧数据结构文档和最小数据模型 | 已完成 | 已新增 Txtovideo 专用模型、迁移和数据结构文档，并完成迁移验证 |
+| 第三轮 | Phase 2：短剧工作台 MVP 页面 | 已完成 | 已新增项目级短剧工作台路由和本地草稿式 MVP 页面 |
 | 第四轮 | Phase 3：Txtovideo 专用提示词模板 | 未开始 | 后续 |
 | 第五轮 | Phase 4：导出 ZIP 包 | 未开始 | 后续 |
 
@@ -18,6 +18,10 @@
 - 新增 Alembic 迁移 `034_create_txtovideo_tables.py`。
 - 新增数据结构文档 `docs/txtovideo-data-schema.md`。
 - 保持旧 `projects`、`movie_*`、`canvas_*` 表和路由不删除。
+- 新增 `/txtovideo/projects/:projectId/workbench` 路由。
+- 短剧项目详情页的“进入短剧工作台”已改为进入项目级 Txtovideo 工作台。
+- 工作台 MVP 已覆盖原文、剧本、角色、场景、道具、分镜、图片提示词、视频提示词、质量检查、导出 10 个线性步骤。
+- 当前工作台产物保存到浏览器本地草稿，后续 Phase 3/4 再接入专用提示词模板和 ZIP 导出。
 
 ## 验证记录
 
@@ -33,6 +37,10 @@
   - `backend: uv run alembic upgrade head` 成功执行 `032 -> 033 -> 034`。
   - `backend: uv run alembic current` 返回 `034 (head)`。
   - `frontend: npm run build` 通过。
+- Phase 2 已验证：
+  - `frontend: npm run build` 通过。
+  - `frontend: npx eslint src/views/ShortDramaWorkbench.vue src/router/index.js src/components/project/ProjectDetail.vue` 通过。
+  - 浏览器打开 `http://127.0.0.1:5173/txtovideo/projects/demo/workbench` 无前端控制台错误；未登录状态由认证壳接管。
 
 ## 环境提示
 

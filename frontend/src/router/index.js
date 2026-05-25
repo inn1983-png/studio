@@ -121,6 +121,13 @@ const routes = [
         name: 'ShortDramaWorkbenchPage',
         component: ShortDramaWorkbench,
         meta: { title: '短剧工作台' }
+      },
+      {
+        path: 'projects/:projectId/workbench',
+        name: 'ShortDramaProjectWorkbench',
+        component: ShortDramaWorkbench,
+        meta: { title: '短剧工作台' },
+        props: true
       }
     ]
   },

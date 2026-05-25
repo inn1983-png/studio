@@ -206,7 +206,7 @@
           v-if="project.type === 'ai_movie'"
           type="primary"
           :icon="VideoCamera"
-          @click="handleOpenMovieStudio"
+          @click="handleOpenShortDramaWorkbench"
         >
           进入短剧工作台
         </el-button>
@@ -398,24 +398,13 @@
   }
 
   // 进入短剧工作台
-  const handleOpenMovieStudio = async () => {
-    try {
-      const chapters = await projectsStore.fetchProjectChapters(props.projectId)
-      if (chapters && chapters.length > 0) {
-        router.push({
-          name: 'MovieStudio',
-          params: { 
-            projectId: props.projectId,
-            chapterId: chapters[0].id
-          }
-        })
-      } else {
-        ElMessage.warning('项目暂无章节，请先添加内容')
+  const handleOpenShortDramaWorkbench = () => {
+    router.push({
+      name: 'ShortDramaProjectWorkbench',
+      params: {
+        projectId: props.projectId
       }
-    } catch (error) {
-      console.error('获取章节列表失败:', error)
-      ElMessage.error('无法进入短剧工作台')
-    }
+    })
   }
 
   const handleExportVideo = async () => {
