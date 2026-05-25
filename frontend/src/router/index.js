@@ -6,8 +6,6 @@ const AuthLayout = () => import('@/components/layout/AuthLayout.vue')
 const MainLayout = () => import('@/components/layout/MainLayout.vue')
 
 // 页面组件
-const Login = () => import('@/views/Login.vue')
-const Register = () => import('@/views/Register.vue')
 const Dashboard = () => import('@/views/Dashboard.vue')
 const Projects = () => import('@/views/Projects.vue')
 const ProjectDetail = () => import('@/components/project/ProjectDetail.vue')
@@ -31,33 +29,21 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: AuthLayout,
-    meta: { requiresGuest: true },
-    children: [
-      {
-        path: '',
-        name: 'LoginPage',
-        component: Login,
-        props: {
-          title: '欢迎回来'
-        }
-      }
-    ]
+    props: {
+      page: 'login',
+      title: '欢迎回来'
+    },
+    meta: { requiresGuest: true }
   },
   {
     path: '/register',
     name: 'Register',
     component: AuthLayout,
-    meta: { requiresGuest: true },
-    children: [
-      {
-        path: '',
-        name: 'RegisterPage',
-        component: Register,
-        props: {
-          title: '创建账户'
-        }
-      }
-    ]
+    props: {
+      page: 'register',
+      title: '创建账户'
+    },
+    meta: { requiresGuest: true }
   },
   {
     path: '/dashboard',
