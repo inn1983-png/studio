@@ -161,7 +161,7 @@ import { ref, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage } from 'element-plus'
-import { User, Setting, SwitchButton, ArrowDown, House, Folder, Document, Share } from '@element-plus/icons-vue'
+import { User, Setting, SwitchButton, ArrowDown, House, Folder, Document, Share, VideoCamera, Download, Key } from '@element-plus/icons-vue'
 import AppSidebar from './AppSidebar.vue'
 
 const router = useRouter()
@@ -188,11 +188,14 @@ const breadcrumbs = computed(() => {
 
   // 根据路由生成面包屑
   const routeMap = {
-    '/dashboard': { title: '控制台', icon: House },
+    '/dashboard': { title: '实验功能', icon: House },
     '/projects': { title: '项目管理', icon: Folder },
-    '/canvas': { title: '无限画布', icon: Share },
-    '/generation': { title: '视频生成', icon: Document },
-    '/publish': { title: '内容发布', icon: Document },
+    '/txtovideo': { title: '短剧工作台', icon: VideoCamera },
+    '/canvas': { title: '画布工作台', icon: Share },
+    '/api-keys': { title: 'API 密钥设置', icon: Key },
+    '/exports': { title: '导出中心', icon: Download },
+    '/generation': { title: '实验功能', icon: Document },
+    '/publish': { title: '实验功能', icon: Document },
     '/settings': { title: '系统设置', icon: Setting }
   }
 

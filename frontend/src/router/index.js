@@ -16,6 +16,8 @@ const GenerationSettings = () => import('@/views/GenerationSettings.vue')
 const Publish = () => import('@/views/Publish.vue')
 const APIKeys = () => import('@/views/APIKeys.vue')
 const Settings = () => import('@/views/Settings.vue')
+const ShortDramaWorkbench = () => import('@/views/ShortDramaWorkbench.vue')
+const ExportCenter = () => import('@/views/ExportCenter.vue')
 const CanvasList = () => import('@/views/canvas/CanvasList.vue')
 const CanvasEditor = () => import('@/views/canvas/CanvasEditor.vue')
 
@@ -23,7 +25,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    redirect: '/dashboard'
+    redirect: '/projects'
   },
   {
     path: '/login',
@@ -103,8 +105,22 @@ const routes = [
         path: ':projectId/chapters/:chapterId/movie-studio',
         name: 'MovieStudio',
         component: () => import('@/views/studio/MovieStudio.vue'),
-        meta: { title: '电影工作室' },
+        meta: { title: '短剧工作台' },
         props: true
+      }
+    ]
+  },
+  {
+    path: '/txtovideo',
+    name: 'ShortDramaWorkbench',
+    component: MainLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'ShortDramaWorkbenchPage',
+        component: ShortDramaWorkbench,
+        meta: { title: '短剧工作台' }
       }
     ]
   },
@@ -124,6 +140,20 @@ const routes = [
         name: 'CanvasEditor',
         component: CanvasEditor,
         props: true
+      }
+    ]
+  },
+  {
+    path: '/exports',
+    name: 'ExportCenter',
+    component: MainLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'ExportCenterPage',
+        component: ExportCenter,
+        meta: { title: '导出中心' }
       }
     ]
   },

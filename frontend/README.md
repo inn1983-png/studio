@@ -1,6 +1,6 @@
-# AICG 前端应用
+# Txtovideo Studio 前端应用
 
-基于 Vue 3 + Element Plus 构建的现代化内容创作管理平台。
+基于 Vue 3 + Element Plus 构建的小说短剧工作站前端。
 
 ## 🌟 核心功能
 

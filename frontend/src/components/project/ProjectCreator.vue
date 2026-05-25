@@ -128,15 +128,15 @@
                 <div class="type-img">
                   <img
                     src="@/assets/images/ai_movie_type.png"
-                    alt="AI电影"
+                    alt="小说短剧"
                   >
                 </div>
                 <div class="type-info">
                   <div class="type-title">
-                    AI 电影
+                    小说短剧
                   </div>
                   <div class="type-desc">
-                    影视级别，角色一致
+                    角色场景分镜链路
                   </div>
                 </div>
                 <div class="active-badge">
@@ -246,19 +246,19 @@
               @click="textFormData.type = 'ai_movie'"
             >
               <div class="type-img">
-                <img
-                  src="@/assets/images/ai_movie_type.png"
-                  alt="AI电影"
-                >
-              </div>
-              <div class="type-info">
-                <div class="type-title">
-                  AI 电影
+                  <img
+                    src="@/assets/images/ai_movie_type.png"
+                    alt="小说短剧"
+                  >
                 </div>
-                <div class="type-desc">
-                  影视级别，角色一致
+                <div class="type-info">
+                  <div class="type-title">
+                    小说短剧
+                  </div>
+                  <div class="type-desc">
+                    角色场景分镜链路
+                  </div>
                 </div>
-              </div>
               <div class="active-badge">
                 <el-icon><Check /></el-icon>
               </div>

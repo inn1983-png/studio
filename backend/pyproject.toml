@@ -3,11 +3,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "aicg-platform-backend"
+name = "txtovideo-studio-backend"
 version = "1.0.0"
-description = "AICG内容分发平台 - 后端服务"
+description = "Txtovideo Studio 小说短剧工作站 - 后端服务"
 authors = [
-    { name = "AICG Platform Team", email = "team@aicg-platform.com" },
+    { name = "Txtovideo Studio Team", email = "team@txtovideo-studio.com" },
 ]
 
 dependencies = [
@@ -52,11 +52,11 @@ dependencies = [
 
 requires-python = ">=3.11"
 readme = "README.md"
-license = { text = "MIT" }
+license = { text = "Apache License 2.0" }
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
@@ -98,14 +98,14 @@ gpu = [
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 
 [project.urls]
-Homepage = "https://github.com/your-org/aicg-platform"
-Documentation = "https://docs.aicg-platform.com"
-Repository = "https://github.com/your-org/aicg-platform.git"
-"Bug Tracker" = "https://github.com/your-org/aicg-platform/issues"
+Homepage = "https://github.com/inn1983-png/studio"
+Documentation = "https://github.com/inn1983-png/studio#readme"
+Repository = "https://github.com/inn1983-png/studio.git"
+"Bug Tracker" = "https://github.com/inn1983-png/studio/issues"
 
 [project.scripts]
-aicg-server = "src.main:main"
-aicg-worker = "src.workers.base:start_worker"
+txtovideo-server = "src.main:main"
+txtovideo-worker = "src.workers.base:start_worker"
 
 [tool.hatch.version]
 path = "src/__init__.py"

@@ -23,6 +23,23 @@ from src.models.user import User
 from src.models.movie import MovieCharacter, MovieProp, MovieScript, MovieScene, MovieShot, ScriptStatus
 from src.models.video_task import VideoTask, VideoTaskStatus
 from src.models.task_status import TaskStatus, TaskPriority, can_transition, validate_transition, get_retry_delay
+from src.models.txtovideo import (
+    CharacterAsset,
+    ExportPackage,
+    ImagePrompt,
+    PropAsset,
+    QualityReport,
+    QualityTargetType,
+    SceneAsset,
+    ScriptVersion,
+    ShortDramaProject,
+    SourceType,
+    StoryboardShot,
+    TargetPlatform,
+    TxtovideoStatus,
+    TxtovideoWorkflowMode,
+    VideoPrompt,
+)
 
 __all__ = [
     "Base",
@@ -65,4 +82,19 @@ __all__ = [
     "can_transition",
     "validate_transition",
     "get_retry_delay",
+    "ShortDramaProject",
+    "ScriptVersion",
+    "CharacterAsset",
+    "SceneAsset",
+    "PropAsset",
+    "StoryboardShot",
+    "ImagePrompt",
+    "VideoPrompt",
+    "QualityReport",
+    "ExportPackage",
+    "SourceType",
+    "TargetPlatform",
+    "TxtovideoWorkflowMode",
+    "TxtovideoStatus",
+    "QualityTargetType",
 ]

@@ -322,7 +322,7 @@ def validate_integration_points():
 def main():
     """主验证函数"""
     print("=" * 60)
-    print("🔧 AICG异步文件处理流程代码验证")
+    print("🔧 Txtovideo Studio 异步文件处理流程代码验证")
     print("=" * 60)
 
     validation_results = []

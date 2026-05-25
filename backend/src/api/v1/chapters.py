@@ -211,7 +211,7 @@ async def update_chapter_status(
     """
     更新章节状态
     
-    用于电影工作室在素材检查完成后更新章节状态为 materials_prepared
+    用于短剧工作台在素材检查完成后更新章节状态为 materials_prepared
     """
     chapter_service = ChapterService(db)
 

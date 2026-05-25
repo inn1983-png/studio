@@ -40,7 +40,7 @@
           </el-option>
         </el-select>
         <div class="form-tip">
-          仅显示状态为"素材已准备"且项目类型为"AI电影"的章节
+          仅显示状态为"素材已准备"且项目类型为"短剧项目"的章节
         </div>
       </el-form-item>
 
@@ -239,7 +239,7 @@ const searchChapters = async (query) => {
     const res = await chaptersService.getChapters(null, {
       search: query,
       chapter_status: 'materials_prepared', // 只显示素材准备好的章节
-      project_type: 'ai_movie', // 只显示AI电影项目的章节
+      project_type: 'ai_movie', // 只显示短剧项目的章节
       size: 50
     })
     chapters.value = res.chapters || []

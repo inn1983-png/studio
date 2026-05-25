@@ -9,7 +9,7 @@
         控制台
       </h1>
       <p class="page-description">
-        欢迎回来，{{ authStore.user?.display_name || authStore.user?.username }}！开始您的{{ brandStore.appDescription.replace('智能创作工作站', '创作之旅') }}
+        欢迎回来，{{ authStore.user?.display_name || authStore.user?.username }}！开始您的小说短剧创作
       </p>
     </div>
 
@@ -41,7 +41,7 @@
 
         <div
           class="quick-action modern-gradient-2"
-          @click="$router.push('/generation')"
+          @click="$router.push('/txtovideo')"
         >
           <div class="action-icon">
             <el-icon size="24">
@@ -49,8 +49,8 @@
             </el-icon>
           </div>
           <div class="action-content">
-            <h4>视频生成</h4>
-            <p>AI 视频制作</p>
+            <h4>短剧工作台</h4>
+            <p>剧本与分镜</p>
           </div>
           <div class="action-arrow">
             <el-icon size="16">
@@ -61,16 +61,16 @@
 
         <div
           class="quick-action modern-gradient-3"
-          @click="$router.push('/publish')"
+          @click="$router.push('/exports')"
         >
           <div class="action-icon">
             <el-icon size="24">
-              <Promotion />
+              <Download />
             </el-icon>
           </div>
           <div class="action-content">
-            <h4>内容分发</h4>
-            <p>一键发布</p>
+            <h4>导出中心</h4>
+            <p>素材包导出</p>
           </div>
           <div class="action-arrow">
             <el-icon size="16">
@@ -141,10 +141,10 @@
             </div>
             <div class="mini-stat-info">
               <div class="mini-stat-number">
-                {{ publishedVideos }}
+                {{ generatedVideos }}
               </div>
               <div class="mini-stat-label">
-                已发布
+                已生成
               </div>
             </div>
           </div>
@@ -246,7 +246,7 @@
             </h3>
             <el-button
               link
-              @click="$router.push('/generation')"
+              @click="$router.push('/txtovideo')"
             >
               管理
             </el-button>
@@ -272,9 +272,9 @@
               <el-button
                 type="primary"
                 plain
-                @click="$router.push('/generation')"
+                @click="$router.push('/projects')"
               >
-                开始生成视频
+                查看短剧项目
               </el-button>
             </div>
             <div
@@ -358,17 +358,16 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useBrandStore } from '@/stores/brand'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
   Folder,
   Film,
   VideoPlay,
-  Promotion,
   Timer,
   Share,
   Setting,
+  Download,
   Document,
   ArrowRight,
   Clock,
@@ -379,7 +378,6 @@ import {
 import { dashboardService } from '@/services/dashboard'
 
 const authStore = useAuthStore()
-const brandStore = useBrandStore()
 const router = useRouter()
 
 // 数据状态
@@ -392,7 +390,7 @@ const taskQueue = ref(null)
 // 计算属性 - 从统计数据中提取值
 const projectCount = computed(() => statistics.value?.projects?.total || 0)
 const runningTasks = computed(() => statistics.value?.tasks?.running_tasks || 0)
-const publishedVideos = computed(() => statistics.value?.generation?.generated_videos || 0)
+const generatedVideos = computed(() => statistics.value?.generation?.generated_videos || 0)
 const totalCost = computed(() => statistics.value?.cost?.total || 0)
 
 // 加载仪表盘数据
@@ -507,7 +505,7 @@ provide('headerActions', [
     text: '开始创作',
     type: 'primary',
     icon: VideoPlay,
-    action: () => router.push('/generation')
+    action: () => router.push('/txtovideo')
   }
 ])
 

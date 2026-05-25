@@ -1,6 +1,6 @@
-# AICG内容分发平台 - 后端服务
+# Txtovideo Studio - 后端服务
 
-基于FastAPI的异步Web服务，提供AI驱动的长文本到视频转换功能。
+基于 FastAPI 的异步 Web 服务，为小说短剧工作站提供项目、文件、素材、任务和导出等后端能力。
 
 ## 功能特性
 
@@ -13,7 +13,7 @@
 - 🔄 **任务队列**: Celery + Redis高并发处理
 - 📊 **实时监控**: WebSocket进度推送 + Prometheus指标
 - 🔐 **安全认证**: JWT + 密钥加密存储
-- 📱 **多平台分发**: B站、YouTube等平台内容发布
+- 🧪 **实验能力**: 保留发布、视频任务等旧功能入口，后续按短剧工作流收口
 
 ## 技术栈
 
@@ -264,7 +264,7 @@ backend/
 
 ```bash
 # 数据库
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/aicg_db
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/txtovideo_studio
 
 # Redis
 REDIS_URL=redis://localhost:6379/0
@@ -283,7 +283,7 @@ MINIO_ENDPOINT=localhost:9000
 MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=minioadmin
 MINIO_SECURE=false
-MINIO_BUCKET_NAME=aicg-files
+MINIO_BUCKET_NAME=txtovideo-files
 
 # 日志
 LOG_LEVEL=INFO
@@ -353,14 +353,14 @@ STRUCTURED_LOGGING=true # 结构化日志到文件
 
 ```bash
 # 构建镜像
-docker build -t aicg-backend .
+docker build -t txtovideo-backend .
 
 # 运行容器
-docker run -d --name aicg-backend \
+docker run -d --name txtovideo-backend \
   -p 8000:8000 \
   -e DATABASE_URL=postgresql+asyncpg://... \
   -e REDIS_URL=redis://... \
-  aicg-backend
+  txtovideo-backend
 ```
 
 ### 生产环境配置
@@ -400,10 +400,10 @@ uv run scripts/test_single_sentence_video.py --sentence-id 94673ecc-abe0-42ea-ae
 
 ```bash
 # 查看应用日志
-docker logs -f aicg-backend
+docker logs -f txtovideo-backend
 
 # 查看特定组件日志
-grep "ERROR" /var/log/aicg/backend.log
+grep "ERROR" /var/log/txtovideo/backend.log
 ```
 
 ## 贡献指南
@@ -416,10 +416,10 @@ grep "ERROR" /var/log/aicg/backend.log
 
 ## 许可证
 
-本项目采用MIT许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 Apache License 2.0 - 查看根目录 [LICENSE](../LICENSE) 文件了解详情。
 
 ## 支持
 
-- 文档: https://docs.aicg-platform.com
-- 问题反馈: https://github.com/your-org/aicg-platform/issues
-- 邮件: support@aicg-platform.com
+- 文档: https://github.com/inn1983-png/studio#readme
+- 问题反馈: https://github.com/inn1983-png/studio/issues
+- 邮件: support@txtovideo-studio.com

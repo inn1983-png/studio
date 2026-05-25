@@ -20,7 +20,7 @@
         >
           返回
         </el-button>
-        <h2>电影工作室</h2>
+        <h2>短剧工作台</h2>
         <div
           v-if="!projectId"
           class="debug-info"

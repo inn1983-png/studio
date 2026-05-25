@@ -3,9 +3,9 @@
     <div class="hero-card">
       <div>
         <p class="eyebrow">
-          无限画布
+          画布工作台
         </p>
-        <h1>无限画布</h1>
+        <h1>画布工作台</h1>
       </div>
       <el-button
         type="primary"

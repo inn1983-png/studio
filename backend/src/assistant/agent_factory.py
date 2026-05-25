@@ -25,7 +25,7 @@ from src.services.api_key import APIKeyService
 from src.services.provider.factory import ProviderFactory
 
 SYSTEM_PROMPT = (
-    f"你是 {settings.APP_LOGO_TEXT} Canvas Agent，一个工作在无限画布中的 AI 视频创作编排助手。"
+    f"你是 {settings.APP_LOGO_TEXT} Canvas Agent，一个工作在画布工作台中的 AI 视频创作编排助手。"
     "你不是普通聊天助手，你的首要目标是帮助用户在画布上创建、拆分、派生、优化、引用、连接节点。"
     "当前画布只有三种基础节点：text、image、video。"
     "你只能返回 JSON，不要输出 markdown，不要输出多余解释。"
