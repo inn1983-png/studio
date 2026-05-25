@@ -30,6 +30,7 @@ from .paragraphs import router as paragraphs_router
 from .sentences import router as sentences_router
 from .api_keys import router as api_keys_router
 from .prompt import router as prompt_router
+from .txtovideo_prompts import router as txtovideo_prompts_router
 from .image import router as image_router
 from .audio import router as audio_router
 from .bgms import router as bgms_router
@@ -58,6 +59,11 @@ api_router.include_router(paragraphs_router, prefix="/paragraphs", tags=["段落
 api_router.include_router(sentences_router, prefix="/sentences", tags=["句子管理"])
 api_router.include_router(api_keys_router, prefix="/api-keys", tags=["API密钥管理"])
 api_router.include_router(prompt_router, prefix="/prompt", tags=["AI导演引擎"])
+api_router.include_router(
+    txtovideo_prompts_router,
+    prefix="/txtovideo/prompts",
+    tags=["Txtovideo提示词模板"],
+)
 api_router.include_router(image_router, prefix="/image", tags=["图片生成"])
 api_router.include_router(audio_router, prefix="/audio", tags=["音频生成"])
 api_router.include_router(bgms_router, prefix="/bgms", tags=["BGM管理"])

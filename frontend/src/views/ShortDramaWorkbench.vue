@@ -181,23 +181,23 @@
                   :xs="24"
                   :md="8"
                 >
-                  <el-form-item label="题材">
+                  <el-form-item label="时代">
                     <el-select
-                      v-model="workbench.source.genre"
+                      v-model="workbench.source.era"
                       class="full-width"
                       @change="markStepDirty('source')"
                     >
                       <el-option
-                        label="古风权谋"
-                        value="古风权谋"
+                        label="中国古代"
+                        value="中国古代"
                       />
                       <el-option
-                        label="现代逆袭"
-                        value="现代逆袭"
+                        label="民国"
+                        value="民国"
                       />
                       <el-option
-                        label="民国悬疑"
-                        value="民国悬疑"
+                        label="现代"
+                        value="现代"
                       />
                     </el-select>
                   </el-form-item>
@@ -205,6 +205,59 @@
                 <el-col
                   :xs="24"
                   :md="8"
+                >
+                  <el-form-item label="风格">
+                    <el-select
+                      v-model="workbench.source.style"
+                      class="full-width"
+                      @change="markStepDirty('source')"
+                    >
+                      <el-option
+                        label="古风真人写实"
+                        value="古风真人写实"
+                      />
+                      <el-option
+                        label="电视剧电影感"
+                        value="电视剧电影感"
+                      />
+                      <el-option
+                        label="悬疑冷调写实"
+                        value="悬疑冷调写实"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col
+                  :xs="24"
+                  :md="8"
+                >
+                  <el-form-item label="平台">
+                    <el-select
+                      v-model="workbench.source.platform"
+                      class="full-width"
+                      @change="markStepDirty('source')"
+                    >
+                      <el-option
+                        label="抖音/视频号"
+                        value="抖音/视频号"
+                      />
+                      <el-option
+                        label="Bilibili"
+                        value="Bilibili"
+                      />
+                      <el-option
+                        label="自定义"
+                        value="自定义"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+
+              <el-row :gutter="12">
+                <el-col
+                  :xs="24"
+                  :md="12"
                 >
                   <el-form-item label="画幅">
                     <el-select
@@ -229,7 +282,7 @@
                 </el-col>
                 <el-col
                   :xs="24"
-                  :md="8"
+                  :md="12"
                 >
                   <el-form-item label="单镜头时长">
                     <el-select
@@ -299,6 +352,37 @@
             </el-tag>
           </div>
 
+          <div
+            v-if="currentStep.outputKey"
+            class="template-box"
+          >
+            <div class="template-title">
+              <strong>提示词模板</strong>
+              <el-tag
+                size="small"
+                effect="plain"
+              >
+                {{ currentPromptUsed?.version || '未生成' }}
+              </el-tag>
+            </div>
+            <el-select
+              v-model="workbench.selectedTemplates[currentStep.outputKey]"
+              class="full-width"
+              :loading="promptTemplateLoading"
+              @change="handleTemplateChange"
+            >
+              <el-option
+                v-for="template in templatesForCurrentStep"
+                :key="template.template_id"
+                :label="`${template.name} ${template.version}`"
+                :value="template.template_id"
+              />
+            </el-select>
+            <p>
+              {{ currentPromptUsed ? `已使用 ${currentPromptUsed.filename}` : '重新生成后会记录 prompt_used' }}
+            </p>
+          </div>
+
           <pre class="json-preview">{{ previewContent }}</pre>
 
           <div class="validation-box">
@@ -365,6 +449,7 @@ import {
   VideoCamera
 } from '@element-plus/icons-vue'
 import { useProjectsStore } from '@/stores/projects'
+import { txtovideoPromptsService } from '@/services/txtovideoPrompts'
 
 const props = defineProps({
   projectId: {
@@ -385,6 +470,31 @@ const LTX_AVOID_RULES = [
   '避免服装和发型变化',
   '避免镜头内出现文字',
   '避免夸张运镜和高速旋转'
+]
+
+const TEMPLATE_STEP_MAP = {
+  script: 'script_adapt',
+  characters: 'character_extract',
+  scenes: 'scene_extract',
+  props: 'prop_extract',
+  storyboard: 'storyboard_cap_desc_promopt',
+  imagePrompts: 'image_prompt',
+  videoPrompts: 'video_prompt_ltx',
+  quality: 'quality_score',
+  export: 'rewrite_fix'
+}
+
+const FALLBACK_TEMPLATES = [
+  { template_id: 'script_adapt', name: '剧本改编', version: 'v1', category: 'script', filename: 'script_adapt_v1.md' },
+  { template_id: 'character_extract', name: '角色提取', version: 'v1', category: 'asset', filename: 'character_extract_v1.md' },
+  { template_id: 'scene_extract', name: '场景提取', version: 'v1', category: 'asset', filename: 'scene_extract_v1.md' },
+  { template_id: 'prop_extract', name: '道具提取', version: 'v1', category: 'asset', filename: 'prop_extract_v1.md' },
+  { template_id: 'storyboard_cap_desc_promopt', name: '分镜 cap/desc_promopt', version: 'v1', category: 'storyboard', filename: 'storyboard_cap_desc_promopt_v1.md' },
+  { template_id: 'image_prompt', name: '图片提示词', version: 'v1', category: 'image', filename: 'image_prompt_v1.md' },
+  { template_id: 'video_prompt_ltx', name: 'LTX 视频提示词', version: 'v1', category: 'video', filename: 'video_prompt_ltx_v1.md' },
+  { template_id: 'video_prompt_seedance', name: 'Seedance 视频提示词', version: 'v1', category: 'video', filename: 'video_prompt_seedance_v1.md' },
+  { template_id: 'quality_score', name: '质量评分', version: 'v1', category: 'quality', filename: 'quality_score_v1.md' },
+  { template_id: 'rewrite_fix', name: '修复改写', version: 'v1', category: 'quality', filename: 'rewrite_fix_v1.md' }
 ]
 
 const steps = [
@@ -499,6 +609,8 @@ const project = ref(null)
 const projectLoading = ref(false)
 const activeStepIndex = ref(0)
 const savedStepIds = ref([])
+const promptTemplates = ref([])
+const promptTemplateLoading = ref(false)
 const workbench = ref(createDefaultWorkbench())
 
 const resolvedProjectId = computed(() => props.projectId || String(route.params.projectId || ''))
@@ -507,6 +619,23 @@ const projectTitle = computed(() => project.value?.title || `项目 ${resolvedPr
 const storageKey = computed(() => `txtovideo-workbench:${resolvedProjectId.value}`)
 const currentStep = computed(() => steps[activeStepIndex.value])
 const completionPercent = computed(() => Math.round((savedStepIds.value.length / steps.length) * 100))
+const currentTemplateId = computed(() => TEMPLATE_STEP_MAP[currentStep.value.outputKey] || '')
+const templatesForCurrentStep = computed(() => {
+  if (!currentTemplateId.value) {
+    return []
+  }
+  if (currentStep.value.id === 'videoPrompts') {
+    return promptTemplates.value.filter(template => template.category === 'video')
+  }
+  return promptTemplates.value.filter(template => template.template_id === currentTemplateId.value)
+})
+const currentPromptUsed = computed(() => {
+  const outputKey = currentStep.value.outputKey
+  if (!outputKey) {
+    return null
+  }
+  return workbench.value.promptUsed[outputKey] || null
+})
 
 const currentOutput = computed({
   get() {
@@ -540,7 +669,9 @@ const currentInputPreview = computed(() => {
       project_id: resolvedProjectId.value,
       title: projectTitle.value,
       file_name: project.value?.file_name || workbench.value.source.fileName || null,
-      genre: workbench.value.source.genre,
+      era: workbench.value.source.era,
+      style: workbench.value.source.style,
+      platform: workbench.value.source.platform,
       aspect_ratio: workbench.value.source.aspectRatio,
       duration_range: workbench.value.source.durationRange
     }))
@@ -587,6 +718,7 @@ const previewContent = computed(() => {
 const currentValidation = computed(() => validateStep(currentStep.value))
 
 onMounted(async () => {
+  await loadPromptTemplates()
   if (isWorkbenchMode.value) {
     await initialiseWorkbench()
   }
@@ -604,6 +736,9 @@ function createDefaultWorkbench() {
       text: '',
       fileName: '',
       genre: '古风权谋',
+      era: '中国古代',
+      style: '古风真人写实',
+      platform: '抖音/视频号',
       aspectRatio: '9:16',
       durationRange: '8-12 秒'
     },
@@ -624,7 +759,27 @@ function createDefaultWorkbench() {
         files: []
       })
     },
+    selectedTemplates: buildDefaultTemplateSelection(),
+    promptUsed: {},
     updatedAt: null
+  }
+}
+
+function buildDefaultTemplateSelection() {
+  return Object.fromEntries(
+    Object.entries(TEMPLATE_STEP_MAP).map(([outputKey, templateId]) => [outputKey, templateId])
+  )
+}
+
+async function loadPromptTemplates() {
+  promptTemplateLoading.value = true
+  try {
+    promptTemplates.value = await txtovideoPromptsService.listTemplates()
+  } catch (error) {
+    console.warn('提示词模板接口不可用，使用内置模板清单:', error)
+    promptTemplates.value = FALLBACK_TEMPLATES
+  } finally {
+    promptTemplateLoading.value = false
   }
 }
 
@@ -680,6 +835,11 @@ function loadDraft() {
     return {
       source: { ...fallback.source, ...(draft.workbench?.source || {}) },
       outputs: { ...fallback.outputs, ...(draft.workbench?.outputs || {}) },
+      selectedTemplates: {
+        ...fallback.selectedTemplates,
+        ...(draft.workbench?.selectedTemplates || {})
+      },
+      promptUsed: { ...fallback.promptUsed, ...(draft.workbench?.promptUsed || {}) },
       updatedAt: draft.workbench?.updatedAt || null
     }
   } catch (error) {
@@ -718,6 +878,36 @@ function handleSourceFile(uploadFile) {
     ElMessage.error('文件读取失败')
   }
   reader.readAsText(file, 'utf-8')
+}
+
+function handleTemplateChange() {
+  markStepDirty(currentStep.value.id)
+  persistDraft()
+}
+
+function getSelectedTemplate(outputKey) {
+  const selectedId = workbench.value.selectedTemplates[outputKey]
+  return promptTemplates.value.find(template => template.template_id === selectedId) || null
+}
+
+function recordPromptUsed(stepId) {
+  const step = steps.find(item => item.id === stepId)
+  if (!step?.outputKey) {
+    return
+  }
+  const template = getSelectedTemplate(step.outputKey)
+  if (!template) {
+    return
+  }
+
+  workbench.value.promptUsed[step.outputKey] = {
+    template_id: template.template_id,
+    name: template.name,
+    version: template.version,
+    category: template.category,
+    filename: template.filename,
+    used_at: new Date().toISOString()
+  }
 }
 
 function goToStep(index) {
@@ -775,6 +965,7 @@ function handleRegenerate() {
     workbench.value.outputs.export = formatJson(buildExportManifest())
   }
 
+  recordPromptUsed(stepId)
   markStepDirty(stepId)
   ElMessage.success('已生成当前步骤草稿')
 }
@@ -828,11 +1019,11 @@ function validateStep(step) {
   }
 
   if (step.id === 'imagePrompts') {
-    return validatePromptArray(parsed.value, 'negative_prompt')
+    return validatePromptArray(parsed.value, 'negative_prompt', ['positive_prompt', 'prompt_zh'])
   }
 
   if (step.id === 'videoPrompts') {
-    return validatePromptArray(parsed.value, 'ltx_avoid')
+    return validatePromptArray(parsed.value, 'avoid', ['prompt', 'prompt_zh'], ['ltx_avoid'])
   }
 
   if (step.id === 'quality') {
@@ -869,13 +1060,18 @@ function validateStoryboard(shots) {
   }
 }
 
-function validatePromptArray(items, fieldName) {
-  const missing = items.filter(item => !item.prompt_zh || !item[fieldName])
+function validatePromptArray(items, fieldName, promptFields = ['prompt_zh'], alternativeFields = []) {
+  const requiredFields = [fieldName, ...alternativeFields]
+  const missing = items.filter(item => {
+    const hasPrompt = promptFields.some(promptField => Boolean(item[promptField]))
+    const hasRequired = requiredFields.some(requiredField => Boolean(item[requiredField]))
+    return !hasPrompt || !hasRequired
+  })
   return {
     valid: items.length > 0 && missing.length === 0,
     messages: [
       `${items.length} 条提示词`,
-      missing.length ? `${missing.length} 条缺少 prompt_zh 或 ${fieldName}` : '提示词字段完整'
+      missing.length ? `${missing.length} 条缺少提示词或 ${fieldName}` : '提示词字段完整'
     ]
   }
 }
@@ -928,21 +1124,21 @@ function buildScenes() {
   return [
     {
       name: '宫门雨夜',
-      era: workbench.value.source.genre,
+      era: workbench.value.source.era,
       location: '朱红宫门外的长阶',
       atmosphere: '大雨、火把、压迫感',
       visual_anchor: '湿冷石阶、红墙、夜色火光'
     },
     {
       name: '偏殿内室',
-      era: workbench.value.source.genre,
+      era: workbench.value.source.era,
       location: '烛火摇晃的偏殿',
       atmosphere: '密谈、紧张、阴影明显',
       visual_anchor: '木案、屏风、昏黄烛光'
     },
     {
       name: '长街拂晓',
-      era: workbench.value.source.genre,
+      era: workbench.value.source.era,
       location: '空旷青石长街',
       atmosphere: '雾气、追逐、临界反转',
       visual_anchor: '青石板、晨雾、远处城楼'
@@ -1003,8 +1199,11 @@ function buildStoryboard() {
 function buildImagePrompts() {
   return safeJsonArray('storyboard', buildStoryboard()).map(shot => ({
     shot_no: shot.shot_no,
+    positive_prompt: `${shot.theme}，${shot.desc_promopt}，电视剧电影真人写实风格，东方人物，中国古代服饰，真实纹理，自然颜色，电影级摄影，浅景深，真实光照，画面清晰，情绪明确，竖屏${workbench.value.source.aspectRatio}`,
     prompt_zh: `${shot.theme}，${shot.desc_promopt}，电影级光影，真实人物，竖屏${workbench.value.source.aspectRatio}，高细节，情绪明确`,
     negative_prompt: NEGATIVE_PROMPT,
+    model_hint: 'realistic',
+    aspect_ratio: workbench.value.source.aspectRatio,
     reference_assets: {
       characters: shot.characters || [],
       scene: shot.scene,
@@ -1017,10 +1216,15 @@ function buildImagePrompts() {
 function buildVideoPrompts() {
   return safeJsonArray('storyboard', buildStoryboard()).map(shot => ({
     shot_no: shot.shot_no,
+    engine: 'ltx',
+    prompt: `${shot.cap}。${shot.camera}，人物动作连续但幅度轻，表情从克制到紧张，环境保持${shot.scene}一致。`,
     prompt_zh: `${shot.cap}。${shot.camera}，人物动作连续，表情从克制到紧张，环境保持${shot.scene}一致。`,
     camera_motion: shot.camera,
+    character_motion: '轻微动作，保持身份和服装一致',
+    scene_motion: '雨、雾、烛火、衣袖或尘埃可轻微运动',
     subject_motion: '保持单一主体动作连续，不新增人物',
     duration_seconds: shot.duration_seconds,
+    avoid: LTX_AVOID_RULES,
     ltx_avoid: LTX_AVOID_RULES,
     status: 'draft'
   }))
@@ -1031,8 +1235,8 @@ function buildQualityReport() {
   const imagePrompts = safeJsonArray('imagePrompts', [])
   const videoPrompts = safeJsonArray('videoPrompts', [])
   const storyboardValid = validateStoryboard(storyboard).valid
-  const imageValid = validatePromptArray(imagePrompts, 'negative_prompt').valid
-  const videoValid = validatePromptArray(videoPrompts, 'ltx_avoid').valid
+  const imageValid = validatePromptArray(imagePrompts, 'negative_prompt', ['positive_prompt', 'prompt_zh']).valid
+  const videoValid = validatePromptArray(videoPrompts, 'avoid', ['prompt', 'prompt_zh'], ['ltx_avoid']).valid
 
   return {
     status: storyboardValid && imageValid && videoValid ? 'ready' : 'needs_fix',
@@ -1079,10 +1283,20 @@ function buildExportManifest() {
     ],
     manifest: {
       title: projectTitle.value,
+      era: workbench.value.source.era,
+      style: workbench.value.source.style,
+      platform: workbench.value.source.platform,
       aspect_ratio: workbench.value.source.aspectRatio,
       duration_range: workbench.value.source.durationRange,
       shot_count: countJsonArray('storyboard'),
-      quality_status: readQualityStatus()
+      quality_status: readQualityStatus(),
+      prompt_template_versions: Object.fromEntries(
+        Object.entries(workbench.value.promptUsed).map(([key, prompt]) => [
+          key,
+          `${prompt.template_id}@${prompt.version}`
+        ])
+      ),
+      prompt_used: workbench.value.promptUsed
     }
   }
 }
@@ -1481,6 +1695,32 @@ function pickCamera(index) {
   border: 1px solid var(--border-primary);
   border-radius: 8px;
   background: var(--bg-primary);
+}
+
+.template-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  background: var(--bg-primary);
+}
+
+.template-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.template-box p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.5;
 }
 
 .validation-box strong {
