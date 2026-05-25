@@ -42,7 +42,10 @@ class EncryptionService:
         encryption_key = settings.API_KEY_ENCRYPTION_KEY
         
         if not encryption_key:
-            # 如果没有设置，生成一个新的密钥（仅用于开发环境）
+            if settings.ENVIRONMENT == "production":
+                raise EncryptionError(
+                    "生产环境必须设置 API_KEY_ENCRYPTION_KEY 环境变量！"
+                )
             logger.warning(
                 "API_KEY_ENCRYPTION_KEY 未设置，使用临时密钥。"
                 "生产环境必须设置此环境变量！"

@@ -69,7 +69,7 @@
       <!-- eslint-disable vue/no-v-html -->
       <div
         class="stage-text-overlay__body canvas-rich-text-content"
-        v-html="item.richTextHtml"
+        v-html="sanitizeHtml(item.richTextHtml)"
       />
       <!-- eslint-enable vue/no-v-html -->
     </div>
@@ -115,6 +115,7 @@ import {
   resolveCanvasStagePreviewText,
   resolveStageVideoPreviewTargets
 } from '@/utils/canvasStageMedia'
+import { sanitizeHtml } from '@/utils/sanitize'
 
 const props = defineProps({
   items: { type: Array, default: () => [] },

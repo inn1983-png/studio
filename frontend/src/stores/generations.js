@@ -39,42 +39,36 @@ export const useGenerationStore = defineStore('generations', () => {
     }
   }
 
-  // 创建生成任务
   const createTask = async (taskData) => {
     const task = await post('/generation/tasks', taskData)
     tasks.value.unshift(task)
     return task
   }
 
-  // 开始任务
   const startTask = async (id) => {
     const task = await post(`/generation/tasks/${id}/start`)
     updateTaskInList(task)
     return task
   }
 
-  // 暂停任务
   const pauseTask = async (id) => {
     const task = await post(`/generation/tasks/${id}/pause`)
     updateTaskInList(task)
     return task
   }
 
-  // 继续任务
   const resumeTask = async (id) => {
     const task = await post(`/generation/tasks/${id}/resume`)
     updateTaskInList(task)
     return task
   }
 
-  // 取消任务
   const cancelTask = async (id) => {
     const task = await post(`/generation/tasks/${id}/cancel`)
     updateTaskInList(task)
     return task
   }
 
-  // 删除任务
   const deleteTask = async (id) => {
     await del(`/generation/tasks/${id}`)
     tasks.value = tasks.value.filter(t => t.id !== id)
@@ -83,7 +77,6 @@ export const useGenerationStore = defineStore('generations', () => {
     }
   }
 
-  // 获取队列状态
   const fetchQueue = async () => {
     const queue_data = await get('/generation/queue')
     queue.value = queue_data

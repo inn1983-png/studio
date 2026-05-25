@@ -4,6 +4,8 @@
 
 from datetime import timedelta
 from typing import Any
+from collections import defaultdict
+import time
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -26,6 +28,25 @@ from src.api.schemas.auth import (
 )
 
 router = APIRouter()
+
+_login_failures: dict[str, list[float]] = defaultdict(list)
+LOGIN_MAX_ATTEMPTS = 5
+LOGIN_LOCKOUT_SECONDS = 900
+
+
+def _check_login_lockout(username: str):
+    now = time.time()
+    failures = _login_failures.get(username, [])
+    _login_failures[username] = [t for t in failures if now - t < LOGIN_LOCKOUT_SECONDS]
+    if len(_login_failures[username]) >= LOGIN_MAX_ATTEMPTS:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"登录失败次数过多，请{LOGIN_LOCKOUT_SECONDS // 60}分钟后再试",
+        )
+
+
+def _record_login_failure(username: str):
+    _login_failures[username].append(time.time())
 
 # OAuth2 scheme for token authentication
 oauth2_scheme = OAuth2PasswordBearer(
@@ -110,11 +131,13 @@ async def login(
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """用户登录"""
-    # 查找用户
+    _check_login_lockout(form_data.username)
+
     result = await db.execute(select(User).filter(User.username == form_data.username))
     user = result.scalar_one_or_none()
 
     if not user or not user.verify_password(form_data.password):
+        _record_login_failure(form_data.username)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="用户名或密码错误",

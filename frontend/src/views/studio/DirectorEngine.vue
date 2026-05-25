@@ -20,7 +20,7 @@
         <template #default>
           <div class="stats-content">
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <p v-html="taskCompletionStats.message" />
+            <p v-html="sanitizeHtml(taskCompletionStats.message)" />
           </div>
         </template>
       </el-alert>
@@ -256,6 +256,7 @@ import PromptDialog from '@/components/studio/PromptDialog.vue'
 import MaterialCheckDialog from '@/components/studio/MaterialCheckDialog.vue'
 import MaterialPreviewDialog from '@/components/studio/MaterialPreviewDialog.vue'
 import { DocumentChecked, Download } from '@element-plus/icons-vue'
+import { sanitizeHtml } from '@/utils/sanitize'
 
 // Props
 const props = defineProps({

@@ -17,6 +17,7 @@ from src.middleware import (
     security_middleware,
     performance_monitoring_middleware,
 )
+from src.middleware.security import rate_limit_middleware
 from src.api.v1 import api_router
 from src.api.websocket import router as websocket_router
 from src.core.config import settings
@@ -67,6 +68,7 @@ app.middleware("http")(error_handler_middleware)          # 最外层，处理�
 app.middleware("http")(performance_monitoring_middleware) # 性能监控
 app.middleware("http")(logging_middleware)                # 日志记录
 app.middleware("http")(security_middleware)               # 安全检查
+app.middleware("http")(rate_limit_middleware)             # 速率限制
 
 
 # 添加请求处理时间中间件

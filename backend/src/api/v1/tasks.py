@@ -3,7 +3,7 @@
 """
 
 from celery.result import AsyncResult
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.api.dependencies import get_current_user_required
 from src.api.schemas.task import TaskStatusResponse
@@ -14,6 +14,17 @@ from src.tasks.app import celery_app
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+
+def _verify_task_owner(task_result: AsyncResult, current_user: User):
+    task_kwargs = task_result.kwargs if hasattr(task_result, 'kwargs') else None
+    if task_kwargs and isinstance(task_kwargs, dict):
+        task_user_id = task_kwargs.get('user_id')
+        if task_user_id and str(task_user_id) != str(current_user.id) and not current_user.is_admin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="无权操作此任务"
+            )
 
 
 def safe_result(task_result: AsyncResult):
@@ -75,8 +86,7 @@ async def terminate_task(
     终止正在运行的任务
     """
     task_result = AsyncResult(task_id, app=celery_app)
-    # terminate=True allows killing the worker process if it's currently executing the task
-    # signal='SIGTERM' is usually enough
+    _verify_task_owner(task_result, current_user)
     task_result.revoke(terminate=True, signal='SIGTERM')
     return {"message": "任务终止请求已发送"}
 
