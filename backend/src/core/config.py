@@ -141,6 +141,13 @@ class Settings(BaseSettings):
             raise ValueError(f"ENVIRONMENT必须是以下之一: {valid_envs}")
         return v
 
+    @field_validator("DEBUG", mode="after")
+    @classmethod
+    def validate_debug_not_in_production(cls, v: bool, info) -> bool:
+        if info.data.get("ENVIRONMENT") == "production" and v:
+            return False
+        return v
+
     @field_validator("LOG_LEVEL", mode="before")
     @classmethod
     def validate_log_level(cls, v: str) -> str:

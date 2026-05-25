@@ -153,26 +153,29 @@ const handleSubmit = async () => {
 
   try {
     await formRef.value.validate()
-    
-    uploading.value = true
-    uploadProgress.value = 0
+  } catch {
+    return
+  }
 
-    // 模拟上传进度
-    const progressInterval = setInterval(() => {
-      if (uploadProgress.value < 90) {
-        uploadProgress.value += 10
-      }
-    }, 200)
+  uploading.value = true
+  uploadProgress.value = 0
 
+  const progressInterval = setInterval(() => {
+    if (uploadProgress.value < 90) {
+      uploadProgress.value += 10
+    }
+  }, 200)
+
+  try {
     await uploadBGM(form.file, form.name)
-    
+
     clearInterval(progressInterval)
     uploadProgress.value = 100
-    
+
     emit('success')
     emit('update:modelValue', false)
-    
   } catch (error) {
+    clearInterval(progressInterval)
     console.error('上传失败:', error)
   } finally {
     uploading.value = false

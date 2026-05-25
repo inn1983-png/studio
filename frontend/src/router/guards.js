@@ -36,7 +36,7 @@ export function setupAuthGuard(router) {
 
     // 检查邮箱验证
     if (to.meta.requiresVerified && authStore.user && !authStore.user.is_verified) {
-      next({ name: 'Profile' })
+      next({ name: 'SettingsPage' })
       return
     }
 

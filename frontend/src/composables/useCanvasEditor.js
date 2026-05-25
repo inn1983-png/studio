@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { canvasService } from '@/services/canvas'
 import { DEFAULT_ASPECT_RATIO } from '@/utils/canvasGenerationPayload'
 
@@ -391,6 +391,13 @@ export function useCanvasEditor() {
       y: Number(nextPan.y || 0)
     }
   }
+
+  onBeforeUnmount(() => {
+    for (const timer of persistTimers.values()) {
+      clearTimeout(timer)
+    }
+    persistTimers.clear()
+  })
 
   return {
     loading,

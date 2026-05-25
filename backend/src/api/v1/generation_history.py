@@ -9,6 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.database import get_db
 from src.services.generation_history_service import GenerationHistoryService
 from src.models.movie import GenerationType
+from src.models.user import User
+from src.core.security import get_current_user_required
 from src.utils.storage import get_storage_client
 from src.api.schemas.generation_history import GenerationHistoryResponse, SelectHistoryRequest
 from datetime import timedelta
@@ -23,7 +25,8 @@ router = APIRouter(prefix="/generation-history", tags=["generation-history"])
 async def get_generation_history(
     resource_type: str,
     resource_id: str,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """
     获取资源的生成历史记录
@@ -68,7 +71,8 @@ async def select_generation_history(
     resource_type: str,
     resource_id: str,
     request: SelectHistoryRequest,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """
     选择特定的历史记录作为当前使用的版本
@@ -134,75 +138,83 @@ async def _update_resource_url(db: AsyncSession, resource_type: str, resource_id
 @router.get("/scenes/{scene_id}/images", response_model=List[GenerationHistoryResponse])
 async def get_scene_image_history(
     scene_id: str,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """获取场景图历史记录"""
-    return await get_generation_history(GenerationType.SCENE_IMAGE, scene_id, db)
+    return await get_generation_history(GenerationType.SCENE_IMAGE, scene_id, db, current_user)
 
 
 @router.post("/scenes/{scene_id}/select-image")
 async def select_scene_image(
     scene_id: str,
     request: SelectHistoryRequest,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """选择场景图"""
-    return await select_generation_history(GenerationType.SCENE_IMAGE, scene_id, request, db)
+    return await select_generation_history(GenerationType.SCENE_IMAGE, scene_id, request, db, current_user)
 
 
 @router.get("/shots/{shot_id}/keyframes", response_model=List[GenerationHistoryResponse])
 async def get_keyframe_history(
     shot_id: str,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """获取关键帧历史记录"""
-    return await get_generation_history(GenerationType.SHOT_KEYFRAME, shot_id, db)
+    return await get_generation_history(GenerationType.SHOT_KEYFRAME, shot_id, db, current_user)
 
 
 @router.post("/shots/{shot_id}/select-keyframe")
 async def select_keyframe(
     shot_id: str,
     request: SelectHistoryRequest,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """选择关键帧"""
-    return await select_generation_history(GenerationType.SHOT_KEYFRAME, shot_id, request, db)
+    return await select_generation_history(GenerationType.SHOT_KEYFRAME, shot_id, request, db, current_user)
 
 
 @router.get("/characters/{character_id}/avatars", response_model=List[GenerationHistoryResponse])
 async def get_avatar_history(
     character_id: str,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """获取角色头像历史记录"""
-    return await get_generation_history(GenerationType.CHARACTER_AVATAR, character_id, db)
+    return await get_generation_history(GenerationType.CHARACTER_AVATAR, character_id, db, current_user)
 
 
 @router.post("/characters/{character_id}/select-avatar")
 async def select_avatar(
     character_id: str,
     request: SelectHistoryRequest,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """选择角色头像"""
-    return await select_generation_history(GenerationType.CHARACTER_AVATAR, character_id, request, db)
+    return await select_generation_history(GenerationType.CHARACTER_AVATAR, character_id, request, db, current_user)
 
 
 @router.get("/transitions/{transition_id}/videos", response_model=List[GenerationHistoryResponse])
 async def get_transition_video_history(
     transition_id: str,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """获取过渡视频历史记录"""
-    return await get_generation_history(GenerationType.TRANSITION_VIDEO, transition_id, db)
+    return await get_generation_history(GenerationType.TRANSITION_VIDEO, transition_id, db, current_user)
 
 
 @router.post("/transitions/{transition_id}/select-video")
 async def select_transition_video(
     transition_id: str,
     request: SelectHistoryRequest,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
 ):
     """选择过渡视频"""
-    return await select_generation_history(GenerationType.TRANSITION_VIDEO, transition_id, request, db)
+    return await select_generation_history(GenerationType.TRANSITION_VIDEO, transition_id, request, db, current_user)
 

@@ -122,28 +122,8 @@ async def rate_limit_middleware(request: Request, call_next: Callable) -> Respon
     return await call_next(request)
 
 
-async def cors_preflight_middleware(request: Request, call_next: Callable) -> Response:
-    """CORS预检请求处理中间件"""
-    if request.method == "OPTIONS":
-        from src.core.config import settings
-        response = Response()
-        origin = request.headers.get("origin", "")
-        if origin in settings.CORS_ORIGINS:
-            response.headers["Access-Control-Allow-Origin"] = origin
-        elif settings.CORS_ORIGINS and settings.CORS_ORIGINS != ["*"]:
-            response.headers["Access-Control-Allow-Origin"] = settings.CORS_ORIGINS[0]
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Accept, X-Requested-With"
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Max-Age"] = "86400"
-        return response
-
-    return await call_next(request)
-
-
 __all__ = [
     "security_middleware",
     "https_redirect_middleware",
     "rate_limit_middleware",
-    "cors_preflight_middleware",
 ]

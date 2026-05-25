@@ -92,8 +92,6 @@ async def check_account_login(
     
     # 检查cookie文件
     bilibili_service = BilibiliService(db)
-    print("Checking cookie at path: ")
-    print(account.cookie_path)
     cookie_exists = await bilibili_service.check_cookie_exists(account.cookie_path)
     
     if cookie_exists:

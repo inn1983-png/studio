@@ -13,6 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.config import settings
 from src.core.database import get_db
 from src.core.logging import logger
+from src.core.security import get_current_user_required
+from src.models.user import User
 
 router = APIRouter()
 
@@ -34,7 +36,10 @@ async def health_check():
 
 
 @router.get("/db")
-async def database_health(db: AsyncSession = Depends(get_db)):
+async def database_health(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required)
+):
     """数据库连接检查"""
     try:
         # 执行简单查询
@@ -56,7 +61,7 @@ async def database_health(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/redis")
-async def redis_health():
+async def redis_health(current_user: User = Depends(get_current_user_required)):
     """Redis连接检查"""
     if redis is None:
         raise HTTPException(status_code=503, detail="Redis client unavailable")
@@ -83,7 +88,7 @@ async def redis_health():
 
 
 @router.get("/celery")
-async def celery_health():
+async def celery_health(current_user: User = Depends(get_current_user_required)):
     """Celery健康检查"""
     try:
         from src.workers.base import app as celery_app
@@ -117,7 +122,7 @@ async def celery_health():
 
 
 @router.get("/system")
-async def system_health():
+async def system_health(current_user: User = Depends(get_current_user_required)):
     """系统资源健康检查"""
     try:
         # CPU使用率
@@ -173,7 +178,7 @@ async def system_health():
 
 
 @router.get("/detailed")
-async def detailed_health_check():
+async def detailed_health_check(current_user: User = Depends(get_current_user_required)):
     """详细健康检查"""
     start_time = time.time()
 

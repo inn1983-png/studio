@@ -132,11 +132,11 @@ async def export_chapter_video(
 async def download_exported_video(
     filename: str,
     current_user: User = Depends(get_current_user_required)
-):(lename).resov()
-    if ot str(file_path).startswith(str(Pth(tempfile.gettepdir()).resolv())):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid file path")
+):
     decoded_filename = unquote(filename)
-    file_path = Path(tempfile.gettempdir()) / decoded_filename
+    file_path = (Path(tempfile.gettempdir()) / decoded_filename).resolve()
+    if not str(file_path).startswith(str(Path(tempfile.gettempdir()).resolve())):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid file path")
 
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="文件不存在或已过期，请重新导出")
