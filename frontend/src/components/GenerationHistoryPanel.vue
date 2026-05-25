@@ -5,9 +5,15 @@
     width="800px"
     @close="handleClose"
   >
-    <div v-loading="loading" class="history-panel">
+    <div
+      v-loading="loading"
+      class="history-panel"
+    >
       <!-- 历史记录列表 -->
-      <div v-if="histories.length > 0" class="history-list">
+      <div
+        v-if="histories.length > 0"
+        class="history-list"
+      >
         <div
           v-for="history in histories"
           :key="history.id"
@@ -22,7 +28,7 @@
               :alt="history.prompt"
               class="preview-image"
               @click="handlePreview(history)"
-            />
+            >
             <video
               v-else
               :src="history.result_url"
@@ -35,7 +41,11 @@
           <!-- 信息区域 -->
           <div class="info-area">
             <div class="info-header">
-              <el-tag v-if="history.is_selected" type="success" size="small">
+              <el-tag
+                v-if="history.is_selected"
+                type="success"
+                size="small"
+              >
                 当前使用
               </el-tag>
               <span class="create-time">
@@ -44,13 +54,19 @@
             </div>
 
             <div class="prompt-text">
-              <el-text line-clamp="2" :title="history.prompt">
+              <el-text
+                line-clamp="2"
+                :title="history.prompt"
+              >
                 {{ history.prompt }}
               </el-text>
             </div>
 
             <div class="info-footer">
-              <span v-if="history.model" class="model-tag">
+              <span
+                v-if="history.model"
+                class="model-tag"
+              >
                 {{ history.model }}
               </span>
               <el-button
@@ -67,16 +83,23 @@
       </div>
 
       <!-- 空状态 -->
-      <el-empty v-else description="暂无历史记录" />
+      <el-empty
+        v-else
+        description="暂无历史记录"
+      />
     </div>
 
     <!-- 图片预览对话框 -->
-    <el-dialog v-model="previewVisible" title="预览" width="90%">
+    <el-dialog
+      v-model="previewVisible"
+      title="预览"
+      width="90%"
+    >
       <img
         v-if="previewUrl && mediaType === 'image'"
         :src="previewUrl"
         style="width: 100%"
-      />
+      >
       <video
         v-else-if="previewUrl && mediaType === 'video'"
         :src="previewUrl"

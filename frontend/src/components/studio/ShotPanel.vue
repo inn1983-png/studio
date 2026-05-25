@@ -15,10 +15,17 @@
     </div>
 
     <div class="shot-list">
-      <el-empty v-if="sceneGroups.length === 0" description="暂无分镜，请先提取分镜" />
+      <el-empty
+        v-if="sceneGroups.length === 0"
+        description="暂无分镜，请先提取分镜"
+      />
       
       <!-- 按场景分组的折叠面板 -->
-      <el-collapse v-else v-model="activeScenes" class="scene-collapse">
+      <el-collapse
+        v-else
+        v-model="activeScenes"
+        class="scene-collapse"
+      >
         <el-collapse-item 
           v-for="group in sceneGroups" 
           :key="group.scene.id"
@@ -28,20 +35,28 @@
             <div class="scene-header">
               <div class="scene-title-row">
                 <span class="scene-number">场景 {{ group.scene.order_index }}</span>
-                <el-tag size="small" type="info">{{ group.shots.length }} 个分镜</el-tag>
+                <el-tag
+                  size="small"
+                  type="info"
+                >
+                  {{ group.shots.length }} 个分镜
+                </el-tag>
                 <el-button
                   v-if="group.shots.length > 0"
                   size="small"
                   type="warning"
                   :loading="extractingScenes.has(group.scene.id)"
                   :disabled="extractingScenes.has(group.scene.id)"
-                  @click.stop="handleSingleSceneExtractClick(group.scene.id)"
                   style="margin-left: 8px"
+                  @click.stop="handleSingleSceneExtractClick(group.scene.id)"
                 >
                   {{ extractingScenes.has(group.scene.id) ? '提取中...' : '重新提取' }}
                 </el-button>
               </div>
-              <div class="scene-characters" v-if="group.scene.characters && group.scene.characters.length > 0">
+              <div
+                v-if="group.scene.characters && group.scene.characters.length > 0"
+                class="scene-characters"
+              >
                 <el-tag 
                   v-for="char in group.scene.characters" 
                   :key="char"
@@ -69,15 +84,31 @@
             >
               <div class="shot-header">
                 <span class="shot-number">镜头 {{ shot.order_index }}</span>
-                <el-tag v-if="shot.keyframe_url" type="success" size="small">已生成关键帧</el-tag>
+                <el-tag
+                  v-if="shot.keyframe_url"
+                  type="success"
+                  size="small"
+                >
+                  已生成关键帧
+                </el-tag>
               </div>
               
               <div class="shot-content">
-                <p class="shot-description">{{ shot.shot }}</p>
-                <p v-if="shot.dialogue" class="shot-dialogue">💬 {{ shot.dialogue }}</p>
+                <p class="shot-description">
+                  {{ shot.shot }}
+                </p>
+                <p
+                  v-if="shot.dialogue"
+                  class="shot-dialogue"
+                >
+                  💬 {{ shot.dialogue }}
+                </p>
                 
                 <!-- 显示分镜中的角色 -->
-                <div v-if="shot.characters && shot.characters.length > 0" class="shot-characters">
+                <div
+                  v-if="shot.characters && shot.characters.length > 0"
+                  class="shot-characters"
+                >
                   <el-tag 
                     v-for="char in shot.characters" 
                     :key="char"
@@ -104,7 +135,10 @@
     >
       <div class="warning-content">
         <div class="warning-icon">
-          <el-icon :size="60" color="#f56c6c">
+          <el-icon
+            :size="60"
+            color="#f56c6c"
+          >
             <WarningFilled />
           </el-icon>
         </div>
@@ -115,15 +149,21 @@
 
         <div class="warning-list">
           <div class="warning-item">
-            <el-icon color="#f56c6c"><Delete /></el-icon>
+            <el-icon color="#f56c6c">
+              <Delete />
+            </el-icon>
             <span>所有现有分镜脚本</span>
           </div>
           <div class="warning-item">
-            <el-icon color="#f56c6c"><Delete /></el-icon>
+            <el-icon color="#f56c6c">
+              <Delete />
+            </el-icon>
             <span>所有场景环境图</span>
           </div>
           <div class="warning-item">
-            <el-icon color="#f56c6c"><Delete /></el-icon>
+            <el-icon color="#f56c6c">
+              <Delete />
+            </el-icon>
             <span>所有关键帧图片</span>
           </div>
         </div>
@@ -141,8 +181,17 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="showWarningDialog = false" size="large">取消</el-button>
-          <el-button type="danger" @click="handleWarningConfirm" size="large">
+          <el-button
+            size="large"
+            @click="showWarningDialog = false"
+          >
+            取消
+          </el-button>
+          <el-button
+            type="danger"
+            size="large"
+            @click="handleWarningConfirm"
+          >
             <el-icon><Delete /></el-icon>
             确认删除并重新提取
           </el-button>
@@ -159,7 +208,10 @@
     >
       <div class="warning-content">
         <div class="warning-icon">
-          <el-icon :size="60" color="#e6a23c">
+          <el-icon
+            :size="60"
+            color="#e6a23c"
+          >
             <WarningFilled />
           </el-icon>
         </div>
@@ -170,11 +222,15 @@
 
         <div class="warning-list">
           <div class="warning-item">
-            <el-icon color="#e6a23c"><Delete /></el-icon>
+            <el-icon color="#e6a23c">
+              <Delete />
+            </el-icon>
             <span>该场景的所有分镜脚本</span>
           </div>
           <div class="warning-item">
-            <el-icon color="#e6a23c"><Delete /></el-icon>
+            <el-icon color="#e6a23c">
+              <Delete />
+            </el-icon>
             <span>该场景的所有关键帧图片</span>
           </div>
         </div>
@@ -192,8 +248,17 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="showSingleSceneWarning = false" size="large">取消</el-button>
-          <el-button type="warning" @click="handleSingleSceneWarningConfirm" size="large">
+          <el-button
+            size="large"
+            @click="showSingleSceneWarning = false"
+          >
+            取消
+          </el-button>
+          <el-button
+            type="warning"
+            size="large"
+            @click="handleSingleSceneWarningConfirm"
+          >
             <el-icon><Delete /></el-icon>
             确认删除并重新提取
           </el-button>
@@ -207,9 +272,16 @@
       :title="currentSceneId ? '重新提取场景分镜' : '提取分镜'"
       width="500px"
     >
-      <el-form :model="formData" label-width="100px">
+      <el-form
+        :model="formData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="formData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="formData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -238,11 +310,13 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showDialog = false">取消</el-button>
+        <el-button @click="showDialog = false">
+          取消
+        </el-button>
         <el-button 
           type="primary" 
-          @click="currentSceneId ? handleSingleSceneDialogConfirm() : handleDialogConfirm()" 
-          :disabled="!formData.apiKeyId || !formData.model"
+          :disabled="!formData.apiKeyId || !formData.model" 
+          @click="currentSceneId ? handleSingleSceneDialogConfirm() : handleDialogConfirm()"
         >
           确定
         </el-button>

@@ -421,3 +421,8 @@ grafana_data/
 
 # Configuration templates
 config/*.local.*
+
+# Electron build output
+frontend/release/
+frontend/dist-electron/
+frontend/dist/

@@ -2,17 +2,14 @@
  * 项目管理的组合式函数
  * 提供项目的通用功能，避免在多个组件中重复代码
  */
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { useProjectsStore } from '@/stores/projects'
 import projectsService from '@/services/projects'
 
 export function useProject(projectId, emit = null) {
   const router = useRouter()
-  const projectsStore = useProjectsStore()
 
-  // 响应式数据
   const refreshing = ref(false)
 
   /**

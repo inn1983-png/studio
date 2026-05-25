@@ -1,11 +1,20 @@
 <template>
   <div class="project-creator">
     <!-- 创建方式选择 -->
-    <el-tabs v-model="activeTab" class="creator-tabs">
+    <el-tabs
+      v-model="activeTab"
+      class="creator-tabs"
+    >
       <!-- 文件上传方式 -->
-      <el-tab-pane label="上传文件" name="file">
+      <el-tab-pane
+        label="上传文件"
+        name="file"
+      >
         <!-- 文件上传区域 -->
-        <div v-if="!selectedFile" class="upload-section">
+        <div
+          v-if="!selectedFile"
+          class="upload-section"
+        >
           <el-upload
             ref="uploadRef"
             class="upload-dragger"
@@ -24,14 +33,19 @@
               <div class="upload-text">
                 <h3>拖拽文件到此处上传</h3>
                 <p>或点击选择文件</p>
-                <p class="upload-hint">支持 TXT、MD、DOCX、EPUB 格式，最大 100MB</p>
+                <p class="upload-hint">
+                  支持 TXT、MD、DOCX、EPUB 格式，最大 100MB
+                </p>
               </div>
             </div>
           </el-upload>
         </div>
 
         <!-- 上传进度 -->
-        <div v-else-if="uploading" class="upload-progress">
+        <div
+          v-else-if="uploading"
+          class="upload-progress"
+        >
           <div class="progress-content">
             <el-icon class="progress-icon">
               <Loading />
@@ -40,14 +54,20 @@
               <h3>正在上传文件...</h3>
               <p>{{ selectedFile.name }}</p>
               <div class="progress-bar">
-                <el-progress :percentage="0" status="active" />
+                <el-progress
+                  :percentage="uploadProgressValue"
+                  :status="uploadProgressValue === 100 ? 'success' : 'active'"
+                />
               </div>
             </div>
           </div>
         </div>
 
         <!-- 文件信息表单 -->
-        <div v-else class="form-section">
+        <div
+          v-else
+          class="form-section"
+        >
           <!-- 文件预览卡片 -->
           <div class="file-preview">
             <div class="file-card">
@@ -55,7 +75,9 @@
                 <Document />
               </el-icon>
               <div class="file-info">
-                <div class="file-name">{{ selectedFile.name }}</div>
+                <div class="file-name">
+                  {{ selectedFile.name }}
+                </div>
                 <div class="file-meta">
                   {{ formatFileSize(selectedFile.size) }} · {{ getFileTypeText(selectedFile.name) }}
                 </div>
@@ -63,15 +85,17 @@
               <el-button
                 type="text"
                 :icon="Delete"
-                @click="removeFile"
                 class="remove-btn"
+                @click="removeFile"
               />
             </div>
           </div>
 
           <!-- 项目类型选择 -->
           <div class="type-selection">
-            <div class="selection-label">项目类型</div>
+            <div class="selection-label">
+              项目类型
+            </div>
             <div class="type-cards">
               <div 
                 class="type-card" 
@@ -79,11 +103,18 @@
                 @click="formData.type = 'picture_narrative'"
               >
                 <div class="type-img">
-                  <img src="@/assets/images/picture_narrative_type.png" alt="解说视频">
+                  <img
+                    src="@/assets/images/picture_narrative_type.png"
+                    alt="解说视频"
+                  >
                 </div>
                 <div class="type-info">
-                  <div class="type-title">解说视频</div>
-                  <div class="type-desc">图文解说，快速出片</div>
+                  <div class="type-title">
+                    解说视频
+                  </div>
+                  <div class="type-desc">
+                    图文解说，快速出片
+                  </div>
                 </div>
                 <div class="active-badge">
                   <el-icon><Check /></el-icon>
@@ -95,11 +126,18 @@
                 @click="formData.type = 'ai_movie'"
               >
                 <div class="type-img">
-                  <img src="@/assets/images/ai_movie_type.png" alt="AI电影">
+                  <img
+                    src="@/assets/images/ai_movie_type.png"
+                    alt="AI电影"
+                  >
                 </div>
                 <div class="type-info">
-                  <div class="type-title">AI 电影</div>
-                  <div class="type-desc">影视级别，角色一致</div>
+                  <div class="type-title">
+                    AI 电影
+                  </div>
+                  <div class="type-desc">
+                    影视级别，角色一致
+                  </div>
                 </div>
                 <div class="active-badge">
                   <el-icon><Check /></el-icon>
@@ -116,7 +154,10 @@
             label-position="top"
             @submit.prevent="handleSubmit"
           >
-            <el-form-item label="项目标题" prop="title">
+            <el-form-item
+              label="项目标题"
+              prop="title"
+            >
               <el-input
                 v-model="formData.title"
                 placeholder="请输入项目标题"
@@ -126,7 +167,10 @@
               />
             </el-form-item>
 
-            <el-form-item label="项目描述" prop="description">
+            <el-form-item
+              label="项目描述"
+              prop="description"
+            >
               <el-input
                 v-model="formData.description"
                 type="textarea"
@@ -144,7 +188,9 @@
             </el-form-item>
 
             <div class="form-actions">
-              <el-button @click="handleCancel">取消</el-button>
+              <el-button @click="handleCancel">
+                取消
+              </el-button>
               <el-button
                 type="primary"
                 native-type="submit"
@@ -158,10 +204,18 @@
       </el-tab-pane>
 
       <!-- 文本导入方式 -->
-      <el-tab-pane label="导入文本" name="text">
+      <el-tab-pane
+        label="导入文本"
+        name="text"
+      >
         <!-- 项目类型选择 -->
-        <div class="type-selection" style="margin-bottom: 20px;">
-          <div class="selection-label">项目类型</div>
+        <div
+          class="type-selection"
+          style="margin-bottom: 20px;"
+        >
+          <div class="selection-label">
+            项目类型
+          </div>
           <div class="type-cards">
             <div 
               class="type-card" 
@@ -169,11 +223,18 @@
               @click="textFormData.type = 'picture_narrative'"
             >
               <div class="type-img">
-                <img src="@/assets/images/picture_narrative_type.png" alt="解说视频">
+                <img
+                  src="@/assets/images/picture_narrative_type.png"
+                  alt="解说视频"
+                >
               </div>
               <div class="type-info">
-                <div class="type-title">解说视频</div>
-                <div class="type-desc">图文解说，快速出片</div>
+                <div class="type-title">
+                  解说视频
+                </div>
+                <div class="type-desc">
+                  图文解说，快速出片
+                </div>
               </div>
               <div class="active-badge">
                 <el-icon><Check /></el-icon>
@@ -185,11 +246,18 @@
               @click="textFormData.type = 'ai_movie'"
             >
               <div class="type-img">
-                <img src="@/assets/images/ai_movie_type.png" alt="AI电影">
+                <img
+                  src="@/assets/images/ai_movie_type.png"
+                  alt="AI电影"
+                >
               </div>
               <div class="type-info">
-                <div class="type-title">AI 电影</div>
-                <div class="type-desc">影视级别，角色一致</div>
+                <div class="type-title">
+                  AI 电影
+                </div>
+                <div class="type-desc">
+                  影视级别，角色一致
+                </div>
               </div>
               <div class="active-badge">
                 <el-icon><Check /></el-icon>
@@ -205,7 +273,10 @@
           label-position="top"
           @submit.prevent="handleTextSubmit"
         >
-          <el-form-item label="项目标题" prop="title">
+          <el-form-item
+            label="项目标题"
+            prop="title"
+          >
             <el-input
               v-model="textFormData.title"
               placeholder="请输入项目标题"
@@ -215,7 +286,10 @@
             />
           </el-form-item>
 
-          <el-form-item label="项目描述" prop="description">
+          <el-form-item
+            label="项目描述"
+            prop="description"
+          >
             <el-input
               v-model="textFormData.description"
               type="textarea"
@@ -226,7 +300,10 @@
             />
           </el-form-item>
 
-          <el-form-item label="文本内容" prop="content">
+          <el-form-item
+            label="文本内容"
+            prop="content"
+          >
             <el-input
               v-model="textFormData.content"
               type="textarea"
@@ -243,7 +320,9 @@
           </div>
 
           <div class="form-actions">
-            <el-button @click="handleCancel">取消</el-button>
+            <el-button @click="handleCancel">
+              取消
+            </el-button>
             <el-button
               type="primary"
               native-type="submit"
@@ -261,7 +340,7 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { UploadFilled, Document, Delete, Loading, Check, VideoCamera, Collection } from '@element-plus/icons-vue'
+import { UploadFilled, Document, Delete, Loading, Check } from '@element-plus/icons-vue'
 import { fileService } from '@/services/upload'
 import { projectsService } from '@/services/projects'
 
@@ -290,6 +369,7 @@ const submitting = ref(false)
 const selectedFile = ref(null)
 const uploadedFileInfo = ref(null)
 const activeTab = ref('file')
+const uploadProgressValue = ref(0)
 
 // 文件上传表单数据
 const formData = reactive({
@@ -375,13 +455,13 @@ const handleFileChange = async (file) => {
   try {
     selectedFile.value = file.raw
     uploading.value = true
+    uploadProgressValue.value = 0
 
-    // 创建FormData并上传文件
     const uploadFormData = new FormData()
     uploadFormData.append('file', file.raw)
 
     const uploadResult = await fileService.uploadFile(uploadFormData, (percent) => {
-      console.log(`上传进度: ${percent}%`)
+      uploadProgressValue.value = percent
     })
 
     if (uploadResult.success) {

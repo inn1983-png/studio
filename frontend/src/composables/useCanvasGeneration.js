@@ -69,16 +69,6 @@ export function useCanvasGeneration(updateItem, getItemById = () => null) {
     }
   }
 
-  const syncItemFromGeneration = (item, generation) => {
-    updateItem(item.id, {
-      content: applyGenerationResultToContent(item.item_type, item.content, generation.result_payload || {}),
-      last_run_status: generation.status,
-      last_run_error: generation.error_message || null,
-      last_output: generation.result_payload || {},
-      is_persisted: true
-    })
-  }
-
   const parseSseBlock = (block) => {
     const lines = block
       .split(/\r?\n/)
@@ -113,6 +103,7 @@ export function useCanvasGeneration(updateItem, getItemById = () => null) {
 
   const processSseBuffer = (buffer, onEvent) => {
     let nextBuffer = buffer
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const separatorIndex = nextBuffer.indexOf('\n\n')
       if (separatorIndex < 0) {
@@ -152,6 +143,7 @@ export function useCanvasGeneration(updateItem, getItemById = () => null) {
       const reader = response.body.getReader()
       let buffer = ''
 
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read()
         if (done) {
@@ -251,6 +243,7 @@ export function useCanvasGeneration(updateItem, getItemById = () => null) {
       const reader = response.body.getReader()
       let buffer = ''
 
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read()
         if (done) {

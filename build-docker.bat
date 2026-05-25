@@ -1,20 +1,20 @@
 @echo off
 REM ==========================================
-REM AICG平台 - Docker镜像构建脚本 (Windows)
+REM Txtovideo Studio - Docker镜像构建脚本 (Windows)
 REM ==========================================
 
 setlocal enabledelayedexpansion
 
 REM 配置
-set IMAGE_REGISTRY=aicg
+set IMAGE_REGISTRY=txtovideo
 if not "%IMAGE_REGISTRY%"=="" set IMAGE_REGISTRY=%IMAGE_REGISTRY%
 set VERSION=latest
 if not "%VERSION%"=="" set VERSION=%VERSION%
-set BACKEND_IMAGE=%IMAGE_REGISTRY%/aicg-backend:%VERSION%
-set FRONTEND_IMAGE=%IMAGE_REGISTRY%/aicg-frontend:%VERSION%
+set BACKEND_IMAGE=%IMAGE_REGISTRY%/txtovideo-backend:%VERSION%
+set FRONTEND_IMAGE=%IMAGE_REGISTRY%/txtovideo-frontend:%VERSION%
 
 echo ========================================
-echo AICG平台 - Docker镜像构建
+echo Txtovideo Studio - Docker镜像构建
 echo ========================================
 echo.
 
@@ -62,7 +62,7 @@ echo 🎉 所有镜像构建完成！
 echo ========================================
 echo.
 echo 构建的镜像:
-docker images | findstr "%IMAGE_REGISTRY%/aicg"
+docker images | findstr "%IMAGE_REGISTRY%/txtovideo"
 echo.
 
 REM 提示下一步操作
@@ -78,8 +78,8 @@ echo    docker push %BACKEND_IMAGE%
 echo    docker push %FRONTEND_IMAGE%
 echo.
 echo 3. 标记为其他版本:
-echo    docker tag %BACKEND_IMAGE% %IMAGE_REGISTRY%/aicg-backend:v1.0.0
-echo    docker tag %FRONTEND_IMAGE% %IMAGE_REGISTRY%/aicg-frontend:v1.0.0
+echo    docker tag %BACKEND_IMAGE% %IMAGE_REGISTRY%/txtovideo-backend:v1.0.0
+echo    docker tag %FRONTEND_IMAGE% %IMAGE_REGISTRY%/txtovideo-frontend:v1.0.0
 echo.
 
 endlocal

@@ -1,5 +1,8 @@
 <template>
-  <div v-if="visible && position" class="connection-actions">
+  <div
+    v-if="visible && position"
+    class="connection-actions"
+  >
     <button
       class="connection-control-btn"
       type="button"

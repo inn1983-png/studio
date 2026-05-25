@@ -4,7 +4,9 @@
     class="link-create-menu"
     :style="{ left: `${screenX}px`, top: `${screenY}px` }"
   >
-    <div class="link-create-menu__header">{{ title }}</div>
+    <div class="link-create-menu__header">
+      {{ title }}
+    </div>
     <button
       v-for="option in options"
       :key="option.type"

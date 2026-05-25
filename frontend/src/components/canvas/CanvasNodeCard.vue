@@ -6,41 +6,63 @@
     @mousedown.left.stop="$emit('drag-start', $event)"
     @click.stop="$emit('select')"
   >
-    <button class="node-handle input" @click.stop="$emit('complete-connection')">
-      <span></span>
+    <button
+      class="node-handle input"
+      @click.stop="$emit('complete-connection')"
+    >
+      <span />
     </button>
-    <button class="node-handle output" @click.stop="$emit('start-connection')">
-      <span></span>
+    <button
+      class="node-handle output"
+      @click.stop="$emit('start-connection')"
+    >
+      <span />
     </button>
 
     <div class="node-header">
       <div>
-        <div class="node-type">{{ typeLabel }}</div>
-        <div class="node-title">{{ item.title || '未命名节点' }}</div>
+        <div class="node-type">
+          {{ typeLabel }}
+        </div>
+        <div class="node-title">
+          {{ item.title || '未命名节点' }}
+        </div>
       </div>
-      <span class="node-status" :class="statusClass">{{ statusLabel }}</span>
+      <span
+        class="node-status"
+        :class="statusClass"
+      >{{ statusLabel }}</span>
     </div>
 
     <div class="node-body">
-      <p v-if="item.item_type === 'text'" class="node-text">
+      <p
+        v-if="item.item_type === 'text'"
+        class="node-text"
+      >
         {{ item.content.text || item.content.draft_text || item.content.text_preview || item.content.prompt || '输入 prompt 后生成文本内容' }}
       </p>
 
-      <div v-else-if="item.item_type === 'image'" class="media-preview">
+      <div
+        v-else-if="item.item_type === 'image'"
+        class="media-preview"
+      >
         <img
           v-if="item.content.result_image_url || item.content.reference_image_url"
           :src="item.content.result_image_url || item.content.reference_image_url"
           alt="image preview"
-        />
+        >
         <span v-else>生成图片或上传参考图</span>
       </div>
 
-      <div v-else class="media-preview video">
+      <div
+        v-else
+        class="media-preview video"
+      >
         <video
           v-if="item.content.result_video_url"
           :src="item.content.result_video_url"
           controls
-        ></video>
+        />
         <span v-else>生成视频后会在这里预览</span>
       </div>
     </div>

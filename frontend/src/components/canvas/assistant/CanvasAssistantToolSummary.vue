@@ -1,20 +1,36 @@
 <template>
-  <section class="assistant-activity" data-testid="assistant-tool-summary">
+  <section
+    class="assistant-activity"
+    data-testid="assistant-tool-summary"
+  >
     <div class="assistant-activity__header">
       <div>
-        <div class="assistant-activity__eyebrow">Workflow activity</div>
-        <h3 class="assistant-activity__title">{{ summaryText }}</h3>
+        <div class="assistant-activity__eyebrow">
+          Workflow activity
+        </div>
+        <h3 class="assistant-activity__title">
+          {{ summaryText }}
+        </h3>
       </div>
-      <span class="assistant-activity__badge" :class="{ 'assistant-activity__badge--live': live || runningToolCount > 0 }">
+      <span
+        class="assistant-activity__badge"
+        :class="{ 'assistant-activity__badge--live': live || runningToolCount > 0 }"
+      >
         {{ live || runningToolCount > 0 ? `执行中 ${Math.max(1, runningToolCount)}` : '已同步' }}
       </span>
     </div>
 
-    <div v-if="thinkingBuffer" class="assistant-activity__thinking">
+    <div
+      v-if="thinkingBuffer"
+      class="assistant-activity__thinking"
+    >
       {{ thinkingBuffer }}
     </div>
 
-    <div v-if="toolCalls.length" class="assistant-activity__list">
+    <div
+      v-if="toolCalls.length"
+      class="assistant-activity__list"
+    >
       <article
         v-for="toolCall in toolCalls"
         :key="toolCall.id"
@@ -22,11 +38,19 @@
         :class="{ 'assistant-tool-card--running': toolCall.status !== 'completed' }"
       >
         <div class="assistant-tool-card__header">
-          <span class="assistant-tool-card__dot" :class="`assistant-tool-card__dot--${toolCall.status || 'completed'}`"></span>
+          <span
+            class="assistant-tool-card__dot"
+            :class="`assistant-tool-card__dot--${toolCall.status || 'completed'}`"
+          />
           <strong>{{ toolCall.toolName || 'unknown_tool' }}</strong>
           <span class="assistant-tool-card__status">{{ readStatusLabel(toolCall.status) }}</span>
         </div>
-        <div v-if="readToolSummary(toolCall)" class="assistant-tool-card__summary">{{ readToolSummary(toolCall) }}</div>
+        <div
+          v-if="readToolSummary(toolCall)"
+          class="assistant-tool-card__summary"
+        >
+          {{ readToolSummary(toolCall) }}
+        </div>
       </article>
     </div>
   </section>

@@ -2,8 +2,8 @@
   <div class="auth-layout">
     <!-- 背景装饰 -->
     <div class="auth-background">
-      <div class="background-pattern"></div>
-      <div class="gradient-overlay"></div>
+      <div class="background-pattern" />
+      <div class="gradient-overlay" />
     </div>
 
     <!-- 主要内容 -->
@@ -14,21 +14,29 @@
           <el-icon class="logo-icon">
             <VideoCamera />
           </el-icon>
-          <span class="logo-text">AICG</span>
+          <span class="logo-text">{{ brandStore.logoText }}</span>
         </div>
         <h1 class="auth-title">
           <span v-if="title">{{ title }}</span>
-          <span v-else>AI内容生成平台</span>
+          <span v-else>{{ brandStore.appDescription }}</span>
         </h1>
-        <p v-if="subtitle" class="auth-subtitle">{{ subtitle }}</p>
+        <p class="auth-subtitle">
+          {{ subtitle || `登录您的账户继续使用${brandStore.appDescription}` }}
+        </p>
       </div>
 
       <!-- 表单内容 -->
       <div class="auth-content">
         <div class="form-container">
           <router-view v-slot="{ Component, route }">
-            <transition name="fade" mode="out-in">
-              <component :is="Component" :key="route.path" />
+            <transition
+              name="fade"
+              mode="out-in"
+            >
+              <component
+                :is="Component"
+                :key="route.path"
+              />
             </transition>
           </router-view>
         </div>
@@ -37,14 +45,23 @@
       <!-- 底部链接 -->
       <div class="auth-footer">
         <div class="footer-links">
-          <a href="#" class="footer-link">使用条款</a>
+          <a
+            href="#"
+            class="footer-link"
+          >使用条款</a>
           <span class="separator">·</span>
-          <a href="#" class="footer-link">隐私政策</a>
+          <a
+            href="#"
+            class="footer-link"
+          >隐私政策</a>
           <span class="separator">·</span>
-          <a href="#" class="footer-link">帮助中心</a>
+          <a
+            href="#"
+            class="footer-link"
+          >帮助中心</a>
         </div>
         <div class="copyright">
-          © 2024 AICG Platform. All rights reserved.
+          {{ brandStore.copyright }}
         </div>
       </div>
     </div>
@@ -53,8 +70,10 @@
 
 <script setup>
 import { VideoCamera } from '@element-plus/icons-vue'
+import { useBrandStore } from '@/stores/brand'
 
-// Props
+const brandStore = useBrandStore()
+
 defineProps({
   title: {
     type: String,

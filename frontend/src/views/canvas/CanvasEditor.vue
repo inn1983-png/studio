@@ -1,6 +1,12 @@
 <template>
-  <section class="canvas-editor-page" v-loading="loading">
-    <div ref="stageShellRef" class="canvas-stage-shell">
+  <section
+    v-loading="loading"
+    class="canvas-editor-page"
+  >
+    <div
+      ref="stageShellRef"
+      class="canvas-stage-shell"
+    >
       <KonvaCanvasStage
         :items="items"
         :connections="connections"
@@ -204,12 +210,10 @@ import CanvasTextStudio from '@/components/canvas/CanvasTextStudio.vue'
 
   const {
     loading,
-    saving,
     document,
     items,
     connections,
     selectedItemIds,
-    selectedItemId,
     selectedItem,
     zoom,
     pan,
@@ -706,7 +710,7 @@ import CanvasTextStudio from '@/components/canvas/CanvasTextStudio.vue'
       if (item && ['text', 'image'].includes(item.item_type)) {
         references.push(buildReferenceItem(item))
       }
-      ;(reverseConnectionMap.value.get(currentId) || []).forEach(
+      (reverseConnectionMap.value.get(currentId) || []).forEach(
         (upstreamId) => {
           if (!visited.has(upstreamId)) {
             queue.push(upstreamId)

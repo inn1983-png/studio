@@ -2,19 +2,22 @@
   <el-dialog
     title="新建电影合成任务"
     :model-value="modelValue"
-    @update:model-value="$emit('update:modelValue', $event)"
     width="600px"
     :close-on-click-modal="false"
+    @update:model-value="$emit('update:modelValue', $event)"
   >
     <el-form
       ref="formRef"
+      v-loading="loading"
       :model="form"
       :rules="rules"
       label-width="100px"
-      v-loading="loading"
     >
       <!-- 选择章节 -->
-      <el-form-item label="选择章节" prop="chapter_id">
+      <el-form-item
+        label="选择章节"
+        prop="chapter_id"
+      >
         <el-select
           v-model="form.chapter_id"
           placeholder="请选择已完成电影制作的章节"
@@ -41,27 +44,58 @@
         </div>
       </el-form-item>
 
-      <el-divider content-position="left">生成设置</el-divider>
+      <el-divider content-position="left">
+        生成设置
+      </el-divider>
 
-      <el-form-item label="分辨率" prop="gen_setting.resolution">
-        <el-select v-model="form.gen_setting.resolution" style="width: 100%">
-          <el-option label="竖屏 9:16 (1080x1920)" value="1080x1920" />
-          <el-option label="横屏 16:9 (1920x1080)" value="1920x1080" />
-          <el-option label="方形 1:1 (1080x1080)" value="1080x1080" />
+      <el-form-item
+        label="分辨率"
+        prop="gen_setting.resolution"
+      >
+        <el-select
+          v-model="form.gen_setting.resolution"
+          style="width: 100%"
+        >
+          <el-option
+            label="竖屏 9:16 (1080x1920)"
+            value="1080x1920"
+          />
+          <el-option
+            label="横屏 16:9 (1920x1080)"
+            value="1920x1080"
+          />
+          <el-option
+            label="方形 1:1 (1080x1080)"
+            value="1080x1080"
+          />
         </el-select>
       </el-form-item>
 
-      <el-form-item label="帧率" prop="gen_setting.fps">
+      <el-form-item
+        label="帧率"
+        prop="gen_setting.fps"
+      >
         <el-radio-group v-model="form.gen_setting.fps">
-          <el-radio-button :label="24">24 FPS</el-radio-button>
-          <el-radio-button :label="30">30 FPS</el-radio-button>
-          <el-radio-button :label="60">60 FPS</el-radio-button>
+          <el-radio-button :label="24">
+            24 FPS
+          </el-radio-button>
+          <el-radio-button :label="30">
+            30 FPS
+          </el-radio-button>
+          <el-radio-button :label="60">
+            60 FPS
+          </el-radio-button>
         </el-radio-group>
       </el-form-item>
 
       <el-collapse v-model="activeCollapse">
-        <el-collapse-item title="高级设置" name="advanced">
-          <el-divider content-position="left">背景音乐</el-divider>
+        <el-collapse-item
+          title="高级设置"
+          name="advanced"
+        >
+          <el-divider content-position="left">
+            背景音乐
+          </el-divider>
           <el-form-item label="BGM选择">
             <el-select 
               v-model="form.bgm_id" 
@@ -80,7 +114,10 @@
             <span class="form-tip">为视频添加背景音乐，将与原音频混合</span>
           </el-form-item>
 
-          <el-form-item label="BGM音量" v-if="form.bgm_id">
+          <el-form-item
+            v-if="form.bgm_id"
+            label="BGM音量"
+          >
             <el-slider 
               v-model="bgmVolumeDisplay" 
               :min="0" 
@@ -93,13 +130,16 @@
           </el-form-item>
         </el-collapse-item>
       </el-collapse>
-
     </el-form>
 
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="$emit('update:modelValue', false)">取消</el-button>
-        <el-button type="primary" @click="submitForm" :loading="submitting">
+        <el-button
+          type="primary"
+          :loading="submitting"
+          @click="submitForm"
+        >
           开始合成
         </el-button>
       </span>
@@ -115,8 +155,14 @@ import bgmService from '@/services/bgm'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps({
-  modelValue: Boolean,
-  chapterId: String  // 可选的预填充章节ID
+  modelValue: {
+    type: Boolean,
+    default: false
+  },
+  chapterId: {
+    type: String,
+    default: ''
+  }
 })
 
 const emit = defineEmits(['update:modelValue', 'success'])

@@ -1,14 +1,18 @@
 <template>
   <div class="workflow-stepper">
-    <el-steps :active="currentStep" align-center finish-status="success">
+    <el-steps
+      :active="currentStep"
+      align-center
+      finish-status="success"
+    >
       <el-step 
         v-for="(step, index) in steps" 
         :key="index"
         :title="step.title"
         :description="step.description"
         :icon="step.icon"
-        @click="handleStepClick(index)"
         class="clickable-step"
+        @click="handleStepClick(index)"
       />
     </el-steps>
   </div>
@@ -17,7 +21,7 @@
 <script setup>
 import { VideoCamera, Film, Camera, Picture, Connection, Check } from '@element-plus/icons-vue'
 
-const props = defineProps({
+defineProps({
   currentStep: {
     type: Number,
     default: 0

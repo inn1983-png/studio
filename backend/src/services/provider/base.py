@@ -1,7 +1,5 @@
-# src/services/providers/base.py
-
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from functools import wraps
 import json
 import time
@@ -11,19 +9,13 @@ logger = get_logger(__name__)
 
 
 def log_provider_call(method_name: str):
-    """
-    Provider方法调用日志装饰器
-    记录请求参数和响应结果,方便调试
-    """
     def decorator(func):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
-            # 记录请求开始
             start_time = time.time()
-            base_url = self.base_url
+            base_url = getattr(self, 'base_url', 'unknown')
             provider_name = self.__class__.__name__
-            
-            # 构建请求日志
+
             request_info = {
                 "provider": provider_name,
                 "method": method_name,
@@ -31,38 +23,26 @@ def log_provider_call(method_name: str):
                 "kwargs": _sanitize_for_log(kwargs),
                 "base_url": base_url
             }
-            
+
             logger.info(f"[{provider_name}] {method_name} 请求开始")
             logger.info(f"[{provider_name}] {method_name} 请求参数: {json.dumps(request_info, ensure_ascii=False, indent=2)}")
-            
+
             try:
-                # 执行实际方法
                 result = await func(self, *args, **kwargs)
-                
-                # 计算耗时
                 elapsed = time.time() - start_time
-                
-                # 记录响应
                 logger.info(f"[{provider_name}] {method_name} 请求成功 (耗时: {elapsed:.2f}s)")
                 logger.info(f"[{provider_name}] {method_name} 响应摘要: {_get_response_summary(result)}")
-                
                 return result
-                
             except Exception as e:
-                # 计算耗时
                 elapsed = time.time() - start_time
-                
-                # 记录错误
                 logger.error(f"[{provider_name}] {method_name} 请求失败 (耗时: {elapsed:.2f}s): {e}")
-                
                 raise
-                
+
         return wrapper
     return decorator
 
 
 def _sanitize_for_log(data: Any, max_length: int = 200) -> Any:
-    """清理数据用于日志输出,避免敏感信息和过长内容"""
     if isinstance(data, dict):
         return {k: _sanitize_for_log(v, max_length) for k, v in data.items()}
     elif isinstance(data, (list, tuple)):
@@ -76,7 +56,6 @@ def _sanitize_for_log(data: Any, max_length: int = 200) -> Any:
 
 
 def _get_response_summary(response: Any) -> str:
-    """获取响应摘要,避免日志过长"""
     try:
         if hasattr(response, '__dict__'):
             attrs = {k: v for k, v in response.__dict__.items() if not k.startswith('_')}
@@ -92,12 +71,7 @@ def _get_response_summary(response: Any) -> str:
 
 
 class BaseLLMProvider(ABC):
-    """
-    纯粹 LLM Provider 接口。
-    不参杂任何业务、文本处理、拼接逻辑。
-
-    所有 Provider 都必须实现 completions() 方法。
-    """
+    provider_type: str = "llm"
 
     @abstractmethod
     async def completions(
@@ -106,22 +80,50 @@ class BaseLLMProvider(ABC):
             messages: List[Dict[str, Any]],
             **kwargs: Any
     ) -> Any:
-        """
-        LLM 的 completions 调用（纯粹透传）
-        """
         pass
 
-    @abstractmethod
     async def generate_image(
             self,
             prompt: str,
             model: str = None,
             **kwargs: Any
     ) -> Any:
-        """
-        生成图像的调用（纯粹透传）
-        """
+        raise NotImplementedError(f"{self.__class__.__name__} 不支持图像生成")
+
+    async def generate_audio(
+            self,
+            input_text: str,
+            voice: str = "alloy",
+            model: str = "tts-1",
+            **kwargs: Any
+    ) -> Any:
+        raise NotImplementedError(f"{self.__class__.__name__} 不支持音频生成")
+
+
+class BaseVideoProvider(ABC):
+    provider_type: str = "video"
+
+    @abstractmethod
+    async def create_video(
+            self,
+            prompt: str,
+            images: Optional[List[str]] = None,
+            model: str = None,
+            **kwargs: Any
+    ) -> Dict[str, Any]:
         pass
+
+    @abstractmethod
+    async def get_task_status(self, task_id: str) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    async def get_video_content(self, task_id: str) -> Dict[str, Any]:
+        pass
+
+
+class BaseTTSProvider(ABC):
+    provider_type: str = "tts"
 
     @abstractmethod
     async def generate_audio(
@@ -131,7 +133,31 @@ class BaseLLMProvider(ABC):
             model: str = "tts-1",
             **kwargs: Any
     ) -> Any:
-        """
-        生成音频的调用（纯粹透传）
-        """
         pass
+
+
+class BaseImageProvider(ABC):
+    provider_type: str = "image"
+
+    @abstractmethod
+    async def generate_image(
+            self,
+            prompt: str,
+            model: str = None,
+            **kwargs: Any
+    ) -> Any:
+        pass
+
+
+_PROVIDER_REGISTRY: Dict[str, type] = {}
+
+
+def register_provider(name: str):
+    def decorator(cls):
+        _PROVIDER_REGISTRY[name.lower()] = cls
+        return cls
+    return decorator
+
+
+def get_registered_providers() -> Dict[str, type]:
+    return dict(_PROVIDER_REGISTRY)

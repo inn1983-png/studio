@@ -3,9 +3,16 @@
     <h2>偏好设置</h2>
     <p>自定义应用程序的外观和行为</p>
 
-    <el-form :model="preferencesForm" label-width="120px" class="preferences-form">
+    <el-form
+      :model="preferencesForm"
+      label-width="120px"
+      class="preferences-form"
+    >
       <el-form-item label="主题模式">
-        <el-radio-group v-model="preferencesForm.theme" @change="savePreferences">
+        <el-radio-group
+          v-model="preferencesForm.theme"
+          @change="savePreferences"
+        >
           <el-radio label="light">
             <div class="preference-option">
               <el-icon><Sunny /></el-icon>
@@ -27,8 +34,14 @@
           placeholder="选择界面语言"
           @change="savePreferences"
         >
-          <el-option label="简体中文" value="zh-CN" />
-          <el-option label="English" value="en-US" />
+          <el-option
+            label="简体中文"
+            value="zh-CN"
+          />
+          <el-option
+            label="English"
+            value="en-US"
+          />
         </el-select>
       </el-form-item>
 
@@ -38,10 +51,22 @@
           placeholder="选择时区"
           @change="savePreferences"
         >
-          <el-option label="Asia/Shanghai" value="Asia/Shanghai" />
-          <el-option label="UTC" value="UTC" />
-          <el-option label="America/New_York" value="America/New_York" />
-          <el-option label="Europe/London" value="Europe/London" />
+          <el-option
+            label="Asia/Shanghai"
+            value="Asia/Shanghai"
+          />
+          <el-option
+            label="UTC"
+            value="UTC"
+          />
+          <el-option
+            label="America/New_York"
+            value="America/New_York"
+          />
+          <el-option
+            label="Europe/London"
+            value="Europe/London"
+          />
         </el-select>
       </el-form-item>
 

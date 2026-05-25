@@ -24,34 +24,64 @@
           size="small"
           clearable
         >
-          <el-option label="全部" value="" />
-          <el-option label="已确认" value="confirmed" />
-          <el-option label="未确认" value="unconfirmed" />
+          <el-option
+            label="全部"
+            value=""
+          />
+          <el-option
+            label="已确认"
+            value="confirmed"
+          />
+          <el-option
+            label="未确认"
+            value="unconfirmed"
+          />
         </el-select>
         <el-select
           v-model="sortBy"
           placeholder="排序方式"
           size="small"
         >
-          <el-option label="章节序号" value="chapter_number" />
-          <el-option label="创建时间" value="created_at" />
-          <el-option label="更新时间" value="updated_at" />
+          <el-option
+            label="章节序号"
+            value="chapter_number"
+          />
+          <el-option
+            label="创建时间"
+            value="created_at"
+          />
+          <el-option
+            label="更新时间"
+            value="updated_at"
+          />
         </el-select>
       </div>
     </div>
 
-    <div v-if="loading && !chapters.length" class="nav-loading">
-      <el-skeleton :rows="5" animated />
+    <div
+      v-if="loading && !chapters.length"
+      class="nav-loading"
+    >
+      <el-skeleton
+        :rows="5"
+        animated
+      />
     </div>
 
-    <div v-else-if="filteredChapters.length === 0" class="nav-empty">
-      <el-empty description="暂无章节" :image-size="80" />
+    <div
+      v-else-if="filteredChapters.length === 0"
+      class="nav-empty"
+    >
+      <el-empty
+        description="暂无章节"
+        :image-size="80"
+      />
     </div>
 
     <div 
       v-else 
-      class="nav-list" 
-      ref="navListRef"
+      ref="navListRef" 
+      class="nav-list"
       @scroll="handleScroll"
     >
       <div
@@ -61,9 +91,13 @@
         :class="{ 'is-selected': chapter.id === selectedId }"
         @click="$emit('select', chapter.id)"
       >
-        <div class="chapter-number">{{ chapter.chapter_number }}</div>
+        <div class="chapter-number">
+          {{ chapter.chapter_number }}
+        </div>
         <div class="chapter-info">
-          <div class="chapter-title">{{ chapter.title }}</div>
+          <div class="chapter-title">
+            {{ chapter.title }}
+          </div>
           <div class="chapter-meta">
             <span>{{ chapter.paragraph_count || 0 }} 段落</span>
             <span>{{ chapter.word_count || 0 }} 字</span>
@@ -79,9 +113,14 @@
             已确认
           </el-tag>
         </div>
-        <div class="chapter-actions" @click.stop>
+        <div
+          class="chapter-actions"
+          @click.stop
+        >
           <el-dropdown trigger="click">
-            <el-icon class="action-icon"><MoreFilled /></el-icon>
+            <el-icon class="action-icon">
+              <MoreFilled />
+            </el-icon>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="$emit('edit', chapter)">
@@ -102,7 +141,10 @@
                   <el-icon><MagicStick /></el-icon>
                   进入导演引擎
                 </el-dropdown-item>
-                <el-dropdown-item @click="$emit('delete', chapter)" divided>
+                <el-dropdown-item
+                  divided
+                  @click="$emit('delete', chapter)"
+                >
                   <el-icon><Delete /></el-icon>
                   删除
                 </el-dropdown-item>
@@ -112,10 +154,18 @@
         </div>
       </div>
       
-      <div v-if="loading && chapters.length" class="loading-more">
-        <el-icon class="is-loading"><Loading /></el-icon> 加载中...
+      <div
+        v-if="loading && chapters.length"
+        class="loading-more"
+      >
+        <el-icon class="is-loading">
+          <Loading />
+        </el-icon> 加载中...
       </div>
-      <div v-if="!hasMore && filteredChapters.length > 0" class="no-more">
+      <div
+        v-if="!hasMore && filteredChapters.length > 0"
+        class="no-more"
+      >
         没有更多了
       </div>
     </div>
@@ -199,11 +249,6 @@ const handleScroll = useThrottleFn((e) => {
     }
   }
 }, 200)
-
-// 处理加载更多
-const handleLoadMore = () => {
-  emit('load-more')
-}
 </script>
 
 <style scoped>

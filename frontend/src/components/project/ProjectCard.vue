@@ -1,14 +1,25 @@
 <template>
-  <div class="project-card" @click="$emit('view', project)">
+  <div
+    class="project-card"
+    @click="$emit('view', project)"
+  >
     <!-- 卡片头部 -->
     <div class="card-header">
       <div class="file-icon">
-        <el-icon :size="24" :color="getFileTypeColor(project.file_type)">
+        <el-icon
+          :size="24"
+          :color="getFileTypeColor(project.file_type)"
+        >
           <component :is="getFileTypeIcon(project.file_type)" />
         </el-icon>
       </div>
-      <div class="card-title">{{ project.title }}</div>
-      <div v-if="project.type" class="type-tag">
+      <div class="card-title">
+        {{ project.title }}
+      </div>
+      <div
+        v-if="project.type"
+        class="type-tag"
+      >
         <el-tag
           :type="project.type === 'ai_movie' ? 'primary' : 'success'"
           size="small"
@@ -25,10 +36,16 @@
       <!-- 文件信息 -->
       <div class="file-info">
         <div class="info-item">
-          <el-text size="small" type="info">
+          <el-text
+            size="small"
+            type="info"
+          >
             {{ project.file_type?.toUpperCase() || '-' }}
           </el-text>
-          <el-text size="small" type="info">
+          <el-text
+            size="small"
+            type="info"
+          >
             {{ projectsStore.formatFileSize(project.file_size) }}
           </el-text>
         </div>
@@ -37,16 +54,37 @@
       <!-- 统计信息 -->
       <div class="stats-info">
         <div class="stat-item">
-          <el-text size="small">{{ projectsStore.formatNumber(project.word_count) }}</el-text>
-          <el-text size="small" type="info">字数</el-text>
+          <el-text size="small">
+            {{ projectsStore.formatNumber(project.word_count) }}
+          </el-text>
+          <el-text
+            size="small"
+            type="info"
+          >
+            字数
+          </el-text>
         </div>
         <div class="stat-item">
-          <el-text size="small">{{ projectsStore.formatNumber(project.paragraph_count) }}</el-text>
-          <el-text size="small" type="info">段落</el-text>
+          <el-text size="small">
+            {{ projectsStore.formatNumber(project.paragraph_count) }}
+          </el-text>
+          <el-text
+            size="small"
+            type="info"
+          >
+            段落
+          </el-text>
         </div>
         <div class="stat-item">
-          <el-text size="small">{{ projectsStore.formatNumber(project.chapter_count) }}</el-text>
-          <el-text size="small" type="info">章节</el-text>
+          <el-text size="small">
+            {{ projectsStore.formatNumber(project.chapter_count) }}
+          </el-text>
+          <el-text
+            size="small"
+            type="info"
+          >
+            章节
+          </el-text>
         </div>
       </div>
 
@@ -59,13 +97,19 @@
         >
           {{ projectsStore.getStatusText(project.status) }}
         </el-tag>
-        <el-text size="small" type="info">
+        <el-text
+          size="small"
+          type="info"
+        >
           {{ projectsStore.formatDateTime(project.updated_at) }}
         </el-text>
       </div>
 
       <!-- 处理进度条 -->
-      <div v-if="project.status === 'parsing' || project.status === 'generating'" class="progress-section">
+      <div
+        v-if="project.status === 'parsing' || project.status === 'generating'"
+        class="progress-section"
+      >
         <el-progress
           :percentage="project.processing_progress || 0"
           :show-text="false"
@@ -77,7 +121,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import {
   Document,
   VideoPlay,
@@ -88,7 +131,7 @@ import {
 import { useProjectsStore } from '@/stores/projects'
 
 // Props定义
-const props = defineProps({
+defineProps({
   project: {
     type: Object,
     required: true
@@ -99,7 +142,7 @@ const props = defineProps({
 const projectsStore = useProjectsStore()
 
 // Emits定义
-const emit = defineEmits([
+defineEmits([
   'view'
 ])
 

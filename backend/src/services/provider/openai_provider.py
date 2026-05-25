@@ -5,11 +5,12 @@ from typing import Any, Dict, List
 from openai import AsyncOpenAI
 
 from src.core.logging import get_logger
-from src.services.provider.base import BaseLLMProvider, log_provider_call
+from src.services.provider.base import BaseLLMProvider, log_provider_call, register_provider
 
 logger = get_logger(__name__)
 
 
+@register_provider("openai")
 class OpenAIProvider(BaseLLMProvider):
     """
     纯净 OpenAI Provider，不含任何业务逻辑。

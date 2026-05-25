@@ -19,21 +19,6 @@ const normalizeMessageTimelineItem = (message = {}, fallbackOrder = 0) => ({
   }
 })
 
-const normalizeActivityTimelineItem = (activity = {}, fallbackOrder = 0) => ({
-  id: String(activity.id || `activity-${fallbackOrder}`).trim(),
-  type: 'activity',
-  order: readOrder(activity.order, fallbackOrder),
-  activity: {
-    id: String(activity.id || `activity-${fallbackOrder}`).trim(),
-    activityType: 'tool',
-    title: String(activity.title || '').trim(),
-    toolName: String(activity.toolName || '').trim(),
-    status: String(activity.status || 'completed').trim() || 'completed',
-    args: activity.args ?? null,
-    result: activity.result ?? null
-  }
-})
-
 const normalizeToolSummaryItem = (
   { thinkingBuffer = '', toolCalls = [], order = 0 } = {},
   fallbackOrder = 0

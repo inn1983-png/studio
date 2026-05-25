@@ -16,7 +16,12 @@ class Settings(BaseSettings):
     # =============================================================================
     # 应用基础配置
     # =============================================================================
-    APP_NAME: str = "AICG Platform"
+    APP_NAME: str = "Txtovideo Studio"
+    APP_DESCRIPTION: str = "小说转短剧智能创作工作站"
+    APP_LOGO_TEXT: str = "Txtovideo"
+    APP_COPYRIGHT: str = "© 2024-2026 Txtovideo Studio. All rights reserved."
+    APP_SERVICE_NAME: str = "txtovideo-backend"
+    APP_CELERY_NAME: str = "txtovideo"
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     API_V1_PREFIX: str = "/api/v1"
@@ -27,6 +32,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:3001", 
+        "http://localhost:5173",
         "http://localhost:8080"
     ]
     ALLOWED_HOSTS: List[str] = ["*"]
@@ -35,7 +41,7 @@ class Settings(BaseSettings):
     # 数据库配置
     # =============================================================================
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://aicg_user:aicg_password@localhost:5432/aicg_platform",
+        default="postgresql+asyncpg://postgres:postgres@localhost:5432/txtovideo_studio",
         env="DATABASE_URL"
     )
     DATABASE_POOL_PRE_PING: bool = True
@@ -61,11 +67,11 @@ class Settings(BaseSettings):
     # JWT配置
     # =============================================================================
     JWT_SECRET_KEY: str = Field(
-        default="your-super-secret-jwt-key-change-in-production",
+        default="dev-only-jwt-secret-key",
         env="JWT_SECRET_KEY"
     )
     JWT_ALGORITHM: str = "HS256"
-    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7天 (7 * 24 * 60)
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
     # =============================================================================
     # 加密配置
@@ -83,13 +89,13 @@ class Settings(BaseSettings):
     MINIO_ACCESS_KEY: str = Field(default="minioadmin", env="MINIO_ACCESS_KEY")
     MINIO_SECRET_KEY: str = Field(default="minioadmin", env="MINIO_SECRET_KEY")
     MINIO_SECURE: bool = False
-    MINIO_BUCKET_NAME: str = "aicg-files"
+    MINIO_BUCKET_NAME: str = "txtovideo-files"
     MINIO_REGION: str = "us-east-1"
 
     # =============================================================================
     # 头像上传配置
     # =============================================================================
-    AVATAR_BUCKET_NAME: str = "aicg-avatars"
+    AVATAR_BUCKET_NAME: str = "txtovideo-avatars"
     MAX_AVATAR_SIZE: int = 5 * 1024 * 1024  # 5MB
     ALLOWED_AVATAR_TYPES: List[str] = ["jpg", "jpeg", "png", "webp"]
     AVATAR_DEFAULT_SIZE: tuple = (200, 200)
@@ -101,6 +107,10 @@ class Settings(BaseSettings):
     STRUCTURED_LOGGING: bool = True
     LOG_FILE: Optional[str] = None
     COLORED_LOGS: bool = True
+
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_WINDOW: int = 60
+    RATE_LIMIT_REQUESTS: int = 100
 
     # =============================================================================
     # 验证器

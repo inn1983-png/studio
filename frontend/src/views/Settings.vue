@@ -3,10 +3,14 @@
     <!-- 页面头部信息 -->
     <div class="page-header">
       <h1 class="page-title">
-        <el-icon class="title-icon"><Setting /></el-icon>
+        <el-icon class="title-icon">
+          <Setting />
+        </el-icon>
         系统设置
       </h1>
-      <p class="page-description">管理您的账户和应用程序设置</p>
+      <p class="page-description">
+        管理您的账户和应用程序设置
+      </p>
     </div>
 
     <div class="settings-content">
@@ -16,8 +20,8 @@
             <el-menu
               :default-active="activeTab"
               mode="vertical"
-              @select="handleMenuSelect"
               class="settings-nav"
+              @select="handleMenuSelect"
             >
               <el-menu-item index="profile">
                 <el-icon><User /></el-icon>
@@ -31,13 +35,24 @@
                 <el-icon><Setting /></el-icon>
                 <span>偏好设置</span>
               </el-menu-item>
+              <el-menu-item index="brand">
+                <el-icon><PriceTag /></el-icon>
+                <span>品牌配置</span>
+              </el-menu-item>
+              <el-menu-item index="system">
+                <el-icon><Monitor /></el-icon>
+                <span>系统参数</span>
+              </el-menu-item>
             </el-menu>
           </div>
         </el-col>
 
         <el-col :span="16">
           <div class="settings-panel">
-            <Transition name="fade" mode="out-in">
+            <Transition
+              name="fade"
+              mode="out-in"
+            >
               <component :is="currentTabComponent" />
             </Transition>
           </div>
@@ -49,10 +64,12 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Setting, User, Lock } from '@element-plus/icons-vue'
+import { Setting, User, Lock, PriceTag, Monitor } from '@element-plus/icons-vue'
 import ProfileSettings from './settings/ProfileSettings.vue'
 import AccountSettings from './settings/AccountSettings.vue'
 import PreferenceSettings from './settings/PreferenceSettings.vue'
+import BrandSettings from './settings/BrandSettings.vue'
+import SystemSettings from './settings/SystemSettings.vue'
 
 const activeTab = ref('profile')
 
@@ -64,6 +81,10 @@ const currentTabComponent = computed(() => {
       return AccountSettings
     case 'preferences':
       return PreferenceSettings
+    case 'brand':
+      return BrandSettings
+    case 'system':
+      return SystemSettings
     default:
       return ProfileSettings
   }

@@ -20,8 +20,9 @@ from src.models.project import Project, ProjectStatus
 from src.models.publish_task import BilibiliAccount, PublishTask, PublishStatus, PublishPlatform
 from src.models.sentence import Sentence, SentenceStatus
 from src.models.user import User
-from src.models.movie import MovieCharacter, MovieScript, MovieScene, MovieShot, ScriptStatus
+from src.models.movie import MovieCharacter, MovieProp, MovieScript, MovieScene, MovieShot, ScriptStatus
 from src.models.video_task import VideoTask, VideoTaskStatus
+from src.models.task_status import TaskStatus, TaskPriority, can_transition, validate_transition, get_retry_delay
 
 __all__ = [
     "Base",
@@ -54,8 +55,14 @@ __all__ = [
     "PublishPlatform",
     "BilibiliAccount",
     "MovieCharacter",
+    "MovieProp",
     "MovieScript",
     "MovieScene",
     "MovieShot",
     "ScriptStatus",
+    "TaskStatus",
+    "TaskPriority",
+    "can_transition",
+    "validate_transition",
+    "get_retry_delay",
 ]

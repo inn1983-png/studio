@@ -1,38 +1,68 @@
 <template>
   <div class="canvas-workbench-layout">
-    <div class="canvas-topbar" :class="{ 'is-assistant-expanded': assistantExpanded }">
-      <button class="brand-chip" type="button" @click="$emit('back')">
+    <div
+      class="canvas-topbar"
+      :class="{ 'is-assistant-expanded': assistantExpanded }"
+    >
+      <button
+        class="brand-chip"
+        type="button"
+        @click="$emit('back')"
+      >
         <span class="brand-chip__title">{{ title }}</span>
       </button>
     </div>
 
     <aside class="left-toolbar-panel">
-      <el-dropdown trigger="click" placement="right-start" popper-class="canvas-create-dropdown" @command="handleMenuCommand">
-        <button class="toolbar-btn toolbar-btn--primary" type="button" :disabled="creatingItem">
+      <el-dropdown
+        trigger="click"
+        placement="right-start"
+        popper-class="canvas-create-dropdown"
+        @command="handleMenuCommand"
+      >
+        <button
+          class="toolbar-btn toolbar-btn--primary"
+          type="button"
+          :disabled="creatingItem"
+        >
           <el-icon><Plus /></el-icon>
         </button>
         <template #dropdown>
           <el-dropdown-menu>
             <div class="canvas-dropdown-header">
-              <el-icon class="header-icon"><Plus /></el-icon>
+              <el-icon class="header-icon">
+                <Plus />
+              </el-icon>
               <span>新建节点类型</span>
             </div>
             <el-dropdown-item command="text">
               <div class="canvas-dropdown-item">
-                <div class="item-title">文本节点</div>
-                <div class="item-desc">创建文本内容节点</div>
+                <div class="item-title">
+                  文本节点
+                </div>
+                <div class="item-desc">
+                  创建文本内容节点
+                </div>
               </div>
             </el-dropdown-item>
             <el-dropdown-item command="image">
               <div class="canvas-dropdown-item">
-                <div class="item-title">图片节点</div>
-                <div class="item-desc">创建图片内容节点</div>
+                <div class="item-title">
+                  图片节点
+                </div>
+                <div class="item-desc">
+                  创建图片内容节点
+                </div>
               </div>
             </el-dropdown-item>
             <el-dropdown-item command="video">
               <div class="canvas-dropdown-item">
-                <div class="item-title">视频节点</div>
-                <div class="item-desc">创建视频内容节点</div>
+                <div class="item-title">
+                  视频节点
+                </div>
+                <div class="item-desc">
+                  创建视频内容节点
+                </div>
               </div>
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -40,13 +70,28 @@
       </el-dropdown>
 
       <div class="toolbar-icons-group">
-        <button class="toolbar-btn" type="button" :disabled="creatingItem" @click="$emit('create-item', 'text')">
+        <button
+          class="toolbar-btn"
+          type="button"
+          :disabled="creatingItem"
+          @click="$emit('create-item', 'text')"
+        >
           <el-icon><Document /></el-icon>
         </button>
-        <button class="toolbar-btn" type="button" :disabled="creatingItem" @click="$emit('create-item', 'image')">
+        <button
+          class="toolbar-btn"
+          type="button"
+          :disabled="creatingItem"
+          @click="$emit('create-item', 'image')"
+        >
           <el-icon><Picture /></el-icon>
         </button>
-        <button class="toolbar-btn" type="button" :disabled="creatingItem" @click="$emit('create-item', 'video')">
+        <button
+          class="toolbar-btn"
+          type="button"
+          :disabled="creatingItem"
+          @click="$emit('create-item', 'video')"
+        >
           <el-icon><VideoPlay /></el-icon>
         </button>
       </div>
@@ -58,20 +103,38 @@
       </div>
     </aside>
 
-    <div v-if="showLauncher" class="canvas-launcher">
+    <div
+      v-if="showLauncher"
+      class="canvas-launcher"
+    >
       <div class="launcher-chip">
         <el-icon><MagicStick /></el-icon>
         <span>从这里开始搭建你的画布</span>
       </div>
 
       <div class="launcher-actions">
-        <button class="launcher-action" type="button" :disabled="creatingItem" @click="$emit('create-item', 'text')">
+        <button
+          class="launcher-action"
+          type="button"
+          :disabled="creatingItem"
+          @click="$emit('create-item', 'text')"
+        >
           文本节点
         </button>
-        <button class="launcher-action" type="button" :disabled="creatingItem" @click="$emit('create-item', 'image')">
+        <button
+          class="launcher-action"
+          type="button"
+          :disabled="creatingItem"
+          @click="$emit('create-item', 'image')"
+        >
           图片节点
         </button>
-        <button class="launcher-action" type="button" :disabled="creatingItem" @click="$emit('create-item', 'video')">
+        <button
+          class="launcher-action"
+          type="button"
+          :disabled="creatingItem"
+          @click="$emit('create-item', 'video')"
+        >
           视频节点
         </button>
       </div>
@@ -84,10 +147,15 @@
           <span>{{ zoomText }}</span>
         </div>
       </div>
-      <div class="zoom-hint">{{ zoomHintText }}</div>
+      <div class="zoom-hint">
+        {{ zoomHintText }}
+      </div>
     </div>
 
-    <div v-if="linkModeText" class="link-mode-toast">
+    <div
+      v-if="linkModeText"
+      class="link-mode-toast"
+    >
       {{ linkModeText }}
     </div>
   </div>
@@ -96,7 +164,7 @@
 <script setup>
 import { Document, MagicStick, Operation, Picture, Plus, VideoPlay } from '@element-plus/icons-vue'
 
-const props = defineProps({
+defineProps({
   title: { type: String, default: '' },
   zoomHintText: { type: String, default: '' },
   zoomText: { type: String, default: '画布提示' },

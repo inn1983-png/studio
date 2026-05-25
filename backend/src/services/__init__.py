@@ -7,7 +7,7 @@
 # from .video_generator import VideoGeneratorService
 # from .timeline_service import TimelineService
 # from .subtitle_service import SubtitleService
-# from .avatar import AvatarService
+from .avatar import AvatarService
 from .base import BaseService
 from .chapter import ChapterService
 from .chapter_content_parser import ChapterContentParser, chapter_content_parser

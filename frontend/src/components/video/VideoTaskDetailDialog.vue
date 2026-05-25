@@ -2,11 +2,14 @@
   <el-dialog
     title="任务详情"
     :model-value="modelValue"
-    @update:model-value="$emit('update:modelValue', $event)"
     width="700px"
     destroy-on-close
+    @update:model-value="$emit('update:modelValue', $event)"
   >
-    <div v-loading="loading" class="detail-container">
+    <div
+      v-loading="loading"
+      class="detail-container"
+    >
       <template v-if="task">
         <!-- 基本信息 -->
         <div class="info-section">
@@ -43,21 +46,45 @@
             :stroke-width="10"
           />
           <div class="progress-steps">
-            <el-steps :active="getActiveStep(task.status)" finish-status="success" align-center>
-              <el-step title="准备" description="验证素材" />
-              <el-step title="字幕" description="生成字幕" />
-              <el-step title="合成" description="视频合成" />
-              <el-step title="完成" description="上传结果" />
+            <el-steps
+              :active="getActiveStep(task.status)"
+              finish-status="success"
+              align-center
+            >
+              <el-step
+                title="准备"
+                description="验证素材"
+              />
+              <el-step
+                title="字幕"
+                description="生成字幕"
+              />
+              <el-step
+                title="合成"
+                description="视频合成"
+              />
+              <el-step
+                title="完成"
+                description="上传结果"
+              />
             </el-steps>
           </div>
-          <div class="current-action" v-if="task.status !== 'completed' && task.status !== 'failed'">
-            <el-icon class="is-loading"><Loading /></el-icon>
+          <div
+            v-if="task.status !== 'completed' && task.status !== 'failed'"
+            class="current-action"
+          >
+            <el-icon class="is-loading">
+              <Loading />
+            </el-icon>
             {{ getProgressText(task) }}
           </div>
         </div>
 
         <!-- 错误信息 -->
-        <div v-if="task.status === 'failed'" class="error-section">
+        <div
+          v-if="task.status === 'failed'"
+          class="error-section"
+        >
           <el-alert
             title="任务失败"
             type="error"
@@ -68,11 +95,18 @@
         </div>
 
         <!-- 视频预览 -->
-        <div v-if="task.status === 'completed' && task.video_url" class="video-section">
+        <div
+          v-if="task.status === 'completed' && task.video_url"
+          class="video-section"
+        >
           <div class="video-header">
             <span>生成结果</span>
             <div class="video-actions">
-              <el-button type="primary" link @click="downloadVideo">
+              <el-button
+                type="primary"
+                link
+                @click="downloadVideo"
+              >
                 <el-icon><Download /></el-icon> 下载视频
               </el-button>
             </div>
@@ -86,7 +120,10 @@
               您的浏览器不支持视频播放
             </video>
           </div>
-          <div class="video-info" v-if="task.video_duration">
+          <div
+            v-if="task.video_duration"
+            class="video-info"
+          >
             时长: {{ formatDuration(task.video_duration) }}
           </div>
         </div>
@@ -94,7 +131,10 @@
         <!-- 生成设置 -->
         <div class="settings-section">
           <el-collapse>
-            <el-collapse-item title="生成参数配置" name="1">
+            <el-collapse-item
+              title="生成参数配置"
+              name="1"
+            >
               <pre class="json-viewer">{{ JSON.stringify(getGenSetting(task), null, 2) }}</pre>
             </el-collapse-item>
           </el-collapse>
@@ -105,17 +145,23 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useVideoTasks } from '@/composables/useVideoTasks'
 import { formatDate } from '@/utils/dateUtils'
 import { Loading, Download } from '@element-plus/icons-vue'
 
 const props = defineProps({
-  modelValue: Boolean,
-  taskId: String
+  modelValue: {
+    type: Boolean,
+    default: false
+  },
+  taskId: {
+    type: String,
+    default: ''
+  }
 })
 
-const emit = defineEmits(['update:modelValue'])
+defineEmits(['update:modelValue'])
 
 const { fetchTaskById } = useVideoTasks()
 const loading = ref(false)

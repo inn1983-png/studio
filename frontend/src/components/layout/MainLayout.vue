@@ -7,13 +7,20 @@
     />
 
     <!-- 主内容区 -->
-    <div class="main-container" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
+    <div
+      class="main-container"
+      :class="{ 'sidebar-collapsed': sidebarCollapsed }"
+    >
       <!-- 顶部导航栏 - 类似PageNavigation的设计 -->
       <header class="app-header">
         <div class="header-content">
           <!-- 左侧：面包屑导航 -->
           <div class="header-left">
-            <nav class="breadcrumb-nav" aria-label="面包屑导航" v-if="breadcrumbs.length > 0">
+            <nav
+              v-if="breadcrumbs.length > 0"
+              class="breadcrumb-nav"
+              aria-label="面包屑导航"
+            >
               <ol class="breadcrumb-list">
                 <li
                   v-for="(item, index) in breadcrumbs"
@@ -26,22 +33,39 @@
                     :to="item.path"
                     class="breadcrumb-link"
                   >
-                    <el-icon v-if="item.icon" class="breadcrumb-icon">
+                    <el-icon
+                      v-if="item.icon"
+                      class="breadcrumb-icon"
+                    >
                       <component :is="item.icon" />
                     </el-icon>
                     <span class="breadcrumb-text">{{ item.title }}</span>
                   </router-link>
 
-                  <span v-else class="breadcrumb-current">
-                    <el-icon v-if="item.icon" class="breadcrumb-icon">
+                  <span
+                    v-else
+                    class="breadcrumb-current"
+                  >
+                    <el-icon
+                      v-if="item.icon"
+                      class="breadcrumb-icon"
+                    >
                       <component :is="item.icon" />
                     </el-icon>
                     <span class="breadcrumb-text">{{ item.title }}</span>
                   </span>
 
-                  <span v-if="index < breadcrumbs.length - 1" class="breadcrumb-separator">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                  <span
+                    v-if="index < breadcrumbs.length - 1"
+                    class="breadcrumb-separator"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                    >
+                      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
                     </svg>
                   </span>
                 </li>
@@ -52,7 +76,10 @@
           <!-- 右侧：操作区域 -->
           <div class="header-right">
             <!-- 页面特定的操作区域 -->
-            <div v-if="headerActions.length > 0" class="header-actions">
+            <div
+              v-if="headerActions.length > 0"
+              class="header-actions"
+            >
               <el-button
                 v-for="action in headerActions"
                 :key="action.text"
@@ -68,9 +95,16 @@
 
             <!-- 用户信息 -->
             <div class="user-section">
-              <el-dropdown @command="handleUserAction" trigger="click">
+              <el-dropdown
+                trigger="click"
+                @command="handleUserAction"
+              >
                 <div class="user-info">
-                  <el-avatar :size="36" :src="user?.avatar_url" class="user-avatar">
+                  <el-avatar
+                    :size="36"
+                    :src="user?.avatar_url"
+                    class="user-avatar"
+                  >
                     <el-icon><User /></el-icon>
                   </el-avatar>
                   <div class="user-details">
@@ -87,7 +121,10 @@
                       <el-icon><Setting /></el-icon>
                       <span>系统设置</span>
                     </el-dropdown-item>
-                    <el-dropdown-item divided command="logout">
+                    <el-dropdown-item
+                      divided
+                      command="logout"
+                    >
                       <el-icon><SwitchButton /></el-icon>
                       <span>退出登录</span>
                     </el-dropdown-item>
@@ -102,9 +139,15 @@
       <!-- 页面内容 -->
       <main class="main-content">
         <div class="content-wrapper">
-          <router-view v-slot="{ Component, route }">
-            <transition name="fade" mode="out-in">
-              <component :is="Component" :key="route.path" />
+          <router-view v-slot="{ Component, route: currentRoute }">
+            <transition
+              name="fade"
+              mode="out-in"
+            >
+              <component
+                :is="Component"
+                :key="currentRoute.path"
+              />
             </transition>
           </router-view>
         </div>
@@ -114,7 +157,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, inject } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage } from 'element-plus'

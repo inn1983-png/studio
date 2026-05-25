@@ -1,4 +1,4 @@
-name: aicon-gpu
+name: txtovideo-gpu
 channels:
   - defaults
 dependencies:

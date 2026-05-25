@@ -2,10 +2,10 @@
   <el-dialog
     :title="title || '视频预览'"
     :model-value="modelValue"
-    @update:model-value="$emit('update:modelValue', $event)"
     width="800px"
     destroy-on-close
     append-to-body
+    @update:model-value="$emit('update:modelValue', $event)"
   >
     <div class="preview-container">
       <video 
@@ -20,7 +20,10 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="$emit('update:modelValue', false)">关闭</el-button>
-        <el-button type="primary" @click="downloadVideo">
+        <el-button
+          type="primary"
+          @click="downloadVideo"
+        >
           <el-icon><Download /></el-icon> 下载
         </el-button>
       </span>
@@ -32,9 +35,18 @@
 import { Download } from '@element-plus/icons-vue'
 
 const props = defineProps({
-  modelValue: Boolean,
-  videoUrl: String,
-  title: String
+  modelValue: {
+    type: Boolean,
+    default: false
+  },
+  videoUrl: {
+    type: String,
+    default: ''
+  },
+  title: {
+    type: String,
+    default: ''
+  }
 })
 
 defineEmits(['update:modelValue'])

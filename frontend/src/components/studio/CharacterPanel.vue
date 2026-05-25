@@ -23,28 +23,55 @@
     </div>
 
     <div class="character-list">
-      <el-empty v-if="characters.length === 0" description="暂无角色，请先提取角色" />
+      <el-empty
+        v-if="characters.length === 0"
+        description="暂无角色，请先提取角色"
+      />
       
-      <div v-else class="character-grid">
+      <div
+        v-else
+        class="character-grid"
+      >
         <div 
           v-for="char in characters" 
           :key="char.id"
           class="character-card"
         >
-          <div class="character-avatar" @click="handleImagePreview(char.avatar_url)">
-            <img v-if="char.avatar_url" :src="char.avatar_url" :alt="char.name" />
-            <div v-else class="avatar-placeholder">
-              <el-icon :size="40"><User /></el-icon>
+          <div
+            class="character-avatar"
+            @click="handleImagePreview(char.avatar_url)"
+          >
+            <img
+              v-if="char.avatar_url"
+              :src="char.avatar_url"
+              :alt="char.name"
+            >
+            <div
+              v-else
+              class="avatar-placeholder"
+            >
+              <el-icon :size="40">
+                <User />
+              </el-icon>
             </div>
-            <div v-if="char.avatar_url" class="preview-overlay">
-              <el-icon :size="24"><ZoomIn /></el-icon>
+            <div
+              v-if="char.avatar_url"
+              class="preview-overlay"
+            >
+              <el-icon :size="24">
+                <ZoomIn />
+              </el-icon>
             </div>
           </div>
           
           <div class="character-info">
             <h4>{{ char.name }}</h4>
-            <p class="role">{{ char.role_description }}</p>
-            <p class="traits">{{ char.visual_traits }}</p>
+            <p class="role">
+              {{ char.role_description }}
+            </p>
+            <p class="traits">
+              {{ char.visual_traits }}
+            </p>
           </div>
 
           <!-- 参考图画廊 -->
@@ -59,16 +86,28 @@
                 accept="image/*"
                 :on-change="(file) => handleUploadReferenceImage(char.id, file)"
               >
-                <el-button type="primary" size="small" icon="Plus" circle />
+                <el-button
+                  type="primary"
+                  size="small"
+                  icon="Plus"
+                  circle
+                />
               </el-upload>
             </div>
-            <div v-if="char.reference_images && char.reference_images.length > 0" class="gallery-images">
+            <div
+              v-if="char.reference_images && char.reference_images.length > 0"
+              class="gallery-images"
+            >
               <div 
                 v-for="(imgUrl, index) in char.reference_images" 
                 :key="index"
                 class="gallery-item"
               >
-                <img :src="imgUrl" :alt="`参考图${index + 1}`" @click="handleImagePreview(imgUrl)" />
+                <img
+                  :src="imgUrl"
+                  :alt="`参考图${index + 1}`"
+                  @click="handleImagePreview(imgUrl)"
+                >
                 <el-button
                   class="delete-btn"
                   type="danger"
@@ -136,9 +175,16 @@
       :title="dialogTitle"
       width="500px"
     >
-      <el-form :model="formData" label-width="100px">
+      <el-form
+        :model="formData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="formData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="formData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -165,7 +211,10 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogType === 'generate' || dialogType === 'regenerate'" label="提示词">
+        <el-form-item
+          v-if="dialogType === 'generate' || dialogType === 'regenerate'"
+          label="提示词"
+        >
           <el-input 
             v-model="formData.prompt" 
             type="textarea"
@@ -173,10 +222,18 @@
             placeholder="可选，留空使用默认提示词"
           />
         </el-form-item>
-        <el-form-item v-if="dialogType === 'generate' || dialogType === 'regenerate'" label="参考图">
+        <el-form-item
+          v-if="dialogType === 'generate' || dialogType === 'regenerate'"
+          label="参考图"
+        >
           <div class="reference-image-section">
-            <div v-if="currentCharacter && currentCharacter.reference_images && currentCharacter.reference_images.length > 0" class="existing-references">
-              <div class="section-label">选择参考图（最多3张）:</div>
+            <div
+              v-if="currentCharacter && currentCharacter.reference_images && currentCharacter.reference_images.length > 0"
+              class="existing-references"
+            >
+              <div class="section-label">
+                选择参考图（最多3张）:
+              </div>
               <div class="reference-options">
                 <div 
                   v-for="(imgUrl, index) in currentCharacter.reference_images" 
@@ -185,23 +242,48 @@
                   :class="{ selected: formData.selectedReferenceIndices?.includes(index) }"
                   @click="toggleReferenceSelection(index)"
                 >
-                  <img :src="imgUrl" :alt="`参考图${index + 1}`" />
-                  <el-icon v-if="formData.selectedReferenceIndices?.includes(index)" class="check-icon"><Check /></el-icon>
-                  <div v-if="formData.selectedReferenceIndices?.includes(index)" class="selection-badge">
+                  <img
+                    :src="imgUrl"
+                    :alt="`参考图${index + 1}`"
+                  >
+                  <el-icon
+                    v-if="formData.selectedReferenceIndices?.includes(index)"
+                    class="check-icon"
+                  >
+                    <Check />
+                  </el-icon>
+                  <div
+                    v-if="formData.selectedReferenceIndices?.includes(index)"
+                    class="selection-badge"
+                  >
                     {{ formData.selectedReferenceIndices.indexOf(index) + 1 }}
                   </div>
                 </div>
               </div>
             </div>
-            <div v-else class="no-references">
-              <el-empty description="暂无参考图，请在角色卡片上上传" :image-size="60" />
+            <div
+              v-else
+              class="no-references"
+            >
+              <el-empty
+                description="暂无参考图，请在角色卡片上上传"
+                :image-size="60"
+              />
             </div>
           </div>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showDialog = false">取消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm" :disabled="!formData.apiKeyId || !formData.model">确定</el-button>
+        <el-button @click="showDialog = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :disabled="!formData.apiKeyId || !formData.model"
+          @click="handleDialogConfirm"
+        >
+          确定
+        </el-button>
       </template>
     </el-dialog>
 
@@ -225,7 +307,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { User, ZoomIn, Clock, Check, Delete } from '@element-plus/icons-vue'
+import { User, ZoomIn, Clock, Check } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import GenerationHistoryPanel from '@/components/GenerationHistoryPanel.vue'
 import api from '@/services/api'
@@ -299,7 +381,7 @@ const handleShowHistory = (characterId) => {
   showHistory.value = true
 }
 
-const handleHistorySelected = async (history) => {
+const handleHistorySelected = async () => {
   ElMessage.success('已切换到选中的历史版本')
   emit('refresh')
 }

@@ -351,6 +351,13 @@ class APIKeyService(BaseService):
             else:  # text
                 return ['gemini-3.1-flash-lite-preview','gemini-3.1-pro-preview']
         
+        elif provider == 'local':
+            if model_type == "text":
+                return ['qwen3', 'qwen2.5', 'llama3', 'mistral', 'deepseek-r1']
+            elif model_type == "image":
+                return []
+            return []
+
         # Other provider defaults
         elif provider == 'openai':
             if model_type == "image":

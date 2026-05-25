@@ -5,11 +5,12 @@ from typing import Any, Dict, List
 from openai import AsyncOpenAI
 
 from src.core.logging import get_logger
-from .base import BaseLLMProvider, log_provider_call
+from .base import BaseLLMProvider, log_provider_call, register_provider
 
 logger = get_logger(__name__)
 
 
+@register_provider("deepseek")
 class DeepSeekProvider(BaseLLMProvider):
     """
     DeepSeek 官方 API，兼容 OpenAI Protocol

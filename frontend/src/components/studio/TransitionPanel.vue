@@ -23,9 +23,15 @@
     </div>
 
     <div class="transition-list">
-      <el-empty v-if="transitions.length === 0" description="暂无过渡，请先创建过渡" />
+      <el-empty
+        v-if="transitions.length === 0"
+        description="暂无过渡，请先创建过渡"
+      />
       
-      <div v-else class="transition-grid">
+      <div
+        v-else
+        class="transition-grid"
+      >
         <div 
           v-for="transition in transitions" 
           :key="transition.id"
@@ -91,8 +97,14 @@
           
           <div class="transition-content">
             <!-- 场景信息 -->
-            <div v-if="transition.from_shot && transition.to_shot" class="scene-info">
-              <el-tag size="small" type="info">
+            <div
+              v-if="transition.from_shot && transition.to_shot"
+              class="scene-info"
+            >
+              <el-tag
+                size="small"
+                type="info"
+              >
                 场景 {{ transition.from_shot.scene_order }} 
                 <template v-if="transition.from_shot.scene_order !== transition.to_shot.scene_order">
                   → 场景 {{ transition.to_shot.scene_order }}
@@ -104,8 +116,13 @@
             <div class="shot-info">
               <span class="label">起始分镜:</span>
               <div class="shot-detail">
-                <p class="shot-description">{{ transition.from_shot?.shot || getShotDescription(transition.from_shot_id) }}</p>
-                <p v-if="transition.from_shot?.dialogue" class="shot-dialogue">
+                <p class="shot-description">
+                  {{ transition.from_shot?.shot || getShotDescription(transition.from_shot_id) }}
+                </p>
+                <p
+                  v-if="transition.from_shot?.dialogue"
+                  class="shot-dialogue"
+                >
                   💬 "{{ transition.from_shot.dialogue }}"
                 </p>
               </div>
@@ -115,8 +132,13 @@
             <div class="shot-info">
               <span class="label">结束分镜:</span>
               <div class="shot-detail">
-                <p class="shot-description">{{ transition.to_shot?.shot || getShotDescription(transition.to_shot_id) }}</p>
-                <p v-if="transition.to_shot?.dialogue" class="shot-dialogue">
+                <p class="shot-description">
+                  {{ transition.to_shot?.shot || getShotDescription(transition.to_shot_id) }}
+                </p>
+                <p
+                  v-if="transition.to_shot?.dialogue"
+                  class="shot-dialogue"
+                >
                   💬 "{{ transition.to_shot.dialogue }}"
                 </p>
               </div>
@@ -125,28 +147,65 @@
             <!-- 提示词预览 -->
             <div class="prompt-preview">
               <span class="label">视频提示词:</span>
-              <p class="prompt-text">{{ transition.video_prompt || '未生成' }}</p>
+              <p class="prompt-text">
+                {{ transition.video_prompt || '未生成' }}
+              </p>
             </div>
           </div>
 
-          <div v-if="transition.video_url" class="transition-video" @click="handlePreviewVideo(transition.video_url)">
-            <video :src="transition.video_url" controls @click.stop />
+          <div
+            v-if="transition.video_url"
+            class="transition-video"
+            @click="handlePreviewVideo(transition.video_url)"
+          >
+            <video
+              :src="transition.video_url"
+              controls
+              @click.stop
+            />
             <div class="video-overlay">
-              <el-icon :size="30"><ZoomIn /></el-icon>
+              <el-icon :size="30">
+                <ZoomIn />
+              </el-icon>
               <span>点击放大</span>
             </div>
           </div>
-          <div v-else-if="transition.status === 'processing'" class="transition-placeholder">
-            <el-icon :size="40"><Loading /></el-icon>
+          <div
+            v-else-if="transition.status === 'processing'"
+            class="transition-placeholder"
+          >
+            <el-icon :size="40">
+              <Loading />
+            </el-icon>
             <p>生成中...</p>
           </div>
-          <div v-else-if="transition.status === 'failed'" class="transition-placeholder error">
-            <el-icon :size="40" color="#f56c6c"><CircleClose /></el-icon>
-            <p class="error-text">生成失败</p>
-            <p v-if="transition.error_message" class="error-message">{{ formatErrorMessage(transition.error_message) }}</p>
+          <div
+            v-else-if="transition.status === 'failed'"
+            class="transition-placeholder error"
+          >
+            <el-icon
+              :size="40"
+              color="#f56c6c"
+            >
+              <CircleClose />
+            </el-icon>
+            <p class="error-text">
+              生成失败
+            </p>
+            <p
+              v-if="transition.error_message"
+              class="error-message"
+            >
+              {{ formatErrorMessage(transition.error_message) }}
+            </p>
           </div>
-          <div v-else class="transition-placeholder">
-            <el-icon :size="40"><VideoCamera /></el-icon>
+          <div
+            v-else
+            class="transition-placeholder"
+          >
+            <el-icon :size="40">
+              <VideoCamera />
+            </el-icon>
             <p>待生成</p>
           </div>
         </div>
@@ -159,9 +218,16 @@
       title="批量创建过渡"
       width="500px"
     >
-      <el-form :model="createFormData" label-width="100px">
+      <el-form
+        :model="createFormData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="createFormData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="createFormData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -190,8 +256,16 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showCreateDialog = false">取消</el-button>
-        <el-button type="primary" @click="handleCreateConfirm" :disabled="!createFormData.apiKeyId || !createFormData.model">确定</el-button>
+        <el-button @click="showCreateDialog = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :disabled="!createFormData.apiKeyId || !createFormData.model"
+          @click="handleCreateConfirm"
+        >
+          确定
+        </el-button>
       </template>
     </el-dialog>
 
@@ -201,9 +275,16 @@
       title="批量生成过渡视频"
       width="500px"
     >
-      <el-form :model="batchGenerateFormData" label-width="100px">
+      <el-form
+        :model="batchGenerateFormData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="batchGenerateFormData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="batchGenerateFormData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -232,8 +313,16 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showBatchGenerateDialog = false">取消</el-button>
-        <el-button type="primary" @click="handleBatchGenerateConfirm" :disabled="!batchGenerateFormData.apiKeyId || !batchGenerateFormData.videoModel">确定</el-button>
+        <el-button @click="showBatchGenerateDialog = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :disabled="!batchGenerateFormData.apiKeyId || !batchGenerateFormData.videoModel"
+          @click="handleBatchGenerateConfirm"
+        >
+          确定
+        </el-button>
       </template>
     </el-dialog>
 
@@ -243,7 +332,10 @@
       title="编辑过渡提示词"
       width="700px"
     >
-      <el-form :model="editPromptFormData" label-width="100px">
+      <el-form
+        :model="editPromptFormData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
           <el-select
             v-model="editPromptFormData.apiKeyId"
@@ -302,8 +394,15 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showEditPromptDialog = false">取消</el-button>
-        <el-button type="primary" @click="handleEditPromptConfirm">保存</el-button>
+        <el-button @click="showEditPromptDialog = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          @click="handleEditPromptConfirm"
+        >
+          保存
+        </el-button>
       </template>
     </el-dialog>
 
@@ -313,9 +412,16 @@
       :title="singleGenerateDialogType === 'generate' ? '生成过渡视频' : '重新生成过渡视频'"
       width="700px"
     >
-      <el-form :model="singleGenerateFormData" label-width="100px">
+      <el-form
+        :model="singleGenerateFormData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="singleGenerateFormData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="singleGenerateFormData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -356,11 +462,13 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showSingleGenerateDialog = false">取消</el-button>
+        <el-button @click="showSingleGenerateDialog = false">
+          取消
+        </el-button>
         <el-button 
           type="primary" 
-          @click="handleSingleGenerateConfirm" 
-          :disabled="!singleGenerateFormData.apiKeyId || !singleGenerateFormData.videoModel"
+          :disabled="!singleGenerateFormData.apiKeyId || !singleGenerateFormData.videoModel" 
+          @click="handleSingleGenerateConfirm"
         >
           确定
         </el-button>
@@ -375,7 +483,13 @@
       :close-on-click-modal="true"
     >
       <div class="video-preview-container">
-        <video v-if="previewVideoUrl" :src="previewVideoUrl" controls autoplay style="width: 100%; max-height: 70vh;" />
+        <video
+          v-if="previewVideoUrl"
+          :src="previewVideoUrl"
+          controls
+          autoplay
+          style="width: 100%; max-height: 70vh;"
+        />
       </div>
     </el-dialog>
 
@@ -391,7 +505,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Loading, VideoCamera, CircleClose, Refresh, ZoomIn, Clock } from '@element-plus/icons-vue'
 import { useTransitionWorkflow } from '@/composables/useTransitionWorkflow'
@@ -400,8 +514,14 @@ import { pollTaskStatus } from '@/utils/taskPoller'
 import api from '@/services/api'
 
 const props = defineProps({
-  scriptId: String,
-  apiKeys: Array
+  scriptId: {
+    type: String,
+    default: ''
+  },
+  apiKeys: {
+    type: Array,
+    default: () => ([])
+  }
 })
 
 const {
@@ -764,7 +884,7 @@ const handleShowHistory = (transition) => {
 }
 
 // 历史记录选择后的处理
-const handleHistorySelected = async (history) => {
+const handleHistorySelected = async () => {
   ElMessage.success('已切换到选中的历史版本')
   await loadTransitions(props.scriptId)
 }

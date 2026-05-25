@@ -20,6 +20,7 @@ class ShotExtractRequest(BaseModel):
 
 class MovieShotBase(BaseModel):
     scene_id: UUID4
+    chapter_id: Optional[str] = None
     order_index: int
     shot: str
     dialogue: Optional[str] = None
@@ -233,3 +234,79 @@ class BatchGenerateSceneImagesRequest(BaseModel):
     """批量生成场景图请求"""
     api_key_id: str
     model: Optional[str] = None
+
+# --- 道具相关 ---
+class MoviePropBase(BaseModel):
+    id: UUID4
+    name: str
+    category: Optional[str] = None
+    description: Optional[str] = None
+    visual_traits: Optional[str] = None
+    era_background: Optional[str] = None
+    key_visual_traits: List[str] = []
+    generated_prompt: Optional[str] = None
+    image_url: Optional[str] = None
+    reference_images: List[str] = []
+
+    class Config:
+        from_attributes = True
+
+    @field_validator("key_visual_traits", mode="before")
+    @classmethod
+    def ensure_key_traits_list(cls, v):
+        if v is None:
+            return []
+        return v
+
+    @field_validator("reference_images", mode="before")
+    @classmethod
+    def ensure_reference_images_list(cls, v):
+        if v is None:
+            return []
+        return v
+
+    @classmethod
+    def from_orm_with_signed_urls(cls, obj):
+        from src.utils.storage import storage_client
+        from datetime import timedelta
+
+        data = {
+            "id": obj.id,
+            "name": obj.name,
+            "category": obj.category,
+            "description": obj.description,
+            "visual_traits": obj.visual_traits,
+            "era_background": obj.era_background,
+            "key_visual_traits": obj.key_visual_traits or [],
+            "generated_prompt": obj.generated_prompt,
+            "image_url": (
+                storage_client.get_presigned_url(obj.image_url, timedelta(hours=24))
+                if obj.image_url and not obj.image_url.startswith("http")
+                else obj.image_url
+            ),
+            "reference_images": [
+                storage_client.get_presigned_url(img, timedelta(hours=24))
+                if img and not img.startswith("http")
+                else img
+                for img in (obj.reference_images or [])
+            ]
+        }
+        return cls(**data)
+
+class PropExtractRequest(BaseModel):
+    api_key_id: str
+    model: Optional[str] = None
+
+class PropUpdateRequest(BaseModel):
+    image_url: Optional[str] = None
+    reference_images: Optional[List[str]] = None
+    name: Optional[str] = None
+    category: Optional[str] = None
+    description: Optional[str] = None
+    visual_traits: Optional[str] = None
+
+class PropGenerateRequest(BaseModel):
+    api_key_id: str
+    model: Optional[str] = None
+    style: Optional[str] = "cinematic"
+    prompt: Optional[str] = None

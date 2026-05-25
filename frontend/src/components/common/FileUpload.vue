@@ -19,16 +19,24 @@
         :accept="accept"
         :multiple="multiple"
         :disabled="disabled || isUploading"
-        @change="handleFileChange"
         style="display: none"
-      />
+        @change="handleFileChange"
+      >
 
       <!-- 上传状态显示 -->
-      <div v-if="isUploading" class="upload-status">
-        <el-icon class="is-loading" :size="48">
+      <div
+        v-if="isUploading"
+        class="upload-status"
+      >
+        <el-icon
+          class="is-loading"
+          :size="48"
+        >
           <Loading />
         </el-icon>
-        <p class="upload-text">正在上传...</p>
+        <p class="upload-text">
+          正在上传...
+        </p>
         <el-progress
           v-if="uploadProgress > 0"
           :percentage="uploadProgress"
@@ -37,30 +45,61 @@
       </div>
 
       <!-- 上传成功状态 -->
-      <div v-else-if="uploadSuccess" class="upload-status upload-success">
-        <el-icon :size="48" color="#67c23a">
+      <div
+        v-else-if="uploadSuccess"
+        class="upload-status upload-success"
+      >
+        <el-icon
+          :size="48"
+          color="#67c23a"
+        >
           <Check />
         </el-icon>
-        <p class="upload-text">上传成功</p>
+        <p class="upload-text">
+          上传成功
+        </p>
       </div>
 
       <!-- 错误状态 -->
-      <div v-else-if="error" class="upload-status upload-error">
-        <el-icon :size="48" color="#f56c6c">
+      <div
+        v-else-if="error"
+        class="upload-status upload-error"
+      >
+        <el-icon
+          :size="48"
+          color="#f56c6c"
+        >
           <Warning />
         </el-icon>
-        <p class="upload-text">{{ error }}</p>
-        <el-button type="text" @click="clearError">重试</el-button>
+        <p class="upload-text">
+          {{ error }}
+        </p>
+        <el-button
+          type="text"
+          @click="clearError"
+        >
+          重试
+        </el-button>
       </div>
 
       <!-- 默认状态 -->
-      <div v-else class="upload-content">
-        <el-icon :size="48" color="#c0c4cc">
+      <div
+        v-else
+        class="upload-content"
+      >
+        <el-icon
+          :size="48"
+          color="#c0c4cc"
+        >
           <UploadFilled />
         </el-icon>
         <p class="upload-text">
           {{ multiple ? '拖拽文件到此处或' : '拖拽文件到此处或' }}
-          <el-button type="primary" link @click.stop="handleClick">
+          <el-button
+            type="primary"
+            link
+            @click.stop="handleClick"
+          >
             点击上传
           </el-button>
         </p>
@@ -71,8 +110,13 @@
     </div>
 
     <!-- 文件列表 -->
-    <div v-if="fileList.length > 0" class="file-list">
-      <h4 class="list-title">已选择的文件</h4>
+    <div
+      v-if="fileList.length > 0"
+      class="file-list"
+    >
+      <h4 class="list-title">
+        已选择的文件
+      </h4>
       <div
         v-for="(file, index) in fileList"
         :key="index"
@@ -84,9 +128,21 @@
             <Document />
           </el-icon>
           <div class="file-details">
-            <p class="file-name" :title="file.name">{{ file.name }}</p>
-            <p class="file-size">{{ formatFileSize(file.size) }}</p>
-            <p v-if="file.error" class="file-error">{{ file.error }}</p>
+            <p
+              class="file-name"
+              :title="file.name"
+            >
+              {{ file.name }}
+            </p>
+            <p class="file-size">
+              {{ formatFileSize(file.size) }}
+            </p>
+            <p
+              v-if="file.error"
+              class="file-error"
+            >
+              {{ file.error }}
+            </p>
           </div>
         </div>
         <div class="file-actions">
@@ -122,8 +178,13 @@
     </div>
 
     <!-- 上传历史 -->
-    <div v-if="showHistory && uploadHistory.length > 0" class="upload-history">
-      <h4 class="list-title">上传历史</h4>
+    <div
+      v-if="showHistory && uploadHistory.length > 0"
+      class="upload-history"
+    >
+      <h4 class="list-title">
+        上传历史
+      </h4>
       <div class="history-list">
         <div
           v-for="(item, index) in uploadHistory"
@@ -135,8 +196,12 @@
               <Document />
             </el-icon>
             <div class="history-details">
-              <p class="history-name">{{ item.filename }}</p>
-              <p class="history-time">{{ formatTime(item.uploadTime) }}</p>
+              <p class="history-name">
+                {{ item.filename }}
+              </p>
+              <p class="history-time">
+                {{ formatTime(item.uploadTime) }}
+              </p>
             </div>
           </div>
           <div class="history-status">
@@ -154,15 +219,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import {
   UploadFilled,
   Loading,
   Check,
   Warning,
   Document,
-  Delete,
 } from '@element-plus/icons-vue'
 import { fileService } from '@/services/upload'
 
@@ -217,10 +281,6 @@ const error = ref('')
 const fileList = ref([])
 const uploadHistory = ref([])
 
-// 计算属性
-const selectedFilesCount = computed(() => fileList.value.length)
-
-// 方法
 const handleClick = () => {
   if (props.disabled || isUploading.value) return
   fileInput.value?.click()

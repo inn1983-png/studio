@@ -3,10 +3,15 @@
     <div class="page-header">
       <div class="header-left">
         <h2>视频生成任务</h2>
-        <p class="subtitle">管理您的视频生成任务，查看进度和下载结果</p>
+        <p class="subtitle">
+          管理您的视频生成任务，查看进度和下载结果
+        </p>
       </div>
       <div class="header-right">
-        <el-button type="primary" @click="showCreateDialog = true">
+        <el-button
+          type="primary"
+          @click="showCreateDialog = true"
+        >
           <el-icon><Plus /></el-icon>
           新建任务
         </el-button>
@@ -15,48 +20,100 @@
 
     <!-- 统计卡片 -->
     <div class="stats-cards">
-      <el-card shadow="hover" class="stat-card">
+      <el-card
+        shadow="hover"
+        class="stat-card"
+      >
         <div class="stat-content">
-          <div class="stat-value">{{ stats.total }}</div>
-          <div class="stat-label">总任务数</div>
+          <div class="stat-value">
+            {{ stats.total }}
+          </div>
+          <div class="stat-label">
+            总任务数
+          </div>
         </div>
-        <el-icon class="stat-icon"><VideoCamera /></el-icon>
+        <el-icon class="stat-icon">
+          <VideoCamera />
+        </el-icon>
       </el-card>
-      <el-card shadow="hover" class="stat-card success">
+      <el-card
+        shadow="hover"
+        class="stat-card success"
+      >
         <div class="stat-content">
-          <div class="stat-value">{{ stats.completed }}</div>
-          <div class="stat-label">已完成</div>
+          <div class="stat-value">
+            {{ stats.completed }}
+          </div>
+          <div class="stat-label">
+            已完成
+          </div>
         </div>
-        <el-icon class="stat-icon"><CircleCheck /></el-icon>
+        <el-icon class="stat-icon">
+          <CircleCheck />
+        </el-icon>
       </el-card>
-      <el-card shadow="hover" class="stat-card warning">
+      <el-card
+        shadow="hover"
+        class="stat-card warning"
+      >
         <div class="stat-content">
-          <div class="stat-value">{{ stats.processing }}</div>
-          <div class="stat-label">处理中</div>
+          <div class="stat-value">
+            {{ stats.processing }}
+          </div>
+          <div class="stat-label">
+            处理中
+          </div>
         </div>
-        <el-icon class="stat-icon"><Loading /></el-icon>
+        <el-icon class="stat-icon">
+          <Loading />
+        </el-icon>
       </el-card>
-      <el-card shadow="hover" class="stat-card danger">
+      <el-card
+        shadow="hover"
+        class="stat-card danger"
+      >
         <div class="stat-content">
-          <div class="stat-value">{{ stats.failed }}</div>
-          <div class="stat-label">失败</div>
+          <div class="stat-value">
+            {{ stats.failed }}
+          </div>
+          <div class="stat-label">
+            失败
+          </div>
         </div>
-        <el-icon class="stat-icon"><CircleClose /></el-icon>
+        <el-icon class="stat-icon">
+          <CircleClose />
+        </el-icon>
       </el-card>
     </div>
 
     <!-- 过滤器 -->
     <div class="filter-bar">
-      <el-radio-group v-model="filterStatus" @change="handleFilterChange">
-        <el-radio-button label="">全部</el-radio-button>
-        <el-radio-button label="pending">等待中</el-radio-button>
-        <el-radio-button label="processing">处理中</el-radio-button>
-        <el-radio-button label="completed">已完成</el-radio-button>
-        <el-radio-button label="failed">失败</el-radio-button>
+      <el-radio-group
+        v-model="filterStatus"
+        @change="handleFilterChange"
+      >
+        <el-radio-button label="">
+          全部
+        </el-radio-button>
+        <el-radio-button label="pending">
+          等待中
+        </el-radio-button>
+        <el-radio-button label="processing">
+          处理中
+        </el-radio-button>
+        <el-radio-button label="completed">
+          已完成
+        </el-radio-button>
+        <el-radio-button label="failed">
+          失败
+        </el-radio-button>
       </el-radio-group>
       
       <div class="filter-right">
-        <el-button @click="refreshList" :loading="loading">
+        <el-button
+          :loading="loading"
+          @click="refreshList"
+        >
           <el-icon><Refresh /></el-icon>
           刷新
         </el-button>
@@ -64,9 +121,19 @@
     </div>
 
     <!-- 任务列表 -->
-    <el-card class="tasks-list-card" v-loading="loading">
-      <el-table :data="tasks" style="width: 100%">
-        <el-table-column prop="chapter_title" label="章节" min-width="200">
+    <el-card
+      v-loading="loading"
+      class="tasks-list-card"
+    >
+      <el-table
+        :data="tasks"
+        style="width: 100%"
+      >
+        <el-table-column
+          prop="chapter_title"
+          label="章节"
+          min-width="200"
+        >
           <template #default="{ row }">
             <div class="chapter-info">
               <span class="chapter-title">{{ row.chapter_title || '未知章节' }}</span>
@@ -75,7 +142,11 @@
           </template>
         </el-table-column>
         
-        <el-table-column prop="status" label="状态" width="120">
+        <el-table-column
+          prop="status"
+          label="状态"
+          width="120"
+        >
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">
               {{ getStatusText(row.status) }}
@@ -83,27 +154,41 @@
           </template>
         </el-table-column>
         
-        <el-table-column label="进度" width="200">
+        <el-table-column
+          label="进度"
+          width="200"
+        >
           <template #default="{ row }">
             <div class="progress-cell">
               <el-progress 
                 :percentage="row.progress" 
                 :status="row.status === 'failed' ? 'exception' : (row.status === 'completed' ? 'success' : '')"
               />
-              <span class="progress-text" v-if="row.status !== 'completed' && row.status !== 'failed'">
+              <span
+                v-if="row.status !== 'completed' && row.status !== 'failed'"
+                class="progress-text"
+              >
                 {{ getProgressText(row) }}
               </span>
             </div>
           </template>
         </el-table-column>
         
-        <el-table-column prop="created_at" label="创建时间" width="180">
+        <el-table-column
+          prop="created_at"
+          label="创建时间"
+          width="180"
+        >
           <template #default="{ row }">
             {{ formatDate(row.created_at) }}
           </template>
         </el-table-column>
         
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column
+          label="操作"
+          width="200"
+          fixed="right"
+        >
           <template #default="{ row }">
             <el-button-group>
               <el-button 
@@ -139,8 +224,8 @@
               <el-button 
                 size="small" 
                 type="danger" 
-                @click="handleDelete(row)"
                 :disabled="isProcessing(row.status)"
+                @click="handleDelete(row)"
               >
                 删除
               </el-button>
@@ -182,9 +267,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { 
+import { ref, onMounted, onUnmounted } from 'vue'
+import {
   Plus, 
   Refresh, 
   VideoCamera, 
@@ -199,9 +283,7 @@ import CreateVideoTaskDialog from '@/components/video/CreateVideoTaskDialog.vue'
 import VideoTaskDetailDialog from '@/components/video/VideoTaskDetailDialog.vue'
 import VideoPreviewDialog from '@/components/video/VideoPreviewDialog.vue'
 
-const route = useRoute()
-
-const { 
+const {
   tasks, 
   total, 
   loading, 

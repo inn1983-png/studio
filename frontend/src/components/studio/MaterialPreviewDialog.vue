@@ -8,7 +8,10 @@
   >
     <div class="preview-content">
       <!-- 提示词预览 -->
-      <div v-if="type === 'prompt'" class="prompt-preview">
+      <div
+        v-if="type === 'prompt'"
+        class="prompt-preview"
+      >
         <el-input
           :model-value="content"
           type="textarea"
@@ -19,7 +22,10 @@
       </div>
 
       <!-- 图片预览 -->
-      <div v-else-if="type === 'image'" class="image-preview">
+      <div
+        v-else-if="type === 'image'"
+        class="image-preview"
+      >
         <el-image
           v-if="content"
           :src="content"
@@ -34,12 +40,21 @@
             </div>
           </template>
         </el-image>
-        <el-empty v-else description="暂无图片" />
+        <el-empty
+          v-else
+          description="暂无图片"
+        />
       </div>
 
       <!-- 音频预览 -->
-      <div v-else-if="type === 'audio'" class="audio-preview">
-        <div v-if="content" class="audio-player">
+      <div
+        v-else-if="type === 'audio'"
+        class="audio-preview"
+      >
+        <div
+          v-if="content"
+          class="audio-player"
+        >
           <audio
             ref="audioPlayer"
             :src="content"
@@ -54,13 +69,22 @@
             <span>{{ content }}</span>
           </div>
         </div>
-        <el-empty v-else description="暂无音频" />
+        <el-empty
+          v-else
+          description="暂无音频"
+        />
       </div>
     </div>
 
     <template #footer>
-      <el-button @click="handleClose">关闭</el-button>
-      <el-button v-if="content && type === 'image'" type="primary" @click="handleDownload">
+      <el-button @click="handleClose">
+        关闭
+      </el-button>
+      <el-button
+        v-if="content && type === 'image'"
+        type="primary"
+        @click="handleDownload"
+      >
         <el-icon><Download /></el-icon>
         下载图片
       </el-button>

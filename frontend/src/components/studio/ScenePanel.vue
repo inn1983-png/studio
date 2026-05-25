@@ -15,9 +15,15 @@
     </div>
 
     <div class="scene-list">
-      <el-empty v-if="scenes.length === 0" description="暂无场景，请先提取场景" />
+      <el-empty
+        v-if="scenes.length === 0"
+        description="暂无场景，请先提取场景"
+      />
       
-      <el-collapse v-else v-model="activeScenes">
+      <el-collapse
+        v-else
+        v-model="activeScenes"
+      >
         <el-collapse-item 
           v-for="scene in scenes" 
           :key="scene.id"
@@ -51,9 +57,16 @@
       title="提取场景"
       width="500px"
     >
-      <el-form :model="formData" label-width="100px">
+      <el-form
+        :model="formData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="formData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="formData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -82,8 +95,16 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showDialog = false">取消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm" :disabled="!formData.apiKeyId || !formData.model">确定</el-button>
+        <el-button @click="showDialog = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :disabled="!formData.apiKeyId || !formData.model"
+          @click="handleDialogConfirm"
+        >
+          确定
+        </el-button>
       </template>
     </el-dialog>
   </div>

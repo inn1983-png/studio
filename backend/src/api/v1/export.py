@@ -3,18 +3,27 @@
 """
 
 import os
+import tempfile
 from pathlib import Path
+from urllib.parse import quote, unquote
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies import get_current_user_required
-from src.api.schemas.export import JianYingExportResponse
+from src.api.schemas.export import (
+    JianYingExportResponse,
+    VideoExportResponse,
+    BatchExportRequest,
+    BatchExportResponse,
+)
 from src.core.database import get_db
+from src.core.logging import get_logger
 from src.models.user import User
 from src.services.jianying_export import JianYingExportService, JianYingExportError
 
+logger = get_logger(__name__)
 router = APIRouter()
 
 
@@ -25,45 +34,24 @@ async def export_chapter_to_jianying(
     current_user: User = Depends(get_current_user_required),
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    导出章节为剪映草稿格式
-    
-    Args:
-        chapter_id: 章节ID
-        
-    Returns:
-        导出结果，包含下载URL
-    """
     try:
         export_service = JianYingExportService(db)
         zip_path = await export_service.export_chapter(
             chapter_id=chapter_id,
             user_id=str(current_user.id)
         )
-        
-        # 生成下载URL（使用文件ID）
-        from urllib.parse import quote
         filename = Path(zip_path).name
-        # URL编码文件名以支持中文
         encoded_filename = quote(filename)
-        
         return JianYingExportResponse(
             success=True,
             message="导出成功",
             download_url=f"/api/v1/export/jianying/download/{encoded_filename}",
             filename=filename
         )
-        
     except JianYingExportError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"导出失败: {str(e)}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"导出失败: {str(e)}")
 
 
 @router.get("/jianying/download/{filename:path}")
@@ -71,74 +59,159 @@ async def download_jianying_export(
     filename: str,
     current_user: User = Depends(get_current_user_required)
 ):
-    """
-    下载导出的剪映文件
-    
-    Args:
-        filename: URL编码的文件名
-        
-    Returns:
-        文件下载响应
-    """
-    import tempfile
-    from urllib.parse import unquote
-    from src.core.logging import get_logger
-    
-    logger = get_logger(__name__)
-    
-    # URL解码文件名
     decoded_filename = unquote(filename)
-    
-    # 构建文件路径（从临时目录）
-    file_path = Path(tempfile.gettempdir()) / decoded_filename
-    
-    logger.info(f"尝试下载文件: {file_path}")
-    logger.info(f"原始文件名: {filename}")
-    logger.info(f"解码后文件名: {decoded_filename}")
-    logger.info(f"文件是否存在: {file_path.exists()}")
-    
-    if file_path.exists():
-        file_size = file_path.stat().st_size
-        logger.info(f"文件大小: {file_size} bytes")
-    
+    file_path = (Path(tempfile.gettempdir()) / decoded_filename).resolve()
+    if not str(file_path).startswith(str(Path(tempfile.gettempdir()).resolve())):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid file path")
+
     if not file_path.exists():
-        logger.error(f"文件不存在: {file_path}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="文件不存在或已过期"
-        )
-    
-    # URL编码文件名以支持中文
-    from urllib.parse import quote
-    from fastapi import BackgroundTasks
-    import os
-    
-    # 定义清理函数
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="文件不存在或已过期")
+
     def cleanup_file(path: str):
         try:
             if os.path.exists(path):
                 os.remove(path)
-                logger.info(f"清理临时文件: {path}")
         except Exception as e:
             logger.error(f"清理文件失败: {e}")
-    
-    # 对文件名进行URL编码（用于Content-Disposition）
+
     encoded_filename = quote(decoded_filename)
-    
     response = FileResponse(
         path=str(file_path),
         filename=decoded_filename,
         media_type="application/zip",
-        headers={
-            "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
-        }
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
     )
-    
-    # 注册后台清理任务
     response.background = BackgroundTasks()
     response.background.add_task(cleanup_file, str(file_path))
-    
     return response
+
+
+@router.post("/video/{chapter_id}", response_model=VideoExportResponse)
+async def export_chapter_video(
+    *,
+    chapter_id: str,
+    current_user: User = Depends(get_current_user_required),
+    db: AsyncSession = Depends(get_db)
+):
+    from src.models.chapter import Chapter
+    from src.utils.storage import storage_client
+    from datetime import timedelta
+
+    chapter = await db.get(Chapter, chapter_id)
+    if not chapter:
+        raise HTTPException(status_code=404, detail="章节不存在")
+
+    if not chapter.video_url:
+        raise HTTPException(status_code=400, detail="该章节尚未生成视频，请先完成视频合成")
+
+    try:
+        video_key = chapter.video_url
+        temp_dir = tempfile.mkdtemp(prefix="video_export_")
+        project_name = chapter.title or "video"
+        safe_name = "".join(c for c in project_name if c.isalnum() or c in "._- ") or "video"
+        filename = f"{safe_name}.mp4"
+        local_path = os.path.join(temp_dir, filename)
+
+        await storage_client.download_file_to_path(video_key, local_path)
+
+        download_url = f"/api/v1/export/video/download/{quote(filename, safe='')}"
+
+        return VideoExportResponse(
+            success=True,
+            message="视频导出就绪",
+            download_url=download_url,
+            filename=filename,
+            duration=chapter.video_duration
+        )
+    except Exception as e:
+        logger.error(f"视频导出失败: {e}")
+        raise HTTPException(status_code=500, detail=f"视频导出失败: {str(e)}")
+
+
+@router.get("/video/download/{filename:path}")
+async def download_exported_video(
+    filename: str,
+    current_user: User = Depends(get_current_user_required)
+):(lename).resov()
+    if ot str(file_path).startswith(str(Pth(tempfile.gettepdir()).resolv())):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid file path")
+    decoded_filename = unquote(filename)
+    file_path = Path(tempfile.gettempdir()) / decoded_filename
+
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="文件不存在或已过期，请重新导出")
+
+    def cleanup_file(path: str):
+        try:
+            if os.path.exists(path):
+                os.remove(path)
+        except Exception as e:
+            logger.error(f"清理文件失败: {e}")
+
+    encoded_filename = quote(decoded_filename)
+    response = FileResponse(
+        path=str(file_path),
+        filename=decoded_filename,
+        media_type="video/mp4",
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
+    )
+    response.background = BackgroundTasks()
+    response.background.add_task(cleanup_file, str(file_path))
+    return response
+
+
+@router.post("/video/batch", response_model=BatchExportResponse)
+async def batch_export_videos(
+    *,
+    req: BatchExportRequest,
+    current_user: User = Depends(get_current_user_required),
+    db: AsyncSession = Depends(get_db)
+):
+    from src.models.chapter import Chapter
+    from src.utils.storage import storage_client
+
+    results = []
+    for chapter_id in req.chapter_ids:
+        try:
+            chapter = await db.get(Chapter, chapter_id)
+            if not chapter:
+                results.append(VideoExportResponse(
+                    success=False, message="章节不存在", download_url="", filename=""
+                ))
+                continue
+
+            if not chapter.video_url:
+                results.append(VideoExportResponse(
+                    success=False, message="该章节尚未生成视频", download_url="", filename=""
+                ))
+                continue
+
+            temp_dir = tempfile.mkdtemp(prefix="batch_export_")
+            project_name = chapter.title or "video"
+            safe_name = "".join(c for c in project_name if c.isalnum() or c in "._- ") or "video"
+            filename = f"{safe_name}_{chapter_id[:8]}.mp4"
+            local_path = os.path.join(temp_dir, filename)
+
+            await storage_client.download_file_to_path(chapter.video_url, local_path)
+
+            results.append(VideoExportResponse(
+                success=True,
+                message="视频导出就绪",
+                download_url=f"/api/v1/export/video/download/{quote(filename, safe='')}",
+                filename=filename,
+                duration=chapter.video_duration
+            ))
+        except Exception as e:
+            logger.error(f"批量导出章节 {chapter_id} 失败: {e}")
+            results.append(VideoExportResponse(
+                success=False, message=f"导出失败: {str(e)}", download_url="", filename=""
+            ))
+
+    return BatchExportResponse(
+        success=all(r.success for r in results),
+        message=f"成功导出 {sum(1 for r in results if r.success)}/{len(req.chapter_ids)} 个视频",
+        results=results
+    )
 
 
 __all__ = ["router"]

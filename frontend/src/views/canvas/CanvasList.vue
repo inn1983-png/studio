@@ -2,28 +2,50 @@
   <section class="canvas-list-page">
     <div class="hero-card">
       <div>
-        <p class="eyebrow">无限画布</p>
+        <p class="eyebrow">
+          无限画布
+        </p>
         <h1>无限画布</h1>
       </div>
-      <el-button type="primary" size="large" @click="handleCreate" :loading="creating">
+      <el-button
+        type="primary"
+        size="large"
+        :loading="creating"
+        @click="handleCreate"
+      >
         新建画布
       </el-button>
     </div>
 
-    <el-card class="list-card" shadow="never">
+    <el-card
+      class="list-card"
+      shadow="never"
+    >
       <template #header>
         <div class="list-header">
           <div>
             <h2>我的画布</h2>
             <span>{{ documents.length }} 个文档</span>
           </div>
-          <el-button text @click="loadDocuments" :loading="loading">刷新</el-button>
+          <el-button
+            text
+            :loading="loading"
+            @click="loadDocuments"
+          >
+            刷新
+          </el-button>
         </div>
       </template>
 
-      <el-empty v-if="!loading && documents.length === 0" description="还没有画布，先创建一个。" />
+      <el-empty
+        v-if="!loading && documents.length === 0"
+        description="还没有画布，先创建一个。"
+      />
 
-      <div v-else class="canvas-grid">
+      <div
+        v-else
+        class="canvas-grid"
+      >
         <article
           v-for="document in documents"
           :key="document.id"
@@ -35,24 +57,37 @@
               <h3>{{ document.title }}</h3>
               <p>{{ formatDate(document.updated_at) }}</p>
             </div>
-            <el-dropdown trigger="click" @command="(command) => handleMenu(command, document)">
-              <button class="menu-button" @click.stop>
+            <el-dropdown
+              trigger="click"
+              @command="(command) => handleMenu(command, document)"
+            >
+              <button
+                class="menu-button"
+                @click.stop
+              >
                 <el-icon><MoreFilled /></el-icon>
               </button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="rename">重命名</el-dropdown-item>
-                  <el-dropdown-item command="delete" divided>删除</el-dropdown-item>
+                  <el-dropdown-item command="rename">
+                    重命名
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    command="delete"
+                    divided
+                  >
+                    删除
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
           </div>
           <div class="canvas-card__body">
             <div class="preview-grid">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
+              <span />
+              <span />
+              <span />
+              <span />
             </div>
             <p>{{ document.description || '自由节点图、生成面板和历史记录都保存在这张画布里。' }}</p>
           </div>

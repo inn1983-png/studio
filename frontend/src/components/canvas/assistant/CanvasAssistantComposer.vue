@@ -1,5 +1,8 @@
 <template>
-  <form class="assistant-composer" @submit.prevent="handleSubmit">
+  <form
+    class="assistant-composer"
+    @submit.prevent="handleSubmit"
+  >
     <div class="assistant-composer__selectors">
       <label class="assistant-composer__field">
         <span class="assistant-composer__label">对话 Key</span>
@@ -49,7 +52,7 @@
       :disabled="disabled"
       rows="4"
       @keydown="handleKeydown"
-    ></textarea>
+    />
 
     <div class="assistant-composer__footer">
       <span class="assistant-composer__hint">Ctrl/⌘ + Enter 发送</span>

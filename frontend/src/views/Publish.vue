@@ -4,17 +4,24 @@
     <div class="page-header">
       <div class="header-left">
         <h1 class="page-title">
-          <el-icon class="title-icon"><Promotion /></el-icon>
+          <el-icon class="title-icon">
+            <Promotion />
+          </el-icon>
           Bilibili发布管理
         </h1>
-        <p class="page-description">将生成的视频发布到Bilibili平台</p>
+        <p class="page-description">
+          将生成的视频发布到Bilibili平台
+        </p>
       </div>
       <div class="header-right">
         <el-button @click="goToAccountManagement">
           <el-icon><User /></el-icon>
           账号管理
         </el-button>
-        <el-button type="primary" @click="handleRefresh">
+        <el-button
+          type="primary"
+          @click="handleRefresh"
+        >
           <el-icon><Refresh /></el-icon>
           刷新
         </el-button>
@@ -22,23 +29,51 @@
     </div>
 
     <!-- 标签页 -->
-    <el-tabs v-model="activeTab" class="publish-tabs">
+    <el-tabs
+      v-model="activeTab"
+      class="publish-tabs"
+    >
       <!-- 可发布视频列表 -->
-      <el-tab-pane label="可发布视频" name="videos">
-        <div v-loading="videosLoading" class="videos-container">
-          <el-empty v-if="!videosLoading && videos.length === 0" description="暂无可发布的视频">
-            <el-button type="primary" @click="$router.push('/generation')">
+      <el-tab-pane
+        label="可发布视频"
+        name="videos"
+      >
+        <div
+          v-loading="videosLoading"
+          class="videos-container"
+        >
+          <el-empty
+            v-if="!videosLoading && videos.length === 0"
+            description="暂无可发布的视频"
+          >
+            <el-button
+              type="primary"
+              @click="$router.push('/generation')"
+            >
               前往视频任务
             </el-button>
           </el-empty>
 
-          <div v-else class="video-grid">
-            <div v-for="video in videos" :key="video.id" class="video-card">
+          <div
+            v-else
+            class="video-grid"
+          >
+            <div
+              v-for="video in videos"
+              :key="video.id"
+              class="video-card"
+            >
               <div class="video-preview">
-                <video :src="video.video_url" controls class="video-player"></video>
+                <video
+                  :src="video.video_url"
+                  controls
+                  class="video-player"
+                />
               </div>
               <div class="video-info">
-                <h3 class="video-title">{{ video.project_title }} - {{ video.chapter_title }}</h3>
+                <h3 class="video-title">
+                  {{ video.project_title }} - {{ video.chapter_title }}
+                </h3>
                 <div class="video-meta">
                   <span class="meta-item">
                     <el-icon><Clock /></el-icon>
@@ -49,7 +84,11 @@
                     {{ formatDate(video.created_at) }}
                   </span>
                 </div>
-                <el-button type="primary" @click="handlePublish(video)" class="publish-btn">
+                <el-button
+                  type="primary"
+                  class="publish-btn"
+                  @click="handlePublish(video)"
+                >
                   <el-icon><Upload /></el-icon>
                   发布到B站
                 </el-button>
@@ -60,16 +99,36 @@
       </el-tab-pane>
 
       <!-- 发布任务列表 -->
-      <el-tab-pane label="发布任务" name="tasks">
-        <div v-loading="tasksLoading" class="tasks-container">
-          <el-empty v-if="!tasksLoading && tasks.length === 0" description="暂无发布任务" />
+      <el-tab-pane
+        label="发布任务"
+        name="tasks"
+      >
+        <div
+          v-loading="tasksLoading"
+          class="tasks-container"
+        >
+          <el-empty
+            v-if="!tasksLoading && tasks.length === 0"
+            description="暂无发布任务"
+          />
 
-          <div v-else class="task-list">
-            <div v-for="task in tasks" :key="task.id" class="task-item">
+          <div
+            v-else
+            class="task-list"
+          >
+            <div
+              v-for="task in tasks"
+              :key="task.id"
+              class="task-item"
+            >
               <div class="task-header">
                 <div class="header-left">
-                  <h4 class="task-title">{{ task.title }}</h4>
-                  <el-tag :type="getStatusType(task.status)">{{ getStatusText(task.status) }}</el-tag>
+                  <h4 class="task-title">
+                    {{ task.title }}
+                  </h4>
+                  <el-tag :type="getStatusType(task.status)">
+                    {{ getStatusText(task.status) }}
+                  </el-tag>
                 </div>
                 <el-button 
                   v-if="['failed', 'pending'].includes(task.status)" 
@@ -91,15 +150,27 @@
               <div class="task-info">
                 <span class="info-item">平台: {{ task.platform }}</span>
                 <span class="info-item">创建时间: {{ formatDate(task.created_at) }}</span>
-                <span v-if="task.bvid" class="info-item">
+                <span
+                  v-if="task.bvid"
+                  class="info-item"
+                >
                   BV号: 
-                  <a :href="`https://www.bilibili.com/video/${task.bvid}`" target="_blank" class="bv-link">
+                  <a
+                    :href="`https://www.bilibili.com/video/${task.bvid}`"
+                    target="_blank"
+                    class="bv-link"
+                  >
                     {{ task.bvid }}
                   </a>
                 </span>
               </div>
 
-              <el-alert v-if="task.error_message" :title="task.error_message" type="error" :closable="false" />
+              <el-alert
+                v-if="task.error_message"
+                :title="task.error_message"
+                type="error"
+                :closable="false"
+              />
             </div>
           </div>
         </div>
@@ -113,9 +184,21 @@
       width="600px"
       :close-on-click-modal="false"
     >
-      <el-form :model="publishForm" :rules="publishRules" ref="publishFormRef" label-width="80px">
-        <el-form-item label="发布账号" prop="account_id">
-          <el-select v-model="publishForm.account_id" placeholder="请选择发布账号" style="width: 100%">
+      <el-form
+        ref="publishFormRef"
+        :model="publishForm"
+        :rules="publishRules"
+        label-width="80px"
+      >
+        <el-form-item
+          label="发布账号"
+          prop="account_id"
+        >
+          <el-select
+            v-model="publishForm.account_id"
+            placeholder="请选择发布账号"
+            style="width: 100%"
+          >
             <el-option
               v-for="acc in accounts"
               :key="acc.id"
@@ -126,11 +209,22 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="publishForm.title" maxlength="80" show-word-limit placeholder="请输入视频标题" />
+        <el-form-item
+          label="标题"
+          prop="title"
+        >
+          <el-input
+            v-model="publishForm.title"
+            maxlength="80"
+            show-word-limit
+            placeholder="请输入视频标题"
+          />
         </el-form-item>
 
-        <el-form-item label="简介" prop="desc">
+        <el-form-item
+          label="简介"
+          prop="desc"
+        >
           <el-input
             v-model="publishForm.desc"
             type="textarea"
@@ -141,8 +235,15 @@
           />
         </el-form-item>
 
-        <el-form-item label="分区" prop="tid">
-          <el-select v-model="publishForm.tid" placeholder="请选择分区" style="width: 100%">
+        <el-form-item
+          label="分区"
+          prop="tid"
+        >
+          <el-select
+            v-model="publishForm.tid"
+            placeholder="请选择分区"
+            style="width: 100%"
+          >
             <el-option
               v-for="option in tidOptions"
               :key="option.value"
@@ -152,7 +253,10 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="封面" prop="cover_url">
+        <el-form-item
+          label="封面"
+          prop="cover_url"
+        >
           <el-upload
             class="cover-uploader"
             action="#"
@@ -160,51 +264,128 @@
             :http-request="handleCoverUpload"
             :before-upload="beforeCoverUpload"
           >
-            <div v-if="publishForm.cover_url" class="cover-preview">
-              <img :src="getCoverUrl(publishForm.cover_url)" class="cover-image" />
-              <div class="cover-actions" @click.stop>
-                <el-button type="danger" circle size="small" @click="clearCover">
+            <div
+              v-if="publishForm.cover_url"
+              class="cover-preview"
+            >
+              <img
+                :src="getCoverUrl(publishForm.cover_url)"
+                class="cover-image"
+              >
+              <div
+                class="cover-actions"
+                @click.stop
+              >
+                <el-button
+                  type="danger"
+                  circle
+                  size="small"
+                  @click="clearCover"
+                >
                   <el-icon><Delete /></el-icon>
                 </el-button>
               </div>
             </div>
-            <el-icon v-else class="cover-uploader-icon"><Plus /></el-icon>
+            <el-icon
+              v-else
+              class="cover-uploader-icon"
+            >
+              <Plus />
+            </el-icon>
           </el-upload>
-          <div class="form-tip">支持jpg/png格式，建议尺寸16:9，不传则使用视频默认封面</div>
+          <div class="form-tip">
+            支持jpg/png格式，建议尺寸16:9，不传则使用视频默认封面
+          </div>
         </el-form-item>
 
-        <el-form-item label="标签" prop="tag">
-          <el-input v-model="publishForm.tag" placeholder="多个标签用逗号分隔,最多10个" />
+        <el-form-item
+          label="标签"
+          prop="tag"
+        >
+          <el-input
+            v-model="publishForm.tag"
+            placeholder="多个标签用逗号分隔,最多10个"
+          />
         </el-form-item>
 
-        <el-form-item label="类型" prop="copyright">
+        <el-form-item
+          label="类型"
+          prop="copyright"
+        >
           <el-radio-group v-model="publishForm.copyright">
-            <el-radio :label="1">原创</el-radio>
-            <el-radio :label="2">转载</el-radio>
+            <el-radio :label="1">
+              原创
+            </el-radio>
+            <el-radio :label="2">
+              转载
+            </el-radio>
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item v-if="publishForm.copyright === 2" label="转载源" prop="source">
-          <el-input v-model="publishForm.source" placeholder="请输入转载来源" />
+        <el-form-item
+          v-if="publishForm.copyright === 2"
+          label="转载源"
+          prop="source"
+        >
+          <el-input
+            v-model="publishForm.source"
+            placeholder="请输入转载来源"
+          />
         </el-form-item>
 
-        <el-form-item label="上传线路" prop="upload_line">
-          <el-select v-model="publishForm.upload_line" style="width: 100%">
-            <el-option label="百度云 (bda2)" value="bda2" />
-            <el-option label="网宿 (ws)" value="ws" />
-            <el-option label="腾讯云 (qn)" value="qn" />
-            <el-option label="百度云SA (bldsa)" value="bldsa" />
-            <el-option label="腾讯云 (tx)" value="tx" />
-            <el-option label="腾讯云A (txa)" value="txa" />
-            <el-option label="百度云 (bda)" value="bda" />
-            <el-option label="阿里云 (alia)" value="alia" />
+        <el-form-item
+          label="上传线路"
+          prop="upload_line"
+        >
+          <el-select
+            v-model="publishForm.upload_line"
+            style="width: 100%"
+          >
+            <el-option
+              label="百度云 (bda2)"
+              value="bda2"
+            />
+            <el-option
+              label="网宿 (ws)"
+              value="ws"
+            />
+            <el-option
+              label="腾讯云 (qn)"
+              value="qn"
+            />
+            <el-option
+              label="百度云SA (bldsa)"
+              value="bldsa"
+            />
+            <el-option
+              label="腾讯云 (tx)"
+              value="tx"
+            />
+            <el-option
+              label="腾讯云A (txa)"
+              value="txa"
+            />
+            <el-option
+              label="百度云 (bda)"
+              value="bda"
+            />
+            <el-option
+              label="阿里云 (alia)"
+              value="alia"
+            />
           </el-select>
         </el-form-item>
       </el-form>
 
       <template #footer>
-        <el-button @click="publishDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitPublish" :loading="publishing">
+        <el-button @click="publishDialogVisible = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="publishing"
+          @click="submitPublish"
+        >
           确认发布
         </el-button>
       </template>
@@ -213,10 +394,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Promotion, User, CircleCheck, Clock, Calendar, Upload, Refresh, Plus, Delete } from '@element-plus/icons-vue' // Added Plus, Delete
+import { Promotion, User, Clock, Calendar, Upload, Refresh, Plus, Delete } from '@element-plus/icons-vue'
 import bilibiliService from '@/services/bilibili'
 import { uploadService } from '@/services/upload' // Import uploadService
 
@@ -424,12 +605,6 @@ const submitPublish = async () => {
 }
 
 // 格式化时间
-const formatTime = (time) => {
-  if (!time) return '-'
-  return new Date(time).toLocaleString('zh-CN')
-}
-
-// 格式化日期
 const formatDate = (date) => {
   if (!date) return '-'
   return new Date(date).toLocaleDateString('zh-CN')

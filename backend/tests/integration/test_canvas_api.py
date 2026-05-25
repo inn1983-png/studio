@@ -320,7 +320,7 @@ class TestCanvasDocumentApi:
 
         item_id = "21111111-1111-1111-1111-111111111111"
         expired_preview = (
-            "http://localhost:9000/aicg-files/uploads/test-user/reference.png"
+            "http://localhost:9000/txtovideo-files/uploads/test-user/reference.png"
             "?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Signature=expired"
         )
 

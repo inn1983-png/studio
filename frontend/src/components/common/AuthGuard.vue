@@ -1,18 +1,27 @@
 <template>
-  <div v-if="loading" class="auth-loading">
+  <div
+    v-if="loading"
+    class="auth-loading"
+  >
     <el-loading-directive />
   </div>
   <div v-else-if="isAuthenticated">
     <slot />
   </div>
-  <div v-else class="auth-fallback">
+  <div
+    v-else
+    class="auth-fallback"
+  >
     <el-result
       icon="warning"
       title="Authentication Required"
       :sub-title="message"
     >
       <template #extra>
-        <el-button type="primary" @click="handleLogin">
+        <el-button
+          type="primary"
+          @click="handleLogin"
+        >
           Login
         </el-button>
         <el-button @click="handleRegister">

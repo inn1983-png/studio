@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import movieService from '@/services/movie'
 import { useTaskPoller } from './useTaskPoller'
@@ -8,6 +8,9 @@ import { useTaskPoller } from './useTaskPoller'
  * 遵循架构：使用movieService而非直接调用api
  */
 export function useTransitionWorkflow() {
+    const { startPolling: startTaskPolling, stopPolling: stopTaskPolling } = useTaskPoller()
+    onUnmounted(() => { stopTaskPolling() })
+
     const transitions = ref([])
     const creating = ref(false)
     const generating = ref(false)
@@ -33,8 +36,7 @@ export function useTransitionWorkflow() {
             })
 
             if (response.task_id) {
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id, async (result) => {
+                startTaskPolling(response.task_id, async (result) => {
                     ElMessage.success(`过渡创建完成: ${result.success} 个过渡`)
                     await loadTransitions(scriptId)
                     creating.value = false
@@ -58,8 +60,7 @@ export function useTransitionWorkflow() {
             })
 
             if (response.task_id) {
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id, async (result) => {
+                startTaskPolling(response.task_id, async (result) => {
                     ElMessage.success(`视频生成完成: 成功 ${result.success}, 失败 ${result.failed}`)
                     await loadTransitions(scriptId)
                     generating.value = false
@@ -96,8 +97,7 @@ export function useTransitionWorkflow() {
             })
 
             if (response.task_id) {
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id, async (result) => {
+                startTaskPolling(response.task_id, async () => {
                     ElMessage.success('视频生成完成')
                     await loadTransitions(scriptId)
                     generatingIds.value.delete(transitionId)

@@ -160,39 +160,23 @@ class FileHandler:
 
     @classmethod
     async def validate_file(cls, file: UploadFile) -> Tuple[str, Dict[str, Any]]:
-        """
-        验证上传的文件 - 整合了安全检查和类型验证
-
-        Args:
-            file: 上传的文件
-
-        Returns:
-            Tuple[文件类型, 文件信息]
-
-        Raises:
-            FileProcessingError: 文件验证失败
-        """
         if not file.filename:
             raise FileProcessingError("文件名不能为空")
 
-        # 验证文件名安全性
         if not cls.validate_filename(file.filename):
             raise FileProcessingError("文件名包含非法字符或不符合规范")
 
-        # 检查文件大小
-        file.file.seek(0, 2)  # 移动到文件末尾
+        file.file.seek(0, 2)
         file_size = file.file.tell()
-        file.file.seek(0)  # 重置到文件开头
+        file.file.seek(0)
 
         if file_size == 0:
             raise FileProcessingError("文件不能为空")
 
-        # 从扩展名推断文件类型
         file_type_ext = cls.get_file_type_from_extension(file.filename)
         if not file_type_ext:
             raise FileProcessingError(f"不支持的文件扩展名: {Path(file.filename).suffix}")
 
-        # 检查文件类型大小限制
         file_config = cls.FILE_TYPE_CONFIG.get(file_type_ext)
         if file_config and file_size > file_config['max_size']:
             max_size_mb = file_config['max_size'] // (1024 * 1024)
@@ -200,11 +184,9 @@ class FileHandler:
                 f"文件大小超过{file_config['description']}限制，最大允许 {max_size_mb}MB"
             )
 
-        # 读取文件开头用于MIME类型检测
         file_content = file.file.read(1024)
-        file.file.seek(0)  # 重置到文件开头
+        file.file.seek(0)
 
-        # 检测MIME类型
         try:
             mime_type = magic.from_buffer(file_content, mime=True)
             file_type_mime = cls.get_file_type_from_mime(mime_type)
@@ -213,15 +195,12 @@ class FileHandler:
             mime_type = None
             file_type_mime = None
 
-        # 安全检查
         security_error = cls.validate_file_security(file.filename, mime_type)
         if security_error:
             raise FileProcessingError(security_error)
 
-        # 验证文件类型一致性
         if file_type_mime and file_type_mime != file_type_ext:
             logger.warning(f"文件类型不匹配: 扩展名={file_type_ext}, MIME={file_type_mime or mime_type}")
-            # 以MIME类型为准，如果支持的话
             if file_type_mime in cls.SUPPORTED_EXTENSIONS.values():
                 file_type = file_type_mime
             else:
@@ -229,9 +208,13 @@ class FileHandler:
         else:
             file_type = file_type_ext
 
-        # 计算文件哈希
-        file_hash = await cls.calculate_file_hash(file)
-        file.file.seek(0)  # 重置到文件开头
+        import asyncio
+        file_hash = None
+        if file_size <= 50 * 1024 * 1024:
+            file_hash = await asyncio.to_thread(cls._calculate_file_hash_sync, file)
+        else:
+            logger.info(f"文件较大({file_size}字节)，跳过哈希计算以加速上传")
+        file.file.seek(0)
 
         file_info = {
             'filename': file.filename,
@@ -246,20 +229,16 @@ class FileHandler:
         return file_type, file_info
 
     @classmethod
-    async def calculate_file_hash(cls, file: UploadFile) -> str:
-        """计算文件的SHA-256哈希值"""
+    def _calculate_file_hash_sync(cls, file: UploadFile) -> str:
         file.file.seek(0)
         hash_sha256 = hashlib.sha256()
-
-        # 分块读取文件以处理大文件
         chunk_size = 8192
         while True:
             chunk = file.file.read(chunk_size)
             if not chunk:
                 break
             hash_sha256.update(chunk)
-
-        file.file.seek(0)  # 重置到文件开头
+        file.file.seek(0)
         return hash_sha256.hexdigest()
 
     @classmethod

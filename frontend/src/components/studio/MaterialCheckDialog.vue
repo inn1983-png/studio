@@ -5,25 +5,38 @@
     width="600px"
     :close-on-click-modal="false"
   >
-    <div v-loading="loading" class="check-result">
+    <div
+      v-loading="loading"
+      class="check-result"
+    >
       <template v-if="!loading && result">
         <!-- 成功状态 -->
-        <div v-if="result.all_ready" class="success-state">
+        <div
+          v-if="result.all_ready"
+          class="success-state"
+        >
           <el-result
             icon="success"
             title="素材准备完成"
             sub-title="所有句子的素材都已准备就绪，可以生成视频了！"
           >
             <template #extra>
-              <el-descriptions :column="2" border>
+              <el-descriptions
+                :column="2"
+                border
+              >
                 <el-descriptions-item label="总句子数">
                   {{ result.total_sentences }}
                 </el-descriptions-item>
                 <el-descriptions-item label="已准备">
-                  <el-tag type="success">{{ result.ready_count }}</el-tag>
+                  <el-tag type="success">
+                    {{ result.ready_count }}
+                  </el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="章节状态">
-                  <el-tag type="success">{{ getStatusText(result.chapter_status) }}</el-tag>
+                  <el-tag type="success">
+                    {{ getStatusText(result.chapter_status) }}
+                  </el-tag>
                 </el-descriptions-item>
               </el-descriptions>
             </template>
@@ -31,7 +44,10 @@
         </div>
 
         <!-- 未完成状态 -->
-        <div v-else class="incomplete-state">
+        <div
+          v-else
+          class="incomplete-state"
+        >
           <el-result
             icon="warning"
             title="素材未完成"
@@ -39,28 +55,44 @@
           >
             <template #extra>
               <div class="stats-section">
-                <el-descriptions :column="2" border>
+                <el-descriptions
+                  :column="2"
+                  border
+                >
                   <el-descriptions-item label="总句子数">
                     {{ result.total_sentences }}
                   </el-descriptions-item>
                   <el-descriptions-item label="已准备">
-                    <el-tag type="success">{{ result.ready_count }}</el-tag>
+                    <el-tag type="success">
+                      {{ result.ready_count }}
+                    </el-tag>
                   </el-descriptions-item>
                   <el-descriptions-item label="缺少提示词">
-                    <el-tag type="warning">{{ result.missing_materials.prompts }}</el-tag>
+                    <el-tag type="warning">
+                      {{ result.missing_materials.prompts }}
+                    </el-tag>
                   </el-descriptions-item>
                   <el-descriptions-item label="缺少图片">
-                    <el-tag type="warning">{{ result.missing_materials.images }}</el-tag>
+                    <el-tag type="warning">
+                      {{ result.missing_materials.images }}
+                    </el-tag>
                   </el-descriptions-item>
                   <el-descriptions-item label="缺少音频">
-                    <el-tag type="warning">{{ result.missing_materials.audio }}</el-tag>
+                    <el-tag type="warning">
+                      {{ result.missing_materials.audio }}
+                    </el-tag>
                   </el-descriptions-item>
                 </el-descriptions>
               </div>
 
               <!-- 缺失素材详情 -->
-              <div v-if="result.missing_sentences.length > 0" class="missing-details">
-                <el-divider content-position="left">缺失素材详情</el-divider>
+              <div
+                v-if="result.missing_sentences.length > 0"
+                class="missing-details"
+              >
+                <el-divider content-position="left">
+                  缺失素材详情
+                </el-divider>
                 <div class="missing-list">
                   <el-card
                     v-for="(item, index) in result.missing_sentences"
@@ -82,7 +114,9 @@
                         </el-tag>
                       </div>
                     </div>
-                    <div class="item-content">{{ item.content }}</div>
+                    <div class="item-content">
+                      {{ item.content }}
+                    </div>
                   </el-card>
                 </div>
               </div>
@@ -93,8 +127,14 @@
     </div>
 
     <template #footer>
-      <el-button @click="handleClose">关闭</el-button>
-      <el-button v-if="result && !result.all_ready" type="primary" @click="handleGenerate">
+      <el-button @click="handleClose">
+        关闭
+      </el-button>
+      <el-button
+        v-if="result && !result.all_ready"
+        type="primary"
+        @click="handleGenerate"
+      >
         去生成素材
       </el-button>
     </template>

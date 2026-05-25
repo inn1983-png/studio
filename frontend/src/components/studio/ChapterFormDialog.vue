@@ -11,7 +11,10 @@
       :rules="rules"
       label-width="100px"
     >
-      <el-form-item label="章节标题" prop="title">
+      <el-form-item
+        label="章节标题"
+        prop="title"
+      >
         <el-input
           v-model="formData.title"
           placeholder="请输入章节标题"
@@ -20,7 +23,10 @@
         />
       </el-form-item>
 
-      <el-form-item label="章节序号" prop="chapter_number">
+      <el-form-item
+        label="章节序号"
+        prop="chapter_number"
+      >
         <el-input-number
           v-model="formData.chapter_number"
           :min="1"
@@ -29,7 +35,10 @@
         />
       </el-form-item>
 
-      <el-form-item label="章节内容" prop="content">
+      <el-form-item
+        label="章节内容"
+        prop="content"
+      >
         <el-input
           v-model="formData.content"
           type="textarea"
@@ -42,8 +51,14 @@
     </el-form>
 
     <template #footer>
-      <el-button @click="handleClose">取消</el-button>
-      <el-button type="primary" @click="handleSubmit" :loading="loading">
+      <el-button @click="handleClose">
+        取消
+      </el-button>
+      <el-button
+        type="primary"
+        :loading="loading"
+        @click="handleSubmit"
+      >
         {{ isEdit ? '保存' : '创建' }}
       </el-button>
     </template>

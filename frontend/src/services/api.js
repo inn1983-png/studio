@@ -23,7 +23,7 @@ export function shouldForceLogoutOnUnauthorized(error) {
 // 创建axios实例
 const api = axios.create({
   baseURL: '/api/v1',
-  timeout: 30000,
+  timeout: 300000,
   headers: {
     'Content-Type': 'application/json'
   }

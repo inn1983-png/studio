@@ -314,16 +314,21 @@ class DashboardService(BaseService):
         
         result = await self.execute(query)
         projects = result.scalars().all()
-        
-        # 转换为字典并添加章节统计
+
+        if projects:
+            chapter_counts_stmt = select(
+                Chapter.project_id, func.count(Chapter.id)
+            ).where(
+                Chapter.project_id.in_([p.id for p in projects])
+            ).group_by(Chapter.project_id)
+            chapter_result = await self.execute(chapter_counts_stmt)
+            chapter_counts = dict(chapter_result.all())
+        else:
+            chapter_counts = {}
+
         project_list = []
         for project in projects:
-            # 获取章节数量
-            chapter_query = select(func.count(Chapter.id)).where(
-                Chapter.project_id == project.id
-            )
-            chapter_result = await self.execute(chapter_query)
-            chapter_count = chapter_result.scalar() or 0
+            chapter_count = chapter_counts.get(project.id, 0)
             
             project_list.append({
                 "id": str(project.id),

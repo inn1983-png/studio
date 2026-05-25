@@ -7,12 +7,17 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    '@vue/eslint-config-prettier'
+    'plugin:vue/vue3-recommended'
   ],
+  parser: 'vue-eslint-parser',
   parserOptions: {
+    parser: 'espree',
     ecmaVersion: 'latest',
     sourceType: 'module'
   },
+  plugins: [
+    'vue'
+  ],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',

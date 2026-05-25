@@ -7,16 +7,35 @@
     @close="emit('update:visible', false)"
   >
     <div class="history-drawer">
-      <div v-if="subtitle" class="history-drawer__subtitle">{{ subtitle }}</div>
-
-      <div class="history-drawer__actions">
-        <el-button text @click="emit('refresh')">刷新</el-button>
+      <div
+        v-if="subtitle"
+        class="history-drawer__subtitle"
+      >
+        {{ subtitle }}
       </div>
 
-      <div v-loading="loading" class="history-drawer__body">
-        <el-empty v-if="!items.length" description="暂无历史记录" />
+      <div class="history-drawer__actions">
+        <el-button
+          text
+          @click="emit('refresh')"
+        >
+          刷新
+        </el-button>
+      </div>
 
-        <div v-else class="history-drawer__list">
+      <div
+        v-loading="loading"
+        class="history-drawer__body"
+      >
+        <el-empty
+          v-if="!items.length"
+          description="暂无历史记录"
+        />
+
+        <div
+          v-else
+          class="history-drawer__list"
+        >
           <article
             v-for="item in items"
             :key="item.id"
@@ -28,20 +47,28 @@
                 v-if="mediaType === 'image' && item.previewUrl"
                 :src="item.previewUrl"
                 :alt="item.prompt || 'history preview'"
-              />
+              >
               <video
                 v-else-if="mediaType === 'video' && item.previewUrl"
                 :src="item.previewUrl"
                 controls
                 playsinline
                 preload="metadata"
-              ></video>
-              <div v-else class="history-card__empty-preview">无预览</div>
+              />
+              <div
+                v-else
+                class="history-card__empty-preview"
+              >
+                无预览
+              </div>
             </div>
 
             <div class="history-card__content">
               <div class="history-card__meta">
-                <el-tag size="small" :type="item.isActive ? 'success' : 'info'">
+                <el-tag
+                  size="small"
+                  :type="item.isActive ? 'success' : 'info'"
+                >
                   {{ item.isActive ? '当前版本' : item.statusText }}
                 </el-tag>
                 <span class="history-card__time">{{ item.createdAtText }}</span>

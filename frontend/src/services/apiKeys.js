@@ -103,7 +103,8 @@ export const apiKeyUtils = {
             'alibaba': '阿里云',
             'volcengine': '火山引擎',
             'custom': '自定义',
-            'siliconflow': 'SiliconFlow'
+            'siliconflow': 'SiliconFlow',
+            'local': '本地模型'
         }
         return providerMap[provider] || provider
     },
@@ -150,7 +151,8 @@ export const apiKeyUtils = {
             'alibaba': 'Cloudy',
             'volcengine': 'Cloudy',
             'custom': 'Setting',
-            'siliconflow': 'Cloudy'
+            'siliconflow': 'Cloudy',
+            'local': 'Monitor'
         }
         return iconMap[provider] || 'Key'
     },
@@ -196,7 +198,8 @@ export const apiKeyUtils = {
             // { label: '火山引擎', value: 'volcengine' },
             // { label: 'deepseek', value: 'deepseek' },
             { label: '硅基流动', value: 'siliconflow' },
-            { label: '自定义', value: 'custom' }
+            { label: '自定义', value: 'custom' },
+            { label: '本地模型', value: 'local' }
         ]
     },
 

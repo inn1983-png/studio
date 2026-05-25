@@ -8,7 +8,10 @@
       label-position="top"
       @submit.prevent="handleSubmit"
     >
-      <el-form-item label="项目标题" prop="title">
+      <el-form-item
+        label="项目标题"
+        prop="title"
+      >
         <el-input
           v-model="formData.title"
           placeholder="请输入项目标题"
@@ -19,7 +22,10 @@
         />
       </el-form-item>
 
-      <el-form-item label="项目描述" prop="description">
+      <el-form-item
+        label="项目描述"
+        prop="description"
+      >
         <el-input
           v-model="formData.description"
           type="textarea"
@@ -32,7 +38,12 @@
       </el-form-item>
 
       <div class="form-actions">
-        <el-button @click="handleCancel" :disabled="loading">取消</el-button>
+        <el-button
+          :disabled="loading"
+          @click="handleCancel"
+        >
+          取消
+        </el-button>
         <el-button
           type="primary"
           native-type="submit"

@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import movieService from '@/services/movie'
 import { useTaskPoller } from './useTaskPoller'
@@ -8,6 +8,9 @@ import { useTaskPoller } from './useTaskPoller'
  * 遵循架构：使用movieService而非直接调用api
  */
 export function useShotWorkflow(script) {
+    const { startPolling: startTaskPolling, stopPolling: stopTaskPolling } = useTaskPoller()
+    onUnmounted(() => { stopTaskPolling() })
+
     const extracting = ref(false)
     const generatingKeyframes = ref(new Set()) // 使用Set跟踪多个并发生成
     const extractingScenes = ref(new Set()) // 跟踪正在提取的场景
@@ -39,13 +42,11 @@ export function useShotWorkflow(script) {
 
             if (response.task_id) {
                 ElMessage.success('分镜提取任务已提交')
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id, async (result) => {
+                startTaskPolling(response.task_id, async (result) => {
                     ElMessage.success(`分镜提取完成: 成功 ${result.success}, 失败 ${result.failed}`)
                     extracting.value = false
-                    // 只刷新script数据，不刷新整个页面
                     if (script.value?.chapter_id && loadScript) {
-                        await loadScript(script.value.chapter_id, true) // skipStepUpdate=true
+                        await loadScript(script.value.chapter_id, true)
                     }
                 }, (error) => {
                     ElMessage.error(`提取失败: ${error.message}`)
@@ -68,20 +69,18 @@ export function useShotWorkflow(script) {
 
             if (response.task_id) {
                 ElMessage.success('关键帧生成任务已提交')
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id, async (result) => {
-                    batchGenerating.value = false // 清除loading状态
+                startTaskPolling(response.task_id, async (result) => {
+                    batchGenerating.value = false
                     if (result.failed > 0) {
                         ElMessage.warning(`关键帧生成部分完成: 成功 ${result.success}, 失败 ${result.failed}`)
                     } else {
                         ElMessage.success(`关键帧生成完成: 共 ${result.success} 个分镜`)
                     }
-                    // 只刷新script数据，不刷新整个页面
                     if (script.value?.chapter_id && loadScript) {
-                        await loadScript(script.value.chapter_id, true) // skipStepUpdate=true
+                        await loadScript(script.value.chapter_id, true)
                     }
                 }, (error) => {
-                    batchGenerating.value = false // 清除loading状态
+                    batchGenerating.value = false
                     ElMessage.error(`生成失败: ${error.message}`)
                 })
             } else {
@@ -104,18 +103,14 @@ export function useShotWorkflow(script) {
 
             if (response.task_id) {
                 ElMessage.success('关键帧生成任务已提交')
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id,
-                    // Success callback
+                startTaskPolling(response.task_id,
                     async () => {
                         ElMessage.success('关键帧生成完成')
                         generatingKeyframes.value.delete(shotId)
-                        // 只刷新script数据，不刷新整个页面
                         if (script.value?.chapter_id && loadScript) {
-                            await loadScript(script.value.chapter_id, true) // skipStepUpdate=true
+                            await loadScript(script.value.chapter_id, true)
                         }
                     },
-                    // Error callback
                     (error) => {
                         ElMessage.error(`生成失败: ${error.message}`)
                         generatingKeyframes.value.delete(shotId)
@@ -140,13 +135,11 @@ export function useShotWorkflow(script) {
 
             if (response.task_id) {
                 ElMessage.success('单场景分镜提取任务已提交')
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id, async (result) => {
+                startTaskPolling(response.task_id, async (result) => {
                     ElMessage.success(`场景分镜提取完成: 生成 ${result.shot_count} 个分镜`)
                     extractingScenes.value.delete(sceneId)
-                    // 只刷新script数据，不刷新整个页面
                     if (script.value?.chapter_id && loadScript) {
-                        await loadScript(script.value.chapter_id, true) // skipStepUpdate=true
+                        await loadScript(script.value.chapter_id, true)
                     }
                 }, (error) => {
                     ElMessage.error(`提取失败: ${error.message}`)

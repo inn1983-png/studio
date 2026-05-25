@@ -9,9 +9,14 @@
     @pointerdown.capture="handleRootPointerDown"
     @focusin="handleRootFocusIn"
   >
-    <div class="floating-header" @mousedown.stop="handleHeaderPointerDown">
+    <div
+      class="floating-header"
+      @mousedown.stop="handleHeaderPointerDown"
+    >
       <div class="image-label">
-        <el-icon class="icon"><Picture /></el-icon>
+        <el-icon class="icon">
+          <Picture />
+        </el-icon>
         <span>图片节点</span>
       </div>
       <input
@@ -19,14 +24,14 @@
         class="header-title-input"
         placeholder="图片节点标题"
         @input="$emit('update:title', $event.target.value)"
-      />
+      >
       <input
         ref="fileInputRef"
         class="image-upload-input"
         type="file"
         accept="image/*"
         @change="handleFileChange"
-      />
+      >
       <button
         class="upload-btn"
         :disabled="uploading"
@@ -47,8 +52,13 @@
         :src="previewUrl"
         class="preview-image"
         alt="canvas preview"
-      />
-      <div v-else class="empty-preview">输入提示词或上传参考图</div>
+      >
+      <div
+        v-else
+        class="empty-preview"
+      >
+        输入提示词或上传参考图
+      </div>
       <CanvasGeneratingOverlay
         :visible="generating"
         label="AI 正在生成图像"
@@ -146,7 +156,7 @@
               type="file"
               accept="image/*"
               @change="handleStyleReferenceFileChange"
-            />
+            >
             <button
               class="toolbar-chip-btn"
               :class="{ 'is-active': hasStyleReference }"
@@ -161,8 +171,10 @@
                 :src="draft.styleReferencePreviewUrl"
                 :alt="styleReferenceLabel"
                 class="style-reference-thumb"
-              />
-              <el-icon v-else><Picture /></el-icon>
+              >
+              <el-icon v-else>
+                <Picture />
+              </el-icon>
               <span>{{
                 hasStyleReference ? styleReferenceLabel : '风格参考'
               }}</span>
@@ -188,13 +200,23 @@
             :disabled="!canSubmitPrompt || generating || uploading"
             @click="handleGenerate"
           >
-            <el-icon v-if="generating" class="is-loading"><Loading /></el-icon>
-            <el-icon v-else><Top /></el-icon>
+            <el-icon
+              v-if="generating"
+              class="is-loading"
+            >
+              <Loading />
+            </el-icon>
+            <el-icon v-else>
+              <Top />
+            </el-icon>
           </button>
         </div>
       </div>
 
-      <button class="panel-delete-btn" @click="$emit('delete')">
+      <button
+        class="panel-delete-btn"
+        @click="$emit('delete')"
+      >
         <el-icon><Delete /></el-icon>
       </button>
     </div>
@@ -210,7 +232,7 @@
         :src="previewUrl"
         class="dialog-preview-image"
         alt="canvas full preview"
-      />
+      >
     </el-dialog>
   </div>
 </template>

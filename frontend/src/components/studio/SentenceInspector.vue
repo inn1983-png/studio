@@ -1,20 +1,32 @@
 <template>
   <div class="sentence-inspector">
-    <div class="inspector-header" @click="$emit('toggle-maximize')">
+    <div
+      class="inspector-header"
+      @click="$emit('toggle-maximize')"
+    >
       <h3>详情面板</h3>
       <el-button 
         link 
         :icon="isMaximized ? 'Close' : 'FullScreen'" 
-        @click.stop="$emit('toggle-maximize')"
         :title="isMaximized ? '退出专注模式' : '专注模式'"
+        @click.stop="$emit('toggle-maximize')"
       />
     </div>
 
-    <div v-if="!paragraph" class="inspector-empty">
-      <el-empty description="请选择一个段落" :image-size="100" />
+    <div
+      v-if="!paragraph"
+      class="inspector-empty"
+    >
+      <el-empty
+        description="请选择一个段落"
+        :image-size="100"
+      />
     </div>
 
-    <div v-else class="inspector-content">
+    <div
+      v-else
+      class="inspector-content"
+    >
       <!-- 段落信息 -->
       <div class="info-section">
         <h4>段落信息</h4>
@@ -29,13 +41,19 @@
           </div>
           <div class="info-item">
             <span class="label">状态</span>
-            <el-tag :type="getActionType(paragraph.action)" size="small">
+            <el-tag
+              :type="getActionType(paragraph.action)"
+              size="small"
+            >
               {{ getActionText(paragraph.action) }}
             </el-tag>
           </div>
         </div>
         <!-- 段落内容预览 -->
-        <div class="paragraph-preview" v-if="paragraph.content">
+        <div
+          v-if="paragraph.content"
+          class="paragraph-preview"
+        >
           <span class="label">原始内容：</span>
           <p>{{ paragraph.content }}</p>
         </div>
@@ -56,8 +74,14 @@
           </el-button>
         </div>
         
-        <div v-loading="loading" class="sentence-list">
-          <div v-if="sentences.length === 0" class="empty-sentences">
+        <div
+          v-loading="loading"
+          class="sentence-list"
+        >
+          <div
+            v-if="sentences.length === 0"
+            class="empty-sentences"
+          >
             暂无句子
           </div>
           
@@ -66,9 +90,14 @@
             :key="sentence.id" 
             class="sentence-item"
           >
-            <div class="sentence-index">{{ index + 1 }}</div>
+            <div class="sentence-index">
+              {{ index + 1 }}
+            </div>
             <div class="sentence-content">
-              <div v-if="editingId === sentence.id" class="edit-mode">
+              <div
+                v-if="editingId === sentence.id"
+                class="edit-mode"
+              >
                 <el-input
                   v-model="editContent"
                   type="textarea"
@@ -77,20 +106,55 @@
                   @keyup.enter.ctrl="handleSaveEdit(sentence)"
                 />
                 <div class="edit-actions">
-                  <el-button type="primary" link size="small" @click="handleSaveEdit(sentence)">保存</el-button>
-                  <el-button link size="small" @click="cancelEdit">取消</el-button>
+                  <el-button
+                    type="primary"
+                    link
+                    size="small"
+                    @click="handleSaveEdit(sentence)"
+                  >
+                    保存
+                  </el-button>
+                  <el-button
+                    link
+                    size="small"
+                    @click="cancelEdit"
+                  >
+                    取消
+                  </el-button>
                 </div>
               </div>
-              <div v-else class="view-mode">
+              <div
+                v-else
+                class="view-mode"
+              >
                 <p>{{ sentence.content }}</p>
-                <div class="item-actions" v-if="!readOnly">
-                  <el-button type="primary" link size="small" @click="startEdit(sentence)">
+                <div
+                  v-if="!readOnly"
+                  class="item-actions"
+                >
+                  <el-button
+                    type="primary"
+                    link
+                    size="small"
+                    @click="startEdit(sentence)"
+                  >
                     <el-icon><Edit /></el-icon>
                   </el-button>
-                  <el-button type="success" link size="small" @click="$emit('generate-audio', sentence)" title="生成音频">
+                  <el-button
+                    type="success"
+                    link
+                    size="small"
+                    title="生成音频"
+                    @click="$emit('generate-audio', sentence)"
+                  >
                     <el-icon><Microphone /></el-icon>
                   </el-button>
-                  <el-button type="danger" link size="small" @click="handleDelete(sentence)">
+                  <el-button
+                    type="danger"
+                    link
+                    size="small"
+                    @click="handleDelete(sentence)"
+                  >
                     <el-icon><Delete /></el-icon>
                   </el-button>
                 </div>
@@ -108,7 +172,10 @@
       width="500px"
       append-to-body
     >
-      <el-form :model="addForm" label-width="80px">
+      <el-form
+        :model="addForm"
+        label-width="80px"
+      >
         <el-form-item label="内容">
           <el-input 
             v-model="addForm.content" 
@@ -121,7 +188,11 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showAddDialog = false">取消</el-button>
-          <el-button type="primary" @click="submitAddSentence" :loading="submitting">
+          <el-button
+            type="primary"
+            :loading="submitting"
+            @click="submitAddSentence"
+          >
             确定
           </el-button>
         </span>
@@ -131,8 +202,8 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
-import { InfoFilled, Plus, Edit, Delete, FullScreen, Close, Microphone } from '@element-plus/icons-vue'
+import { ref, watch } from 'vue'
+import { Plus, Edit, Delete, Microphone } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import sentencesService from '@/services/sentences'
 
@@ -155,11 +226,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['toggle-maximize', 'generate-audio'])
+defineEmits(['toggle-maximize', 'generate-audio'])
 
 // 状态
 const sentences = ref([])
-const loading = ref(false)
+const localLoading = ref(false)
 const showAddDialog = ref(false)
 const submitting = ref(false)
 const addForm = ref({ content: '' })
@@ -180,7 +251,7 @@ watch(() => props.paragraph, async (newVal) => {
 // 加载句子列表
 const loadSentences = async (paragraphId) => {
   try {
-    loading.value = true
+    localLoading.value = true
     // 注意：后端目前没有直接的列表接口，这里假设我们通过段落详情或者需要后端补充接口
     // 暂时使用模拟数据或者尝试调用（如果后端支持）
     // 由于后端确实没有 GET /sentences/?paragraph_id=xxx，这里可能会失败
@@ -200,7 +271,7 @@ const loadSentences = async (paragraphId) => {
     console.error('加载句子失败:', error)
     sentences.value = []
   } finally {
-    loading.value = false
+    localLoading.value = false
   }
 }
 

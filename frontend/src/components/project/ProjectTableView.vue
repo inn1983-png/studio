@@ -3,14 +3,23 @@
     <el-table
       :data="projects"
       :row-key="(row) => row.id"
-      @row-click="$emit('row-click', $event)"
       stripe
       highlight-current-row
+      @row-click="$emit('row-click', $event)"
     >
-      <el-table-column prop="title" label="项目标题" min-width="200">
+      <el-table-column
+        prop="title"
+        label="项目标题"
+        min-width="200"
+      >
         <template #default="{ row }">
           <div class="project-title">
-            <el-text class="title-text" truncated>{{ row.title }}</el-text>
+            <el-text
+              class="title-text"
+              truncated
+            >
+              {{ row.title }}
+            </el-text>
             <el-tag
               v-if="row.type"
               :type="row.type === 'ai_movie' ? 'primary' : 'success'"
@@ -31,7 +40,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="status" label="状态" width="120">
+      <el-table-column
+        prop="status"
+        label="状态"
+        width="120"
+      >
         <template #default="{ row }">
           <div class="status-cell">
             <el-tag
@@ -49,55 +62,92 @@
               <div
                 class="progress-fill"
                 :style="{ width: row.processing_progress + '%' }"
-              ></div>
+              />
             </div>
           </div>
         </template>
       </el-table-column>
 
-      <el-table-column prop="word_count" label="字数" width="100" align="right">
+      <el-table-column
+        prop="word_count"
+        label="字数"
+        width="100"
+        align="right"
+      >
         <template #default="{ row }">
           <el-text>{{ projectsStore.formatNumber(row.word_count) }}</el-text>
         </template>
       </el-table-column>
 
-      <el-table-column prop="paragraph_count" label="段落" width="100" align="right">
+      <el-table-column
+        prop="paragraph_count"
+        label="段落"
+        width="100"
+        align="right"
+      >
         <template #default="{ row }">
           <el-text>{{ projectsStore.formatNumber(row.paragraph_count) }}</el-text>
         </template>
       </el-table-column>
 
-      <el-table-column prop="sentence_count" label="句子" width="100" align="right">
+      <el-table-column
+        prop="sentence_count"
+        label="句子"
+        width="100"
+        align="right"
+      >
         <template #default="{ row }">
           <el-text>{{ projectsStore.formatNumber(row.sentence_count) }}</el-text>
         </template>
       </el-table-column>
 
-      <el-table-column prop="chapter_count" label="章节" width="100" align="right">
+      <el-table-column
+        prop="chapter_count"
+        label="章节"
+        width="100"
+        align="right"
+      >
         <template #default="{ row }">
           <el-text>{{ projectsStore.formatNumber(row.chapter_count) }}</el-text>
         </template>
       </el-table-column>
 
-      <el-table-column prop="file_size" label="文件大小" width="120" align="right">
+      <el-table-column
+        prop="file_size"
+        label="文件大小"
+        width="120"
+        align="right"
+      >
         <template #default="{ row }">
           <el-text>{{ projectsStore.formatFileSize(row.file_size) }}</el-text>
         </template>
       </el-table-column>
 
-      <el-table-column prop="created_at" label="创建时间" width="160">
+      <el-table-column
+        prop="created_at"
+        label="创建时间"
+        width="160"
+      >
         <template #default="{ row }">
           <el-text>{{ projectsStore.formatDateTime(row.created_at) }}</el-text>
         </template>
       </el-table-column>
 
-      <el-table-column prop="updated_at" label="更新时间" width="160">
+      <el-table-column
+        prop="updated_at"
+        label="更新时间"
+        width="160"
+      >
         <template #default="{ row }">
           <el-text>{{ projectsStore.formatDateTime(row.updated_at) }}</el-text>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column
+        label="操作"
+        width="220"
+        fixed="right"
+      >
         <template #default="{ row }">
           <div class="action-buttons">
             <el-button
@@ -148,14 +198,14 @@
 import { View, Edit, RefreshRight } from '@element-plus/icons-vue'
 import { useProjectsStore } from '@/stores/projects'
 
-const props = defineProps({
+defineProps({
   projects: {
     type: Array,
     default: () => [],
   }
 })
 
-const emit = defineEmits([
+defineEmits([
   'view-project',
   'retry-project',
   'edit-project',

@@ -1,24 +1,42 @@
 <template>
   <header class="assistant-header">
     <div class="assistant-header__copy">
-      <div class="assistant-header__eyebrow">Canvas assistant</div>
-      <h2 class="assistant-header__title">{{ title }}</h2>
+      <div class="assistant-header__eyebrow">
+        Canvas assistant
+      </div>
+      <h2 class="assistant-header__title">
+        {{ title }}
+      </h2>
       <p class="assistant-header__subtitle">
         {{ subtitle }}
       </p>
     </div>
 
     <div class="assistant-header__actions">
-      <span class="assistant-status" :class="`assistant-status--${statusTone}`">
+      <span
+        class="assistant-status"
+        :class="`assistant-status--${statusTone}`"
+      >
         {{ statusLabel }}
       </span>
-      <button v-if="canReset" class="assistant-header__reset" type="button" @click="$emit('reset')">
+      <button
+        v-if="canReset"
+        class="assistant-header__reset"
+        type="button"
+        @click="$emit('reset')"
+      >
         重置会话
       </button>
     </div>
 
-    <div v-if="sessionId" class="assistant-header__chips">
-      <span v-if="sessionId" class="assistant-chip">Session {{ sessionId }}</span>
+    <div
+      v-if="sessionId"
+      class="assistant-header__chips"
+    >
+      <span
+        v-if="sessionId"
+        class="assistant-chip"
+      >Session {{ sessionId }}</span>
     </div>
   </header>
 </template>

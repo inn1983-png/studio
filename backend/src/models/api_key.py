@@ -25,15 +25,17 @@ class APIKeyStatus(str, Enum):
 
 
 class APIKeyProvider(str, Enum):
-    """服务提供商枚举"""
     OPENAI = "openai"
+    DEEPSEEK = "deepseek"
     AZURE = "azure"
     GOOGLE = "google"
     BAIDU = "baidu"
     ALIBABA = "alibaba"
     VOLCENGINE = "volcengine"
-    CUSTOM = "custom"
     SILICONFLOW = "siliconflow"
+    VECTORENGINE = "vectorengine"
+    CUSTOM = "custom"
+    LOCAL = "local"
 
 
 class APIKey(BaseModel):
@@ -65,6 +67,7 @@ class APIKey(BaseModel):
 
     # 索引定义
     __table_args__ = (
+        Index('idx_apikey_user_provider_status', 'user_id', 'provider', 'status'),
         {'comment': 'API密钥表 - 存储用户配置的AI服务API密钥'},
     )
 

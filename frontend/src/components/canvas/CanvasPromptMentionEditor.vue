@@ -1,6 +1,9 @@
 <template>
   <div class="canvas-prompt-mention-editor">
-    <div ref="promptPanelShellRef" class="prompt-panel-shell">
+    <div
+      ref="promptPanelShellRef"
+      class="prompt-panel-shell"
+    >
       <div
         ref="editableRef"
         class="prompt-editor"
@@ -16,7 +19,7 @@
         @click="handleEditorClick"
         @blur="handleEditorBlur"
         @paste="handleEditorPaste"
-      ></div>
+      />
 
       <div
         v-if="showReferencePicker"
@@ -31,11 +34,24 @@
           </div>
           <span class="reference-picker-query">@{{ referenceQuery }}</span>
         </div>
-        <div class="reference-picker-subtitle">{{ referencePickerSubtitle }}</div>
-        <div class="reference-picker-search-hint">{{ referencePickerSearchHint }}</div>
-        <div v-if="flattenedReferenceItems.length" class="reference-list">
-          <div v-for="group in groupedReferenceItems" :key="group.key" class="reference-group">
-            <div class="reference-group-title">{{ group.title }}</div>
+        <div class="reference-picker-subtitle">
+          {{ referencePickerSubtitle }}
+        </div>
+        <div class="reference-picker-search-hint">
+          {{ referencePickerSearchHint }}
+        </div>
+        <div
+          v-if="flattenedReferenceItems.length"
+          class="reference-list"
+        >
+          <div
+            v-for="group in groupedReferenceItems"
+            :key="group.key"
+            class="reference-group"
+          >
+            <div class="reference-group-title">
+              {{ group.title }}
+            </div>
             <button
               v-for="reference in group.items"
               :key="reference.id"
@@ -44,10 +60,20 @@
               :class="{ 'is-active': reference.flatIndex === activeReferenceIndex }"
               @mousedown.prevent="insertReference(reference)"
             >
-              <span v-if="reference.item_type === 'image' && reference.previewUrl" class="reference-item-thumb-wrap">
-                <img class="reference-item-thumb" :src="reference.previewUrl" :alt="reference.title || reference.id" />
+              <span
+                v-if="reference.item_type === 'image' && reference.previewUrl"
+                class="reference-item-thumb-wrap"
+              >
+                <img
+                  class="reference-item-thumb"
+                  :src="reference.previewUrl"
+                  :alt="reference.title || reference.id"
+                >
               </span>
-              <span v-else class="reference-item-type">{{ reference.item_type === 'image' ? 'IMG' : 'TXT' }}</span>
+              <span
+                v-else
+                class="reference-item-type"
+              >{{ reference.item_type === 'image' ? 'IMG' : 'TXT' }}</span>
               <span class="reference-item-body">
                 <span class="reference-item-title-row">
                   <span class="reference-item-title">{{ reference.title || reference.id }}</span>
@@ -59,14 +85,24 @@
             </button>
           </div>
         </div>
-        <div v-else class="reference-empty">
-          <div class="reference-empty-title">暂无结果</div>
-          <div class="reference-empty-hint">{{ referencePickerEmptyHint }}</div>
+        <div
+          v-else
+          class="reference-empty"
+        >
+          <div class="reference-empty-title">
+            暂无结果
+          </div>
+          <div class="reference-empty-hint">
+            {{ referencePickerEmptyHint }}
+          </div>
         </div>
       </div>
     </div>
 
-    <div v-if="helperText" class="prompt-hint-row">
+    <div
+      v-if="helperText"
+      class="prompt-hint-row"
+    >
       <span>{{ helperText }}</span>
     </div>
   </div>

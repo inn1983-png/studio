@@ -15,7 +15,7 @@
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from sqlalchemy import desc, func, or_, select
+from sqlalchemy import delete as sql_delete, desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.exceptions import BusinessLogicError, NotFoundError
@@ -431,19 +431,11 @@ class ProjectService(BaseService):
             project_id: str,
             owner_id: str
     ) -> bool:
-        """
-        删除项目
-
-        Args:
-            project_id: 项目ID
-            owner_id: 所有者ID
-
-        Returns:
-            是否删除成功
-        """
         project = await self.get_project_by_id(project_id, owner_id)
 
-        self.delete(project)
+        await self.execute(
+            sql_delete(Project).where(Project.id == project_id)
+        )
         await self.commit()
 
         logger.info(f"删除项目成功: ID={project_id}, 标题={project.title}")

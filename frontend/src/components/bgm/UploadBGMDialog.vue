@@ -2,9 +2,9 @@
   <el-dialog
     title="上传BGM"
     :model-value="modelValue"
-    @update:model-value="$emit('update:modelValue', $event)"
     width="500px"
     destroy-on-close
+    @update:model-value="$emit('update:modelValue', $event)"
   >
     <el-form
       ref="formRef"
@@ -12,7 +12,10 @@
       :rules="rules"
       label-width="80px"
     >
-      <el-form-item label="BGM名称" prop="name">
+      <el-form-item
+        label="BGM名称"
+        prop="name"
+      >
         <el-input
           v-model="form.name"
           placeholder="请输入BGM名称"
@@ -21,7 +24,10 @@
         />
       </el-form-item>
 
-      <el-form-item label="选择文件" prop="file">
+      <el-form-item
+        label="选择文件"
+        prop="file"
+      >
         <el-upload
           ref="uploadRef"
           :auto-upload="false"
@@ -32,7 +38,9 @@
           accept=".mp3,.wav,.m4a,.aac,.ogg"
           drag
         >
-          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+          <el-icon class="el-icon--upload">
+            <upload-filled />
+          </el-icon>
           <div class="el-upload__text">
             拖拽文件到此处或 <em>点击上传</em>
           </div>
@@ -50,7 +58,9 @@
     </el-form>
 
     <template #footer>
-      <el-button @click="handleCancel">取消</el-button>
+      <el-button @click="handleCancel">
+        取消
+      </el-button>
       <el-button
         type="primary"
         :loading="uploading"

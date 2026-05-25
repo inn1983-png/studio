@@ -4,9 +4,17 @@
     title="生成音频"
     width="500px"
   >
-    <el-form :inline="false" class="dialog-form" label-width="80px">
+    <el-form
+      :inline="false"
+      class="dialog-form"
+      label-width="80px"
+    >
       <el-form-item label="API Key">
-        <el-select v-model="selectedApiKey" placeholder="选择API Key" style="width: 100%">
+        <el-select
+          v-model="selectedApiKey"
+          placeholder="选择API Key"
+          style="width: 100%"
+        >
           <el-option
             v-for="key in apiKeys"
             :key="key.id"
@@ -61,7 +69,11 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" :loading="generating" @click="handleGenerate">
+        <el-button
+          type="primary"
+          :loading="generating"
+          @click="handleGenerate"
+        >
           生成
         </el-button>
       </span>

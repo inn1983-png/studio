@@ -5,6 +5,7 @@
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies import get_current_user_required
@@ -13,7 +14,7 @@ from src.core.logging import get_logger
 from src.models.user import User
 from src.services.project import ProjectService
 from src.utils.file_handlers import FileHandler, FileProcessingError
-from src.utils.storage import get_storage_client
+from src.utils.storage import get_storage_client, get_storage_type, LocalStorage
 from src.api.schemas.file import (
     FileUploadResult,
     FileInfo,
@@ -28,6 +29,25 @@ from src.api.schemas.file import (
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+
+@router.get("/local/{object_key:path}")
+async def serve_local_file(
+    object_key: str,
+    current_user: User = Depends(get_current_user_required)
+):
+    if get_storage_type() != "local":
+        raise HTTPException(status_code=404, detail="Not found")
+    storage_client = await get_storage_client()
+    if not isinstance(storage_client, LocalStorage):
+        raise HTTPException(status_code=404, detail="Not found")
+    user_prefix = f"uploads/{current_user.id}/"
+    if not object_key.startswith(user_prefix):
+        raise HTTPException(status_code=403, detail="Access denied")
+    file_path = storage_client.get_file_path(object_key)
+    if not file_path:
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(file_path)
 
 
 @router.post("/upload", response_model=FileUploadResult)

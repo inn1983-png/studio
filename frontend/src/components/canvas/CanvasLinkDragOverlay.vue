@@ -1,7 +1,13 @@
 <template>
-  <div v-if="path" class="canvas-link-drag-layer">
+  <div
+    v-if="path"
+    class="canvas-link-drag-layer"
+  >
     <svg class="canvas-link-drag-layer__svg">
-      <path :d="path" class="canvas-link-drag-layer__path" />
+      <path
+        :d="path"
+        class="canvas-link-drag-layer__path"
+      />
     </svg>
   </div>
 </template>

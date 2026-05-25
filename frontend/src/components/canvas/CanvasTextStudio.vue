@@ -10,9 +10,14 @@
     @pointerdown.capture="handleRootPointerDown"
     @focusin="handleRootFocusIn"
   >
-    <div class="floating-header" @mousedown.stop="handleHeaderPointerDown">
+    <div
+      class="floating-header"
+      @mousedown.stop="handleHeaderPointerDown"
+    >
       <div class="text-label">
-        <el-icon class="icon"><Document /></el-icon>
+        <el-icon class="icon">
+          <Document />
+        </el-icon>
         <span>文本节点</span>
       </div>
       <input
@@ -21,21 +26,46 @@
         placeholder="文本节点标题"
         :disabled="generating"
         @input="$emit('update:title', $event.target.value)"
+      >
+    </div>
+
+    <div
+      class="node-handle handle-left"
+      @mousedown.prevent="$emit('handle-drag', $event, 'left')"
+    >
+      <div class="plus-icon">
+        <el-icon><Plus /></el-icon>
+      </div>
+    </div>
+    <div
+      class="node-handle handle-right"
+      @mousedown.prevent="$emit('handle-drag', $event, 'right')"
+    >
+      <div class="plus-icon">
+        <el-icon><Plus /></el-icon>
+      </div>
+    </div>
+
+    <div
+      class="editor-glass-card"
+      @mousedown.stop="handleEditorCardPointerDown"
+    >
+      <div
+        class="drag-strip drag-strip--top"
+        @mousedown.stop="handleCardDragZonePointerDown"
       />
-    </div>
-
-    <div class="node-handle handle-left" @mousedown.prevent="$emit('handle-drag', $event, 'left')">
-      <div class="plus-icon"><el-icon><Plus /></el-icon></div>
-    </div>
-    <div class="node-handle handle-right" @mousedown.prevent="$emit('handle-drag', $event, 'right')">
-      <div class="plus-icon"><el-icon><Plus /></el-icon></div>
-    </div>
-
-    <div class="editor-glass-card" @mousedown.stop="handleEditorCardPointerDown">
-      <div class="drag-strip drag-strip--top" @mousedown.stop="handleCardDragZonePointerDown"></div>
-      <div class="drag-strip drag-strip--right" @mousedown.stop="handleCardDragZonePointerDown"></div>
-      <div class="drag-strip drag-strip--bottom" @mousedown.stop="handleCardDragZonePointerDown"></div>
-      <div class="drag-strip drag-strip--left" @mousedown.stop="handleCardDragZonePointerDown"></div>
+      <div
+        class="drag-strip drag-strip--right"
+        @mousedown.stop="handleCardDragZonePointerDown"
+      />
+      <div
+        class="drag-strip drag-strip--bottom"
+        @mousedown.stop="handleCardDragZonePointerDown"
+      />
+      <div
+        class="drag-strip drag-strip--left"
+        @mousedown.stop="handleCardDragZonePointerDown"
+      />
       <div
         ref="editableRef"
         class="rich-textarea"
@@ -44,7 +74,7 @@
         data-placeholder="输入正文内容..."
         @input="handleEditorInput"
         @blur="handleEditorBlur"
-      ></div>
+      />
     </div>
 
     <div class="studio-docked-panel">
@@ -99,14 +129,28 @@
           </el-select>
         </div>
         <div class="toolbar-right">
-          <button class="generate-action-btn" :disabled="!canSubmitPrompt || generating" @click="handleSubmitGeneration">
-            <el-icon v-if="generating" class="is-loading"><Loading /></el-icon>
-            <el-icon v-else><Top /></el-icon>
+          <button
+            class="generate-action-btn"
+            :disabled="!canSubmitPrompt || generating"
+            @click="handleSubmitGeneration"
+          >
+            <el-icon
+              v-if="generating"
+              class="is-loading"
+            >
+              <Loading />
+            </el-icon>
+            <el-icon v-else>
+              <Top />
+            </el-icon>
           </button>
         </div>
       </div>
 
-      <button class="panel-delete-btn" @click="$emit('delete')">
+      <button
+        class="panel-delete-btn"
+        @click="$emit('delete')"
+      >
         <el-icon><Delete /></el-icon>
       </button>
     </div>

@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import movieService from '@/services/movie'
 import { useTaskPoller } from './useTaskPoller'
@@ -8,6 +8,9 @@ import { useTaskPoller } from './useTaskPoller'
  * 遵循架构：使用movieService而非直接调用api
  */
 export function useCharacterWorkflow(projectId) {
+    const { startPolling: startTaskPolling, stopPolling: stopTaskPolling } = useTaskPoller()
+    onUnmounted(() => { stopTaskPolling() })
+
     const characters = ref([])
     const extracting = ref(false)
     const generatingIds = ref(new Set()) // 改用Set跟踪多个正在生成的角色
@@ -34,8 +37,7 @@ export function useCharacterWorkflow(projectId) {
 
             if (response.task_id) {
                 ElMessage.success('角色提取任务已提交')
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id, async () => {
+                startTaskPolling(response.task_id, async () => {
                     ElMessage.success('角色提取完成')
                     await loadCharacters()
                     extracting.value = false
@@ -63,14 +65,13 @@ export function useCharacterWorkflow(projectId) {
 
             if (response.task_id) {
                 ElMessage.success('角色形象生成任务已提交')
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id, async () => {
+                startTaskPolling(response.task_id, async () => {
                     ElMessage.success('角色形象生成成功')
                     await loadCharacters()
-                    generatingIds.value.delete(characterId) // 从Set中移除
+                    generatingIds.value.delete(characterId)
                 }, (error) => {
                     ElMessage.error(`生成失败: ${error.message}`)
-                    generatingIds.value.delete(characterId) // 从Set中移除
+                    generatingIds.value.delete(characterId)
                 })
             }
         } catch (error) {
@@ -89,14 +90,13 @@ export function useCharacterWorkflow(projectId) {
 
             if (response.task_id) {
                 ElMessage.success('批量生成任务已提交')
-                const { startPolling } = useTaskPoller()
-                startPolling(response.task_id, async (result) => {
+                startTaskPolling(response.task_id, async (result) => {
                     ElMessage.success(`批量生成完成: 成功 ${result.success}, 失败 ${result.failed}`)
                     await loadCharacters()
-                    batchGenerating.value = false // 完成后重置状态
+                    batchGenerating.value = false
                 }, (error) => {
                     ElMessage.error(`批量生成失败: ${error.message}`)
-                    batchGenerating.value = false // 失败后重置状态
+                    batchGenerating.value = false
                 })
             } else {
                 batchGenerating.value = false // 没有task_id时重置状态

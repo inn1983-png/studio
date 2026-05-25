@@ -5,10 +5,11 @@ from typing import Any, Dict, List
 from openai import AsyncOpenAI
 
 from src.core.logging import get_logger
-from .base import BaseLLMProvider, log_provider_call
+from .base import BaseLLMProvider, log_provider_call, register_provider
 
 logger = get_logger(__name__)
 
+@register_provider("volcengine")
 class VolcengineProvider(BaseLLMProvider):
     """
     火山方舟（Doubao）Provider，兼容 OpenAI SDK。

@@ -2,8 +2,12 @@
   <div class="projects-page">
     <!-- 页面头部信息 -->
     <div class="page-header">
-      <h1 class="page-title">项目管理</h1>
-      <p class="page-description">管理和查看您的所有项目</p>
+      <h1 class="page-title">
+        项目管理
+      </h1>
+      <p class="page-description">
+        管理和查看您的所有项目
+      </p>
     </div>
 
     <!-- 操作栏 -->
@@ -14,8 +18,8 @@
         placeholder="搜索项目标题或描述..."
         :prefix-icon="Search"
         clearable
-        @input="handleSearch"
         style="width: 240px"
+        @input="handleSearch"
       />
 
       <!-- 状态筛选 -->
@@ -23,45 +27,91 @@
         v-model="statusFilter"
         placeholder="状态筛选"
         clearable
-        @change="handleStatusFilter"
         style="width: 120px"
+        @change="handleStatusFilter"
       >
-        <el-option label="全部" value="" />
-        <el-option label="已上传" value="uploaded" />
-        <el-option label="解析中" value="parsing" />
-        <el-option label="解析完成" value="parsed" />
-        <el-option label="生成中" value="generating" />
-        <el-option label="已完成" value="completed" />
-        <el-option label="失败" value="failed" />
-        <el-option label="已归档" value="archived" />
+        <el-option
+          label="全部"
+          value=""
+        />
+        <el-option
+          label="已上传"
+          value="uploaded"
+        />
+        <el-option
+          label="解析中"
+          value="parsing"
+        />
+        <el-option
+          label="解析完成"
+          value="parsed"
+        />
+        <el-option
+          label="生成中"
+          value="generating"
+        />
+        <el-option
+          label="已完成"
+          value="completed"
+        />
+        <el-option
+          label="失败"
+          value="failed"
+        />
+        <el-option
+          label="已归档"
+          value="archived"
+        />
       </el-select>
 
       <!-- 排序方式 -->
       <el-select
         v-model="sortBy"
         placeholder="排序方式"
-        @change="handleSort"
         style="width: 120px"
+        @change="handleSort"
       >
-        <el-option label="创建时间" value="created_at" />
-        <el-option label="标题" value="title" />
-        <el-option label="更新时间" value="updated_at" />
-        <el-option label="文件大小" value="file_size" />
+        <el-option
+          label="创建时间"
+          value="created_at"
+        />
+        <el-option
+          label="标题"
+          value="title"
+        />
+        <el-option
+          label="更新时间"
+          value="updated_at"
+        />
+        <el-option
+          label="文件大小"
+          value="file_size"
+        />
       </el-select>
 
       <!-- 操作按钮 -->
       <div class="action-buttons">
-        <el-button type="primary" @click="handleCreateProject" :icon="Plus">
+        <el-button
+          type="primary"
+          :icon="Plus"
+          @click="handleCreateProject"
+        >
           新建项目
         </el-button>
-        <el-button @click="handleRefreshProjects" :icon="Refresh">
+        <el-button
+          :icon="Refresh"
+          @click="handleRefreshProjects"
+        >
           刷新
         </el-button>
       </div>
     </div>
 
     <!-- 项目列表视图 -->
-    <div v-if="currentView === 'list'" class="list-view">
+    <div
+      v-if="currentView === 'list'"
+      class="list-view"
+    >
       <ProjectList
         :projects="projects"
         :loading="loading"
@@ -81,7 +131,10 @@
     </div>
 
     <!-- 项目详情视图 -->
-    <div v-else-if="currentView === 'detail'" class="detail-view">
+    <div
+      v-else-if="currentView === 'detail'"
+      class="detail-view"
+    >
       <ProjectDetail
         :project-id="selectedProjectId"
         :project="selectedProject"
@@ -140,20 +193,34 @@
       top="5vh"
       :close-on-click-modal="false"
     >
-      <div v-if="contentLoading" class="content-loading">
-        <el-skeleton :rows="10" animated />
+      <div
+        v-if="contentLoading"
+        class="content-loading"
+      >
+        <el-skeleton
+          :rows="10"
+          animated
+        />
       </div>
-      <div v-else-if="fileContent" class="content-preview">
+      <div
+        v-else-if="fileContent"
+        class="content-preview"
+      >
         <pre class="file-content">{{ fileContent }}</pre>
       </div>
-      <div v-else-if="contentError" class="content-error">
+      <div
+        v-else-if="contentError"
+        class="content-error"
+      >
         <el-result
           icon="error"
           title="加载失败"
           :sub-title="contentError"
         >
           <template #extra>
-            <el-button @click="loadFileContent">重新加载</el-button>
+            <el-button @click="loadFileContent">
+              重新加载
+            </el-button>
           </template>
         </el-result>
       </div>
@@ -162,7 +229,7 @@
 </template>
 
 <script setup>
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { Plus, Refresh, Search } from '@element-plus/icons-vue'
 
@@ -172,15 +239,10 @@
   import ProjectCreator from '@/components/project/ProjectCreator.vue'
   import ProjectEditor from '@/components/project/ProjectEditor.vue'
 
-  // 状态管理导入
   import { useProjectsStore } from '@/stores/projects'
-  import { useAuthStore } from '@/stores/auth'
 
-  // Store实例
   const projectsStore = useProjectsStore()
-  const authStore = useAuthStore()
 
-  // 视图状态
   const currentView = ref('list') // 'list' | 'detail'
   const selectedProjectId = ref(null)
   const selectedProject = ref(null)
@@ -377,7 +439,7 @@
     loadProjectDetail(projectId)
   }
 
-  const handleStartGeneration = (project) => {
+  const handleStartGeneration = () => {
     ElMessage.info('视频生成功能即将上线')
   }
 
@@ -427,7 +489,7 @@
   }
 
   // 创建器处理
-  const handleCreatorSubmit = async (creatorData) => {
+  const handleCreatorSubmit = async () => {
     try {
       creatorLoading.value = true
 
@@ -491,7 +553,7 @@
   }
 
   // 编辑器处理
-  const handleEditorSubmit = async (updatedProject) => {
+  const handleEditorSubmit = async () => {
     try {
       editorLoading.value = true
 

@@ -6,15 +6,15 @@
         <el-button-group>
           <el-button
             :type="viewMode === 'grid' ? 'primary' : 'default'"
-            @click="viewMode = 'grid'"
             title="网格视图"
+            @click="viewMode = 'grid'"
           >
             <el-icon><Grid /></el-icon>
           </el-button>
           <el-button
             :type="viewMode === 'list' ? 'primary' : 'default'"
-            @click="viewMode = 'list'"
             title="列表视图"
+            @click="viewMode = 'list'"
           >
             <el-icon><List /></el-icon>
           </el-button>
@@ -23,15 +23,27 @@
     </div>
 
     <!-- 加载状态 -->
-    <div v-if="loading" class="loading-container">
-      <el-skeleton :rows="5" animated />
+    <div
+      v-if="loading"
+      class="loading-container"
+    >
+      <el-skeleton
+        :rows="5"
+        animated
+      />
     </div>
 
     <!-- 空状态 -->
-    <div v-else-if="!loading && projects.length === 0" class="empty-state">
+    <div
+      v-else-if="!loading && projects.length === 0"
+      class="empty-state"
+    >
       <el-empty :image-size="160">
         <template #image>
-          <el-icon :size="120" class="empty-icon">
+          <el-icon
+            :size="120"
+            class="empty-icon"
+          >
             <FolderOpened />
           </el-icon>
         </template>
@@ -39,11 +51,17 @@
           <div class="empty-description">
             <h3>还没有项目</h3>
             <p>创建您的第一个项目，开始AI内容生成之旅</p>
-            <p class="empty-hint">上传文本文件，系统将自动解析章节和段落</p>
+            <p class="empty-hint">
+              上传文本文件，系统将自动解析章节和段落
+            </p>
           </div>
         </template>
         <template #default>
-          <el-button type="primary" size="large" @click="$emit('create-project')">
+          <el-button
+            type="primary"
+            size="large"
+            @click="$emit('create-project')"
+          >
             <el-icon><Plus /></el-icon>
             创建第一个项目
           </el-button>
@@ -70,7 +88,10 @@
     />
 
     <!-- 分页 -->
-    <div v-if="total > 0" class="pagination-container">
+    <div
+      v-if="total > 0"
+      class="pagination-container"
+    >
       <el-pagination
         :current-page="currentPage"
         :page-size="pageSize"

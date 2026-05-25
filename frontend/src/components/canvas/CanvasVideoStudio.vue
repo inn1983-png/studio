@@ -9,9 +9,14 @@
     @pointerdown.capture="handleRootPointerDown"
     @focusin="handleRootFocusIn"
   >
-    <div class="floating-header" @mousedown.stop="handleHeaderPointerDown">
+    <div
+      class="floating-header"
+      @mousedown.stop="handleHeaderPointerDown"
+    >
       <div class="image-label">
-        <el-icon class="icon"><VideoCamera /></el-icon>
+        <el-icon class="icon">
+          <VideoCamera />
+        </el-icon>
         <span>视频节点</span>
       </div>
       <input
@@ -19,14 +24,14 @@
         class="header-title-input"
         placeholder="视频节点标题"
         @input="$emit('update:title', $event.target.value)"
-      />
+      >
       <input
         ref="fileInputRef"
         class="image-upload-input"
         type="file"
         accept="video/*"
         @change="handleFileChange"
-      />
+      >
       <button
         class="upload-btn"
         :disabled="uploading"
@@ -49,8 +54,13 @@
         controls
         playsinline
         preload="metadata"
-      ></video>
-      <div v-else class="empty-preview">输入提示词并连接上游参考节点</div>
+      />
+      <div
+        v-else
+        class="empty-preview"
+      >
+        输入提示词并连接上游参考节点
+      </div>
       <CanvasGeneratingOverlay
         :visible="generating"
         label="AI 正在生成视频"
@@ -81,8 +91,12 @@
         class="status-banner"
         :class="`status-banner--${statusMeta.tone}`"
       >
-        <div class="status-banner__label">{{ statusMeta.label }}</div>
-        <div class="status-banner__detail">{{ statusMeta.detail }}</div>
+        <div class="status-banner__label">
+          {{ statusMeta.label }}
+        </div>
+        <div class="status-banner__detail">
+          {{ statusMeta.detail }}
+        </div>
       </div>
       <CanvasPromptMentionEditor
         ref="promptEditorRef"
@@ -162,13 +176,23 @@
             :disabled="!canSubmitPrompt || generating || uploading"
             @click="handleGenerate"
           >
-            <el-icon v-if="generating" class="is-loading"><Loading /></el-icon>
-            <el-icon v-else><Top /></el-icon>
+            <el-icon
+              v-if="generating"
+              class="is-loading"
+            >
+              <Loading />
+            </el-icon>
+            <el-icon v-else>
+              <Top />
+            </el-icon>
           </button>
         </div>
       </div>
 
-      <button class="panel-delete-btn" @click="$emit('delete')">
+      <button
+        class="panel-delete-btn"
+        @click="$emit('delete')"
+      >
         <el-icon><Delete /></el-icon>
       </button>
     </div>
@@ -187,7 +211,7 @@
         autoplay
         playsinline
         preload="metadata"
-      ></video>
+      />
     </el-dialog>
   </div>
 </template>

@@ -1,31 +1,45 @@
 <template>
   <div 
-    class="director-mode"
     v-loading="loading || isPolling"
+    class="director-mode"
     :element-loading-text="loadingText"
     element-loading-background="rgba(255, 255, 255, 0.8)"
   >
     <!-- 任务完成统计信息 -->
-    <div v-if="taskCompletionStats" class="task-completion-alert">
+    <div
+      v-if="taskCompletionStats"
+      class="task-completion-alert"
+    >
       <el-alert
         :title="taskCompletionStats.title"
         :type="taskCompletionStats.type"
         :closable="true"
-        @close="taskCompletionStats = null"
         show-icon
+        @close="taskCompletionStats = null"
       >
         <template #default>
           <div class="stats-content">
-            <p v-html="taskCompletionStats.message"></p>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <p v-html="taskCompletionStats.message" />
           </div>
         </template>
       </el-alert>
     </div>
 
     <div class="toolbar">
-      <el-form :inline="true" class="filter-form">
-        <el-form-item label="选择章节" style="width: 240px">
-          <el-select v-model="selectedChapterId" placeholder="请选择已确认的章节" @change="loadSentences">
+      <el-form
+        :inline="true"
+        class="filter-form"
+      >
+        <el-form-item
+          label="选择章节"
+          style="width: 240px"
+        >
+          <el-select
+            v-model="selectedChapterId"
+            placeholder="请选择已确认的章节"
+            @change="loadSentences"
+          >
             <el-option
               v-for="chapter in chapters"
               :key="chapter.id"
@@ -35,42 +49,106 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="提示词" style="width: 120px">
-          <el-select v-model="filterHasPrompt" placeholder="全部" clearable @change="loadSentences">
-            <el-option label="已生成" value="true" />
-            <el-option label="未生成" value="false" />
+        <el-form-item
+          label="提示词"
+          style="width: 120px"
+        >
+          <el-select
+            v-model="filterHasPrompt"
+            placeholder="全部"
+            clearable
+            @change="loadSentences"
+          >
+            <el-option
+              label="已生成"
+              value="true"
+            />
+            <el-option
+              label="未生成"
+              value="false"
+            />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="图片" style="width: 120px">
-          <el-select v-model="filterHasImage" placeholder="全部" clearable @change="loadSentences">
-            <el-option label="已生成" value="true" />
-            <el-option label="未生成" value="false" />
+        <el-form-item
+          label="图片"
+          style="width: 120px"
+        >
+          <el-select
+            v-model="filterHasImage"
+            placeholder="全部"
+            clearable
+            @change="loadSentences"
+          >
+            <el-option
+              label="已生成"
+              value="true"
+            />
+            <el-option
+              label="未生成"
+              value="false"
+            />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="音频" style="width: 120px">
-          <el-select v-model="filterHasAudio" placeholder="全部" clearable @change="loadSentences">
-            <el-option label="已生成" value="true" />
-            <el-option label="未生成" value="false" />
+        <el-form-item
+          label="音频"
+          style="width: 120px"
+        >
+          <el-select
+            v-model="filterHasAudio"
+            placeholder="全部"
+            clearable
+            @change="loadSentences"
+          >
+            <el-option
+              label="已生成"
+              value="true"
+            />
+            <el-option
+              label="未生成"
+              value="false"
+            />
           </el-select>
         </el-form-item>
         
-        <div class="action-buttons" v-if="selectedChapterId">
-          <el-button type="primary" @click="generatePromptsVisible = true">
+        <div
+          v-if="selectedChapterId"
+          class="action-buttons"
+        >
+          <el-button
+            type="primary"
+            @click="generatePromptsVisible = true"
+          >
             批量生成提示词
           </el-button>
-          <el-button type="warning"  @click="batchGenerateImagesVisible = true">
+          <el-button
+            type="warning"
+            @click="batchGenerateImagesVisible = true"
+          >
             批量生成图片
           </el-button>
-          <el-button type="success"  @click="batchGenerateAudioVisible = true">
+          <el-button
+            type="success"
+            @click="batchGenerateAudioVisible = true"
+          >
             批量生成音频
           </el-button>
-          <el-button type="info" @click="handleCheckMaterials" :loading="checkingMaterials">
+          <el-button
+            type="info"
+            :loading="checkingMaterials"
+            @click="handleCheckMaterials"
+          >
             <el-icon><DocumentChecked /></el-icon>
             检测素材
           </el-button>
-          <el-button type="primary" plain @click="handleExportToJianYing" :loading="exportingToJianYing" :disabled="!isMaterialsReady">
+          <el-button
+            type="primary"
+            plain
+            :loading="exportingToJianYing"
+            :disabled="!isMaterialsReady"
+            @click="handleExportToJianYing"
+          >
             <el-icon><Download /></el-icon>
             导出剪映
           </el-button>
@@ -113,9 +191,15 @@
     </div>
 
     <div class="content-area">
-      <el-empty v-if="!sentences.length" description="暂无数据" />
+      <el-empty
+        v-if="!sentences.length"
+        description="暂无数据"
+      />
       
-      <div v-else class="card-grid">
+      <div
+        v-else
+        class="card-grid"
+      >
         <SentenceCard
           v-for="(sentence, index) in sentences"
           :key="sentence.id"
@@ -203,9 +287,7 @@ const {
 } = useDirectorEngine(props.projectId)
 
 const {
-  taskStatus,
   isPolling,
-  taskStatistics,
   startPolling
 } = useTaskPoller()
 

@@ -2,6 +2,7 @@
 项目管理API - 重构后使用schemas模块中的Pydantic模型
 """
 
+import asyncio
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -20,6 +21,43 @@ from src.services.project import ProjectService
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+
+async def _dispatch_file_processing(project_id: str, owner_id: str) -> str:
+    use_direct = True
+    try:
+        from src.tasks.app import celery_app
+        inspect = celery_app.control.inspect()
+        active = inspect.active() if inspect else None
+        if active:
+            use_direct = False
+    except Exception:
+        pass
+
+    if not use_direct:
+        try:
+            from src.tasks.project import process_uploaded_file
+            task = process_uploaded_file.delay(str(project_id), str(owner_id))
+            logger.info(f"Celery任务已投递: {task.id}")
+            return task.id
+        except Exception as e:
+            logger.warning(f"Celery投递失败 ({e})，使用异步直接处理")
+            use_direct = True
+
+    if use_direct:
+        async def _run_direct():
+            from src.core.database import AsyncSessionLocal
+            try:
+                async with AsyncSessionLocal() as db:
+                    from src.services.project_processing import ProjectProcessingService
+                    service = ProjectProcessingService(db)
+                    await service.process_file_task(str(project_id), str(owner_id))
+                    logger.info(f"异步直接处理完成: project_id={project_id}")
+            except Exception as ex:
+                logger.error(f"异步直接处理失败: project_id={project_id}, error={ex}")
+
+        asyncio.create_task(_run_direct())
+        return f"async-direct-{project_id}"
 
 
 @router.get("/", response_model=ProjectListResponse)
@@ -118,17 +156,15 @@ async def create_project(
             can_retry=False
         )
 
-    # 投递Celery解析任务
-    from src.tasks.project import process_uploaded_file
-    task = process_uploaded_file.delay(str(project.id), current_user.id)
+    task_id = await _dispatch_file_processing(str(project.id), current_user.id)
 
-    logger.info(f"项目 {project.id} 创建成功，已投递解析任务: {task.id}")
+    logger.info(f"项目 {project.id} 创建成功，已投递解析任务: {task_id}")
 
     return ProjectProcessingResponse(
         success=True,
         message="项目创建成功，已开始解析文件",
         project=ProjectResponse.from_dict(project.to_dict()),
-        task_id=task.id,
+        task_id=task_id,
         processing_status="parsing",
         can_retry=False
     )
@@ -165,17 +201,15 @@ async def create_project_from_text(
             can_retry=False
         )
 
-    # 投递Celery解析任务
-    from src.tasks.project import process_uploaded_file
-    task = process_uploaded_file.delay(str(project.id), current_user.id)
+    task_id = await _dispatch_file_processing(str(project.id), current_user.id)
 
-    logger.info(f"从文本创建项目 {project.id} 成功，已投递解析任务: {task.id}")
+    logger.info(f"从文本创建项目 {project.id} 成功，已投递解析任务: {task_id}")
 
     return ProjectProcessingResponse(
         success=True,
         message="项目创建成功，已开始解析文本内容",
         project=ProjectResponse.from_dict(project.to_dict()),
-        task_id=task.id,
+        task_id=task_id,
         processing_status="parsing",
         can_retry=False
     )
@@ -283,16 +317,14 @@ async def retry_project(
             processing_status=project.status
         )
 
-    # 投递重试任务
-    from src.tasks.project import retry_failed_project
-    task = retry_failed_project.delay(project_id, current_user.id)
+    task_id = await _dispatch_file_processing(project_id, current_user.id)
 
-    logger.info(f"项目 {project_id} 重试任务已投递: {task.id}")
+    logger.info(f"项目 {project_id} 重试任务已投递: {task_id}")
 
     return ProjectRetryResponse(
         success=True,
         message="重试任务已提交",
-        task_id=task.id,
+        task_id=task_id,
         processing_status="parsing"
     )
 

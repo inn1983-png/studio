@@ -4,9 +4,19 @@
     title="批量生成图片"
     width="500px"
   >
-    <el-form :inline="false" class="dialog-form">
-      <el-form-item label="API Key" style="width: 100%">
-        <el-select v-model="selectedApiKey" placeholder="选择API Key" style="width: 100%">
+    <el-form
+      :inline="false"
+      class="dialog-form"
+    >
+      <el-form-item
+        label="API Key"
+        style="width: 100%"
+      >
+        <el-select
+          v-model="selectedApiKey"
+          placeholder="选择API Key"
+          style="width: 100%"
+        >
           <el-option
             v-for="key in apiKeys"
             :key="key.id"
@@ -16,7 +26,10 @@
         </el-select>
       </el-form-item>
       
-      <el-form-item label="模型" style="width: 100%">
+      <el-form-item
+        label="模型"
+        style="width: 100%"
+      >
         <el-select 
           v-model="selectedModel" 
           placeholder="选择模型" 
@@ -39,7 +52,11 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" :loading="generating" @click="handleGenerate">
+        <el-button
+          type="primary"
+          :loading="generating"
+          @click="handleGenerate"
+        >
           生成
         </el-button>
       </span>

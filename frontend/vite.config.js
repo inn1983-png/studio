@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
 export default defineConfig({
+  base: '/',
   plugins: [vue()],
   resolve: {
     alias: {
@@ -10,7 +11,8 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000,
+    port: 5173,
+    strictPort: true,
     host: '0.0.0.0',
     hmr: {
       overlay: true
@@ -30,13 +32,39 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    sourcemap: true,
+    sourcemap: process.env.NODE_ENV !== 'production',
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['vue', 'vue-router', 'pinia'],
-          element: ['element-plus', '@element-plus/icons-vue'],
-          utils: ['axios']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('element-plus')) {
+              if (id.includes('@element-plus/icons-vue')) {
+                return 'element-icons'
+              }
+              if (id.includes('element-plus/es/components')) {
+                const match = id.match(/element-plus\/es\/components\/([^/]+)/)
+                if (match) {
+                  const component = match[1]
+                  const heavyComponents = ['table', 'virtual-list', 'tree', 'cascader', 'time-picker', 'date-picker']
+                  if (heavyComponents.includes(component)) {
+                    return `element-${component}`
+                  }
+                }
+              }
+              return 'element-core'
+            }
+            if (id.includes('konva') || id.includes('vue-konva')) {
+              return 'konva'
+            }
+            if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) {
+              return 'vue-vendor'
+            }
+            if (id.includes('axios')) {
+              return 'axios'
+            }
+            return 'vendor-other'
+          }
         }
       }
     }

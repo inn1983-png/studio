@@ -2,7 +2,9 @@
   <div class="register-form">
     <!-- 表单标题 -->
     <div class="form-header">
-      <el-icon class="header-icon"><User /></el-icon>
+      <el-icon class="header-icon">
+        <User />
+      </el-icon>
       <h2>创建账户</h2>
     </div>
 
@@ -11,12 +13,15 @@
       ref="registerFormRef"
       :model="registerForm"
       :rules="registerRules"
-      @submit.prevent="handleRegister"
       label-position="top"
       size="large"
       class="register-form-content"
+      @submit.prevent="handleRegister"
     >
-      <el-form-item label="用户名" prop="username">
+      <el-form-item
+        label="用户名"
+        prop="username"
+      >
         <el-input
           v-model="registerForm.username"
           placeholder="请输入用户名"
@@ -25,7 +30,10 @@
         />
       </el-form-item>
 
-      <el-form-item label="邮箱地址" prop="email">
+      <el-form-item
+        label="邮箱地址"
+        prop="email"
+      >
         <el-input
           v-model="registerForm.email"
           type="email"
@@ -35,7 +43,10 @@
         />
       </el-form-item>
 
-      <el-form-item label="密码" prop="password">
+      <el-form-item
+        label="密码"
+        prop="password"
+      >
         <el-input
           v-model="registerForm.password"
           type="password"
@@ -46,7 +57,10 @@
         />
       </el-form-item>
 
-      <el-form-item label="确认密码" prop="confirmPassword">
+      <el-form-item
+        label="确认密码"
+        prop="confirmPassword"
+      >
         <el-input
           v-model="registerForm.confirmPassword"
           type="password"
@@ -63,8 +77,8 @@
           type="primary"
           size="large"
           :loading="authStore.loading"
-          @click="handleRegister"
           class="submit-button"
+          @click="handleRegister"
         >
           <span v-if="!authStore.loading">注册</span>
           <span v-else>注册中...</span>
@@ -74,8 +88,12 @@
 
     <!-- 底部链接 -->
     <div class="form-footer">
-      <p>已有账户？
-        <router-link to="/login" class="link">
+      <p>
+        已有账户？
+        <router-link
+          to="/login"
+          class="link"
+        >
           立即登录
         </router-link>
       </p>

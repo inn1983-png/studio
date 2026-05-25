@@ -3,24 +3,36 @@
     <!-- 顶部工具栏 -->
     <div class="studio-header">
       <div class="header-left">
-        <el-button @click="handleBack" :icon="ArrowLeft" link>返回</el-button>
+        <el-button
+          :icon="ArrowLeft"
+          link
+          @click="handleBack"
+        >
+          返回
+        </el-button>
         <el-divider direction="vertical" />
-        <el-tooltip content="切换章节列表" placement="bottom">
+        <el-tooltip
+          content="切换章节列表"
+          placement="bottom"
+        >
           <el-button 
-            @click="showChapterNav = !showChapterNav" 
-            :icon="showChapterNav ? Fold : Expand"
+            :icon="showChapterNav ? Fold : Expand" 
             link
+            @click="showChapterNav = !showChapterNav"
           />
         </el-tooltip>
         <span class="project-title">{{ projectTitle }}</span>
       </div>
       <div class="header-right">
-        <el-tooltip content="切换句子详情" placement="bottom">
+        <el-tooltip
+          content="切换句子详情"
+          placement="bottom"
+        >
           <el-button 
-            @click="showInspector = !showInspector" 
-            :icon="showInspector ? Expand : Fold"
+            :icon="showInspector ? Expand : Fold" 
             link
             style="margin-right: 10px"
+            @click="showInspector = !showInspector"
           >
             {{ showInspector ? '隐藏详情' : '显示详情' }}
           </el-button>
@@ -79,13 +91,17 @@
       type="success"
       title="章节已确认！"
       :closable="true"
-      @close="showDirectorGuidance = false"
       style="margin: 16px 20px;"
+      @close="showDirectorGuidance = false"
     >
       <template #default>
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <span>现在可以进入导演引擎为这个章节生成分镜脚本了</span>
-          <el-button type="primary" size="small" @click="goToDirector">
+          <el-button
+            type="primary"
+            size="small"
+            @click="goToDirector"
+          >
             <el-icon><MagicStick /></el-icon>
             进入导演引擎
           </el-button>
@@ -124,7 +140,7 @@
         v-show="showChapterNav && !inspectorMaximized"
         class="resize-handle left-handle"
         @mousedown="startResizeLeft"
-      ></div>
+      />
 
       <!-- 左侧折叠条 -->
       <div 
@@ -132,8 +148,14 @@
         class="collapsed-bar left-bar"
         @click="showChapterNav = true"
       >
-        <el-tooltip content="展开章节列表" placement="right">
-          <el-button :icon="Expand" link />
+        <el-tooltip
+          content="展开章节列表"
+          placement="right"
+        >
+          <el-button
+            :icon="Expand"
+            link
+          />
         </el-tooltip>
       </div>
 
@@ -143,11 +165,11 @@
         :paragraphs="paragraphs"
         :selected-id="selectedParagraphId"
         :loading="paragraphsLoading"
+        :read-only="readOnly"
         @select="handleParagraphSelect"
         @update="handleParagraphUpdate"
         @create="handleParagraphCreate"
         @physical-delete="handleParagraphPhysicalDelete"
-        :read-only="readOnly"
       />
 
       <!-- 右侧折叠条 -->
@@ -156,8 +178,14 @@
         class="collapsed-bar right-bar"
         @click="showInspector = true"
       >
-        <el-tooltip content="展开句子详情" placement="left">
-          <el-button :icon="Fold" link />
+        <el-tooltip
+          content="展开句子详情"
+          placement="left"
+        >
+          <el-button
+            :icon="Fold"
+            link
+          />
         </el-tooltip>
       </div>
 
@@ -166,7 +194,7 @@
         v-show="showInspector && !inspectorMaximized"
         class="resize-handle right-handle"
         @mousedown="startResizeRight"
-      ></div>
+      />
 
       <!-- 右侧：句子检查器 -->
       <Transition name="slide-right">
@@ -179,9 +207,9 @@
             :paragraph="selectedParagraph"
             :loading="sentencesLoading"
             :is-maximized="inspectorMaximized"
+            :read-only="readOnly"
             @toggle-maximize="inspectorMaximized = !inspectorMaximized"
             @generate-audio="handleGenerateAudio"
-            :read-only="readOnly"
           />
         </div>
       </Transition>
@@ -206,9 +234,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { ArrowLeft, Check, Fold, Expand, MagicStick } from '@element-plus/icons-vue'
 import { useProjectsStore } from '@/stores/projects'
 
@@ -223,9 +251,7 @@ import paragraphsService from '@/services/paragraphs'
 import apiKeysService from '@/services/apiKeys'
 
 const router = useRouter()
-const route = useRoute()
 
-// Props
 const props = defineProps({
   projectId: {
     type: String,
@@ -757,7 +783,7 @@ const handleGenerateAudio = (sentence) => {
   generateAudioVisible.value = true
 }
 
-const handleGenerateSuccess = (taskId) => {
+const handleGenerateSuccess = () => {
   ElNotification({
     title: '任务已提交',
     message: '音频生成任务正在后台执行',

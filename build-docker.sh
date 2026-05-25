@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# AICG平台 - Docker镜像构建脚本
+# Txtovideo Studio - Docker镜像构建脚本
 # ==========================================
 
 set -e  # 遇到错误立即退出
@@ -14,13 +14,13 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # 配置
-IMAGE_REGISTRY="${IMAGE_REGISTRY:-aicg}"
+IMAGE_REGISTRY="${IMAGE_REGISTRY:-txtovideo}"
 VERSION="${VERSION:-latest}"
-BACKEND_IMAGE="${IMAGE_REGISTRY}/aicg-backend:${VERSION}"
-FRONTEND_IMAGE="${IMAGE_REGISTRY}/aicg-frontend:${VERSION}"
+BACKEND_IMAGE="${IMAGE_REGISTRY}/txtovideo-backend:${VERSION}"
+FRONTEND_IMAGE="${IMAGE_REGISTRY}/txtovideo-frontend:${VERSION}"
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}AICG平台 - Docker镜像构建${NC}"
+echo -e "${BLUE}Txtovideo Studio - Docker镜像构建${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
@@ -67,7 +67,7 @@ echo -e "${GREEN}🎉 所有镜像构建完成！${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 echo -e "${YELLOW}构建的镜像:${NC}"
-docker images | grep "${IMAGE_REGISTRY}/aicg"
+docker images | grep "${IMAGE_REGISTRY}/txtovideo"
 echo ""
 
 # 提示下一步操作
@@ -83,6 +83,6 @@ echo -e "   docker push ${BACKEND_IMAGE}"
 echo -e "   docker push ${FRONTEND_IMAGE}"
 echo ""
 echo -e "3. ${GREEN}标记为其他版本:${NC}"
-echo -e "   docker tag ${BACKEND_IMAGE} ${IMAGE_REGISTRY}/aicg-backend:v1.0.0"
-echo -e "   docker tag ${FRONTEND_IMAGE} ${IMAGE_REGISTRY}/aicg-frontend:v1.0.0"
+echo -e "   docker tag ${BACKEND_IMAGE} ${IMAGE_REGISTRY}/txtovideo-backend:v1.0.0"
+echo -e "   docker tag ${FRONTEND_IMAGE} ${IMAGE_REGISTRY}/txtovideo-frontend:v1.0.0"
 echo ""

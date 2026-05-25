@@ -31,6 +31,8 @@ class BaseModel(Base, UUIDMixin, TimestampMixin):
     def to_dict(self, exclude: Optional[list] = None) -> Dict[str, Any]:
         """转换为字典"""
         exclude = exclude or []
+        if 'password_hash' not in exclude:
+            exclude = exclude + ['password_hash']
         result = {}
         for column in self.__table__.columns:
             if column.name not in exclude:

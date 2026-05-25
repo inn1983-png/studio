@@ -1,5 +1,5 @@
 """
-AICG内容分发平台 - FastAPI应用入口
+Txtovideo Studio - FastAPI应用入口
 """
 
 import time
@@ -20,7 +20,7 @@ from src.middleware import (
 from src.api.v1 import api_router
 from src.api.websocket import router as websocket_router
 from src.core.config import settings
-from src.core.exceptions import AICGException
+from src.core.exceptions import TxtovideoException
 from src.core.logging import logger, setup_logging
 
 # 设置日志
@@ -28,16 +28,16 @@ setup_logging()
 
 # 创建FastAPI应用实例
 app = FastAPI(
-    title="AICG内容分发平台",
-    description="AI驱动的长文本到视频自动转换系统",
+    title=settings.APP_NAME,
+    description=settings.APP_DESCRIPTION,
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
     contact={
-        "name": "AICG Platform Team",
-        "url": "https://github.com/your-org/aicg-platform",
-        "email": "team@aicg-platform.com",
+        "name": f"{settings.APP_NAME} Team",
+        "url": f"https://github.com/your-org/{settings.APP_CELERY_NAME}-studio",
+        "email": f"team@{settings.APP_CELERY_NAME}-studio.com",
     },
     license_info={
         "name": "MIT",
@@ -50,8 +50,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "X-Requested-With"],
 )
 
 # 添加受信任主机中间件
@@ -88,19 +88,54 @@ app.include_router(websocket_router, prefix="/ws")
 
 @app.on_event("startup")
 async def startup_event():
-    """应用启动事件"""
-    # 使用标准库日志避免JSON编码
     import logging
     app_logger = logging.getLogger(__name__)
 
-    app_logger.info("🚀 AICG平台正在启动...")
+    app_logger.info(f"🚀 {settings.APP_NAME} 正在启动...")
     app_logger.info(f"📝 环境: {settings.ENVIRONMENT}")
     app_logger.info(f"🌐 调试模式: {settings.DEBUG}")
     app_logger.info(f"🔗 API地址: http://0.0.0.0:8000")
     app_logger.info(f"📖 API文档: http://0.0.0.0:8000/docs")
 
-    # 这里可以添加其他启动逻辑
-    # 例如: 检查数据库连接、预热缓存等
+    try:
+        from src.core.database import AsyncSessionLocal, create_database_engine
+        from src.models.api_key import APIKey, APIKeyStatus
+        from src.models.user import User
+        from sqlalchemy import select
+
+        if AsyncSessionLocal is None:
+            await create_database_engine()
+
+        from src.core.database import AsyncSessionLocal as SessionFactory
+
+        async with SessionFactory() as db:
+                result = await db.execute(select(User))
+                users = result.scalars().all()
+
+                for user in users:
+                    existing = await db.execute(
+                        select(APIKey).where(
+                            APIKey.user_id == user.id,
+                            APIKey.provider == "local"
+                        )
+                    )
+                    if existing.scalar_one_or_none():
+                        continue
+
+                    local_key = APIKey(
+                        user_id=user.id,
+                        name="本地模型 (Local LLM)",
+                        provider="local",
+                        base_url="http://localhost:8081/v1",
+                        status=APIKeyStatus.ACTIVE,
+                    )
+                    local_key.set_api_key("local-llm-key")
+                    db.add(local_key)
+
+                await db.commit()
+                app_logger.info("✅ 本地模型 API Key 已就绪")
+    except Exception as e:
+        app_logger.warning(f"⚠️ 自动创建本地模型 Key 失败（可忽略）: {e}")
 
 
 @app.on_event("shutdown")
@@ -108,13 +143,13 @@ async def shutdown_event():
     """应用关闭事件"""
     import logging
     app_logger = logging.getLogger(__name__)
-    app_logger.info("🛑 AICG平台正在关闭...")
+    app_logger.info(f"🛑 {settings.APP_NAME} 正在关闭...")
     # 这里可以添加清理逻辑
 
 
-@app.exception_handler(AICGException)
-async def aicg_exception_handler(request: Request, exc: AICGException):
-    """AICG自定义异常处理"""
+@app.exception_handler(TxtovideoException)
+async def txtovideo_exception_handler(request: Request, exc: TxtovideoException):
+    """Txtovideo自定义异常处理"""
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -146,7 +181,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 async def root():
     """根路径"""
     return {
-        "message": "欢迎使用AICG内容分发平台",
+        "message": f"欢迎使用 {settings.APP_NAME}",
         "version": "1.0.0",
         "docs": "/docs",
         "health": "/health",
@@ -157,7 +192,7 @@ async def root():
 async def app_info():
     """应用信息"""
     return {
-        "name": "AICG内容分发平台",
+        "name": settings.APP_NAME,
         "version": "1.0.0",
         "environment": settings.ENVIRONMENT,
         "debug": settings.DEBUG,
@@ -165,6 +200,17 @@ async def app_info():
         "monitoring": {
             "structured_logging": settings.STRUCTURED_LOGGING,
         },
+    }
+
+
+@app.get("/brand")
+async def brand_config():
+    """品牌配置（前端可访问，无需认证）"""
+    return {
+        "appName": settings.APP_NAME,
+        "appDescription": settings.APP_DESCRIPTION,
+        "logoText": settings.APP_LOGO_TEXT,
+        "copyright": settings.APP_COPYRIGHT,
     }
 
 

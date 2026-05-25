@@ -14,11 +14,20 @@
       </div>
     </div>
 
-    <div v-if="loading" class="stream-loading">
-      <el-skeleton :rows="8" animated />
+    <div
+      v-if="loading"
+      class="stream-loading"
+    >
+      <el-skeleton
+        :rows="8"
+        animated
+      />
     </div>
 
-    <div v-else-if="paragraphs.length === 0" class="stream-empty">
+    <div
+      v-else-if="paragraphs.length === 0"
+      class="stream-empty"
+    >
       <el-empty description="暂无段落">
         <el-button 
           v-if="!readOnly"
@@ -31,7 +40,10 @@
       </el-empty>
     </div>
 
-    <div v-else class="stream-content">
+    <div
+      v-else
+      class="stream-content"
+    >
       <div
         v-for="(paragraph, index) in paragraphs"
         :key="paragraph.id"
@@ -47,28 +59,41 @@
           <span class="paragraph-index">#{{ index + 1 }}</span>
           <el-radio-group
             :model-value="paragraph.action || 'keep'"
-            @update:model-value="(val) => handleActionChange(paragraph.id, val)"
-            @click.stop
             size="small"
             :disabled="readOnly"
+            @update:model-value="(val) => handleActionChange(paragraph.id, val)"
+            @click.stop
           >
-            <el-radio-button value="keep">保留</el-radio-button>
-            <el-radio-button value="edit">编辑</el-radio-button>
-            <el-radio-button value="delete">删除</el-radio-button>
+            <el-radio-button value="keep">
+              保留
+            </el-radio-button>
+            <el-radio-button value="edit">
+              编辑
+            </el-radio-button>
+            <el-radio-button value="delete">
+              删除
+            </el-radio-button>
           </el-radio-group>
         </div>
 
         <div class="paragraph-content">
-          <div v-if="paragraph.action === 'edit'" class="content-editor">
+          <div
+            v-if="paragraph.action === 'edit'"
+            class="content-editor"
+          >
             <el-input
               :model-value="paragraph.edited_content || paragraph.content"
-              @update:model-value="(val) => handleContentChange(paragraph.id, val)"
               type="textarea"
               :rows="4"
               placeholder="请输入编辑后的内容"
+              @update:model-value="(val) => handleContentChange(paragraph.id, val)"
             />
           </div>
-          <div v-else class="content-display" :class="{ 'is-deleted': paragraph.action === 'delete' }">
+          <div
+            v-else
+            class="content-display"
+            :class="{ 'is-deleted': paragraph.action === 'delete' }"
+          >
             {{ paragraph.content }}
           </div>
         </div>
@@ -97,8 +122,15 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="createDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleConfirmCreate">确定</el-button>
+        <el-button @click="createDialogVisible = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          @click="handleConfirmCreate"
+        >
+          确定
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -109,7 +141,7 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 
-const props = defineProps({
+defineProps({
   paragraphs: {
     type: Array,
     default: () => []

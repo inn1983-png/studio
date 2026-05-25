@@ -3,9 +3,9 @@
     <!-- 侧边栏：章节选择 -->
     <div class="studio-sidebar-left">
       <ChapterSelector 
-        v-model="selectedChapterId" 
+        ref="chapterSelectorRef" 
+        v-model="selectedChapterId"
         :project-id="projectId"
-        ref="chapterSelectorRef"
         @create="handleChapterCreate"
       />
     </div>
@@ -14,25 +14,48 @@
     <div class="studio-main">
       <!-- 顶部导航 -->
       <div class="studio-header">
-        <el-button icon="ArrowLeft" @click="goBack">返回</el-button>
+        <el-button
+          icon="ArrowLeft"
+          @click="goBack"
+        >
+          返回
+        </el-button>
         <h2>电影工作室</h2>
-        <div class="debug-info" v-if="!projectId">
-          <el-alert type="error" :closable="false">
+        <div
+          v-if="!projectId"
+          class="debug-info"
+        >
+          <el-alert
+            type="error"
+            :closable="false"
+          >
             缺少projectId参数，请从项目详情页进入
           </el-alert>
         </div>
       </div>
 
       <!-- 工作流步骤指示器 -->
-      <WorkflowStepper :current-step="currentStep" @change-step="handleStepChange" />
+      <WorkflowStepper
+        :current-step="currentStep"
+        @change-step="handleStepChange"
+      />
 
       <!-- 内容区 -->
-      <div class="studio-body" v-loading="loading">
-        <div v-if="!selectedChapterId" class="empty-selection">
+      <div
+        v-loading="loading"
+        class="studio-body"
+      >
+        <div
+          v-if="!selectedChapterId"
+          class="empty-selection"
+        >
           <el-empty description="请从左侧选择一个章节开始制作" />
         </div>
 
-        <div v-else class="workflow-content">
+        <div
+          v-else
+          class="workflow-content"
+        >
           <!-- 步骤0: 角色管理 -->
           <CharacterPanel
             v-show="currentStep === 0"
@@ -59,8 +82,8 @@
             @extract-scenes="handleExtractScenes"
           />
 
-          <!-- 步骤2: 分镜提取 -->
-          <ShotPanel
+          <!-- 步骤2: 分镜编辑器 -->
+          <StoryboardEditor
             v-show="currentStep === 2"
             :scene-groups="shotWorkflow.sceneGroups.value"
             :extracting="shotWorkflow.extracting.value"
@@ -69,6 +92,7 @@
             :api-keys="apiKeys"
             @extract-shots="handleExtractShots"
             @extract-single-scene-shots="handleExtractSingleSceneShots"
+            @shots-updated="handleShotsUpdated"
           />
 
           <!-- 步骤3: 场景图生成 -->
@@ -112,25 +136,35 @@
           />
 
           <!-- 步骤6: 最终合成 -->
-          <div v-show="currentStep === 6" class="final-step">
+          <div
+            v-show="currentStep === 6"
+            class="final-step"
+          >
             <el-result
               icon="success"
               title="所有步骤已完成"
               sub-title="检查素材准备情况，开始最终合成"
             >
               <template #extra>
-                <el-space direction="vertical" :size="20" style="width: 100%;">
+                <el-space
+                  direction="vertical"
+                  :size="20"
+                  style="width: 100%;"
+                >
                   <el-button 
                     type="primary" 
                     size="large"
-                    @click="handleCheckMaterials"
                     :loading="checkingMaterials"
+                    @click="handleCheckMaterials"
                   >
                     检查素材并开始合成
                   </el-button>
                   
                   <!-- 素材检查结果 -->
-                  <el-card v-if="materialCheckResult" class="material-check-card">
+                  <el-card
+                    v-if="materialCheckResult"
+                    class="material-check-card"
+                  >
                     <template #header>
                       <div class="card-header">
                         <span>素材检查结果</span>
@@ -143,7 +177,10 @@
                       </div>
                     </template>
                     
-                    <el-descriptions :column="1" border>
+                    <el-descriptions
+                      :column="1"
+                      border
+                    >
                       <el-descriptions-item label="角色头像">
                         <el-tag :type="materialCheckResult.characters.ready ? 'success' : 'danger'">
                           {{ materialCheckResult.characters.ready ? '✓' : '✗' }}
@@ -241,16 +278,16 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowLeft, VideoCamera } from '@element-plus/icons-vue'
+import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { VideoCamera } from '@element-plus/icons-vue'
 
 import ChapterSelector from '@/components/studio/ChapterSelector.vue'
 import WorkflowStepper from '@/components/studio/WorkflowStepper.vue'
 import CharacterPanel from '@/components/studio/CharacterPanel.vue'
 import ScenePanel from '@/components/studio/ScenePanel.vue'
-import ShotPanel from '@/components/studio/ShotPanel.vue'
+import StoryboardEditor from '@/components/studio/StoryboardEditor.vue'
 import SceneImagePanel from '@/components/studio/SceneImagePanel.vue'
 import KeyframePanel from '@/components/studio/KeyframePanel.vue'
 import TransitionPanel from '@/components/studio/TransitionPanel.vue'
@@ -261,7 +298,6 @@ import CreateMovieTaskDialog from '@/components/video/CreateMovieTaskDialog.vue'
 import { useMovieWorkflow } from '@/composables/useMovieWorkflow'
 import chaptersService from '@/services/chapters'
 
-const route = useRoute()
 const router = useRouter()
 
 const {
@@ -355,6 +391,10 @@ const handleExtractShots = async (apiKeyId, model) => {
 
 const handleExtractSingleSceneShots = async (sceneId, apiKeyId, model) => {
   await shotWorkflow.extractSingleSceneShots(sceneId, apiKeyId, model, sceneWorkflow.loadScript)
+}
+
+const handleShotsUpdated = async () => {
+  await sceneWorkflow.loadScript(selectedChapterId.value)
 }
 
 

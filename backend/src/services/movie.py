@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models.movie import MovieScript, MovieScene, MovieShot, MovieCharacter, ScriptStatus
+from src.models.movie import MovieScript, MovieScene, MovieShot, MovieCharacter, MovieProp, ScriptStatus
 from src.models.chapter import Chapter
 from src.core.logging import get_logger
 from src.services.base import BaseService
@@ -178,4 +178,31 @@ class MovieService(BaseService):
         await self.db_session.commit()
         await self.db_session.refresh(shot)
         return shot
+
+    async def list_props(self, project_id: str) -> List[MovieProp]:
+        stmt = select(MovieProp).where(MovieProp.project_id == project_id)
+        result = await self.db_session.execute(stmt)
+        return result.scalars().all()
+
+    async def update_prop(self, prop_id: str, data: dict) -> Optional[MovieProp]:
+        prop = await self.db_session.get(MovieProp, prop_id)
+        if not prop:
+            return None
+
+        for key, value in data.items():
+            if hasattr(prop, key) and value is not None:
+                setattr(prop, key, value)
+
+        await self.db_session.commit()
+        await self.db_session.refresh(prop)
+        return prop
+
+    async def delete_prop(self, prop_id: str) -> bool:
+        prop = await self.db_session.get(MovieProp, prop_id)
+        if not prop:
+            return False
+
+        await self.db_session.delete(prop)
+        await self.db_session.commit()
+        return True
 

@@ -1,5 +1,8 @@
 <template>
-  <aside class="app-sidebar" :class="{ collapsed }">
+  <aside
+    class="app-sidebar"
+    :class="{ collapsed }"
+  >
     <!-- Logo区域 -->
     <div class="sidebar-header">
       <div class="logo-container">
@@ -7,12 +10,15 @@
           <el-icon class="logo-icon">
             <VideoCamera />
           </el-icon>
-          <span v-show="!collapsed" class="logo-text">AICG</span>
+          <span
+            v-show="!collapsed"
+            class="logo-text"
+          >{{ brandStore.logoText }}</span>
         </div>
         <button
           v-show="!collapsed"
-          @click="$emit('toggle')"
           class="toggle-btn"
+          @click="$emit('toggle')"
         >
           <el-icon><Fold /></el-icon>
         </button>
@@ -36,7 +42,10 @@
               <el-icon class="nav-icon">
                 <component :is="item.icon" />
               </el-icon>
-              <span v-show="!collapsed" class="nav-text">{{ item.title }}</span>
+              <span
+                v-show="!collapsed"
+                class="nav-text"
+              >{{ item.title }}</span>
               <span
                 v-if="item.badge && !collapsed"
                 class="nav-badge"
@@ -48,21 +57,37 @@
     </nav>
 
     <!-- 折叠按钮 -->
-    <div v-show="collapsed" class="collapsed-toggle">
-      <button @click="$emit('toggle')" class="toggle-btn">
+    <div
+      v-show="collapsed"
+      class="collapsed-toggle"
+    >
+      <button
+        class="toggle-btn"
+        @click="$emit('toggle')"
+      >
         <el-icon><Expand /></el-icon>
       </button>
     </div>
 
     <!-- 用户信息（展开状态） -->
-    <div v-show="!collapsed" class="sidebar-footer">
+    <div
+      v-show="!collapsed"
+      class="sidebar-footer"
+    >
       <div class="user-card">
-        <el-avatar :size="40" :src="user?.avatar_url">
+        <el-avatar
+          :size="40"
+          :src="user?.avatar_url"
+        >
           <el-icon><User /></el-icon>
         </el-avatar>
         <div class="user-info">
-          <div class="user-name">{{ user?.display_name || user?.username }}</div>
-          <div class="user-role">{{ user?.role || '用户' }}</div>
+          <div class="user-name">
+            {{ user?.display_name || user?.username }}
+          </div>
+          <div class="user-role">
+            {{ user?.role || '用户' }}
+          </div>
         </div>
       </div>
     </div>
@@ -73,6 +98,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useBrandStore } from '@/stores/brand'
 import {
   VideoCamera,
   Fold,
@@ -101,6 +127,7 @@ defineEmits(['toggle'])
 
 const route = useRoute()
 const authStore = useAuthStore()
+const brandStore = useBrandStore()
 
 // 计算属性
 const user = computed(() => authStore.user)

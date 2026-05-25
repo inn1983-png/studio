@@ -1,10 +1,20 @@
 <template>
   <div class="studio-header">
     <div class="header-left">
-      <el-button @click="$emit('back')" icon="ArrowLeft">返回项目</el-button>
+      <el-button
+        icon="ArrowLeft"
+        @click="$emit('back')"
+      >
+        返回项目
+      </el-button>
       <div class="header-info">
         <span class="chapter-title">{{ chapter?.title || '未选择章节' }}</span>
-        <el-tag v-if="chapter" :type="getChapterStatusType(chapter.status)" size="small" class="status-badge">
+        <el-tag
+          v-if="chapter"
+          :type="getChapterStatusType(chapter.status)"
+          size="small"
+          class="status-badge"
+        >
           {{ getChapterStatusLabel(chapter.status) }}
         </el-tag>
       </div>
@@ -12,7 +22,10 @@
     <div class="header-right">
       <el-space>
         <!-- 状态检测与流转 -->
-        <div class="completion-status" v-if="completionStatus">
+        <div
+          v-if="completionStatus"
+          class="completion-status"
+        >
           <el-progress 
             type="circle" 
             :percentage="completionStatus.completion_rate" 
@@ -27,68 +40,71 @@
         </div>
 
         <!-- 批量操作进度 -->
-        <div v-if="isPolling" class="batch-progress-container">
-           <div class="progress-row">
-             <el-progress 
-               :percentage="taskProgressPercentage" 
-               :indeterminate="!taskStatistics && !taskResult?.percent"
-               :status="taskStatus === 'SUCCESS' ? 'success' : ''"
-               style="width: 120px"
-               :stroke-width="18"
-               :text-inside="true"
-             />
-             <el-button 
-               link 
-               type="danger" 
-               size="small" 
-               class="cancel-btn" 
-               @click="$emit('terminate')"
-               icon="Close"
-               title="终止任务"
-             />
-           </div>
-           <span class="progress-label">
-             {{ progressTitle }}
-             <template v-if="taskStatistics">
-               ({{ taskStatistics.success + taskStatistics.failed }}/{{ taskStatistics.total }})
-             </template>
-             <template v-else-if="taskResult?.message">
-               : {{ taskResult.message }}
-             </template>
-           </span>
+        <div
+          v-if="isPolling"
+          class="batch-progress-container"
+        >
+          <div class="progress-row">
+            <el-progress 
+              :percentage="taskProgressPercentage" 
+              :indeterminate="!taskStatistics && !taskResult?.percent"
+              :status="taskStatus === 'SUCCESS' ? 'success' : ''"
+              style="width: 120px"
+              :stroke-width="18"
+              :text-inside="true"
+            />
+            <el-button 
+              link 
+              type="danger" 
+              size="small" 
+              class="cancel-btn" 
+              icon="Close"
+              title="终止任务"
+              @click="$emit('terminate')"
+            />
+          </div>
+          <span class="progress-label">
+            {{ progressTitle }}
+            <template v-if="taskStatistics">
+              ({{ taskStatistics.success + taskStatistics.failed }}/{{ taskStatistics.total }})
+            </template>
+            <template v-else-if="taskResult?.message">
+              : {{ taskResult.message }}
+            </template>
+          </span>
         </div>
 
         <el-button 
+          v-if="script" 
           type="primary" 
           plain 
           icon="Refresh" 
-          @click="$emit('check-completion')" 
           :loading="checkingCompletion"
-          v-if="script"
           size="small"
+          @click="$emit('check-completion')"
         >
           检测进度
         </el-button>
 
         <el-button 
+          v-if="script" 
           type="info" 
           plain 
           icon="Refresh" 
-          @click="$emit('refresh-data')" 
-          v-if="script"
           size="small"
           title="手动刷新数据"
+          @click="$emit('refresh-data')"
         >
           刷新
         </el-button>
 
         <el-button 
+          v-if="script" 
           type="success" 
           icon="Check" 
-          @click="$emit('prepare-materials')" 
           :disabled="!canPrepareMaterials"
-          v-if="script"
           size="small"
+          @click="$emit('prepare-materials')"
         >
           准备素材
         </el-button>
@@ -97,21 +113,62 @@
 
         <el-select 
           :model-value="genConfig.api_key_id" 
-          @update:model-value="(val) => $emit('update-api-key', val)"
-          placeholder="选择 Key" 
+          placeholder="选择 Key"
           style="width: 150px" 
-          size="small"
+          size="small" 
+          @update:model-value="(val) => $emit('update-api-key', val)"
         >
-          <el-option v-for="k in apiKeys" :key="k.id" :label="k.name" :value="k.id" />
+          <el-option
+            v-for="k in apiKeys"
+            :key="k.id"
+            :label="k.name"
+            :value="k.id"
+          />
         </el-select>
         
-        <el-button @click="$emit('toggle-cast')" :type="showCastManager ? 'primary' : 'default'" size="small" plain>
+        <el-button
+          :type="showCastManager ? 'primary' : 'default'"
+          size="small"
+          plain
+          @click="$emit('toggle-cast')"
+        >
           {{ showCastManager ? '剧组' : '显示剧组' }}
         </el-button>
-        <el-button type="success" icon="Picture" @click="$emit('generate-keyframes')" :disabled="!script" :loading="loadingKeyframes" size="small">批量绘图</el-button>
-        <el-button type="warning" icon="VideoPlay" @click="$emit('produce-batch')" :disabled="!script || !allCharactersReady" :loading="batchProducing" size="small">批量视频</el-button>
-        <el-button type="danger" icon="Film" @click="$emit('generate-video')" :disabled="!completionStatus?.is_complete" size="small">生成视频</el-button>
-        <el-button type="primary" @click="$emit('generate-script')" :loading="loadingScript" size="small">
+        <el-button
+          type="success"
+          icon="Picture"
+          :disabled="!script"
+          :loading="loadingKeyframes"
+          size="small"
+          @click="$emit('generate-keyframes')"
+        >
+          批量绘图
+        </el-button>
+        <el-button
+          type="warning"
+          icon="VideoPlay"
+          :disabled="!script || !allCharactersReady"
+          :loading="batchProducing"
+          size="small"
+          @click="$emit('produce-batch')"
+        >
+          批量视频
+        </el-button>
+        <el-button
+          type="danger"
+          icon="Film"
+          :disabled="!completionStatus?.is_complete"
+          size="small"
+          @click="$emit('generate-video')"
+        >
+          生成视频
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="loadingScript"
+          size="small"
+          @click="$emit('generate-script')"
+        >
           {{ script ? '重制剧本' : '生成 AI 剧本' }}
         </el-button>
       </el-space>
@@ -120,34 +177,77 @@
 </template>
 
 <script setup>
-import { ArrowLeft, Refresh, Check, Picture, VideoPlay, Film } from '@element-plus/icons-vue'
 
 const props = defineProps({
-  chapter: Object,
-  script: Object,
-  completionStatus: Object,
-  checkingCompletion: Boolean,
-  canPrepareMaterials: Boolean,
-  genConfig: Object,
-  apiKeys: Array,
-  showCastManager: Boolean,
-  loadingKeyframes: Boolean,
-  batchProducing: Boolean,
-  allCharactersReady: Boolean,
-  isPolling: Boolean,
-  taskStatus: String,
-  taskStatistics: Object,
-  taskResult: Object
+  chapter: {
+    type: Object,
+    default: () => ({})
+  },
+  script: {
+    type: Object,
+    default: () => ({})
+  },
+  completionStatus: {
+    type: Object,
+    default: () => ({})
+  },
+  checkingCompletion: {
+    type: Boolean,
+    default: false
+  },
+  canPrepareMaterials: {
+    type: Boolean,
+    default: false
+  },
+  genConfig: {
+    type: Object,
+    default: () => ({})
+  },
+  apiKeys: {
+    type: Array,
+    default: () => ([])
+  },
+  showCastManager: {
+    type: Boolean,
+    default: false
+  },
+  loadingKeyframes: {
+    type: Boolean,
+    default: false
+  },
+  batchProducing: {
+    type: Boolean,
+    default: false
+  },
+  allCharactersReady: {
+    type: Boolean,
+    default: false
+  },
+  isPolling: {
+    type: Boolean,
+    default: false
+  },
+  taskStatus: {
+    type: String,
+    default: ''
+  },
+  taskStatistics: {
+    type: Object,
+    default: () => ({})
+  },
+  taskResult: {
+    type: Object,
+    default: () => ({})
+  }
 })
 
-const emit = defineEmits([
+defineEmits([
   'back', 'check-completion', 'prepare-materials', 'update-api-key',
   'toggle-cast', 'generate-keyframes', 'produce-batch', 'generate-script',
   'terminate', 'generate-video', 'refresh-data'
 ])
 
 import { computed } from 'vue'
-import { Close } from '@element-plus/icons-vue'
 
 const taskProgressPercentage = computed(() => {
   if (props.taskStatistics) {

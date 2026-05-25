@@ -36,8 +36,7 @@ const routes = [
         name: 'LoginPage',
         component: Login,
         props: {
-          title: '欢迎回来',
-          subtitle: '登录您的账户继续使用AI内容生成平台'
+          title: '欢迎回来'
         }
       }
     ]
@@ -53,8 +52,7 @@ const routes = [
         name: 'RegisterPage',
         component: Register,
         props: {
-          title: '创建账户',
-          subtitle: '加入AICG平台，开始您的AI内容创作之旅'
+          title: '创建账户'
         }
       }
     ]
@@ -219,6 +217,12 @@ const routes = [
         component: Settings
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../views/NotFound.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

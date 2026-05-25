@@ -3,10 +3,14 @@
     <!-- 页面欢迎信息 -->
     <div class="page-header">
       <h1 class="page-title">
-        <el-icon class="title-icon"><VideoPlay /></el-icon>
+        <el-icon class="title-icon">
+          <VideoPlay />
+        </el-icon>
         控制台
       </h1>
-      <p class="page-description">欢迎回来，{{ authStore.user?.display_name || authStore.user?.username }}！开始您的创作之旅</p>
+      <p class="page-description">
+        欢迎回来，{{ authStore.user?.display_name || authStore.user?.username }}！开始您的{{ brandStore.appDescription.replace('智能创作工作站', '创作之旅') }}
+      </p>
     </div>
 
     <!-- 快速操作入口 -->
@@ -16,54 +20,82 @@
         <p>选择您需要的功能，快速开始创作</p>
       </div>
       <div class="action-grid">
-        <div class="quick-action primary-action modern-gradient-1" @click="$router.push('/generation')">
+        <div
+          class="quick-action primary-action modern-gradient-1"
+          @click="$router.push('/projects')"
+        >
           <div class="action-icon-large">
-            <el-icon size="32"><VideoPlay /></el-icon>
+            <el-icon size="32">
+              <VideoPlay />
+            </el-icon>
           </div>
           <div class="action-content">
             <h3>开始创作</h3>
-            <p>AI 文本转视频</p>
+            <p>小说转短剧制作</p>
           </div>
-          <div class="action-badge">推荐</div>
-          <div class="action-glow"></div>
+          <div class="action-badge">
+            推荐
+          </div>
+          <div class="action-glow" />
         </div>
 
-        <div class="quick-action modern-gradient-2" @click="$router.push('/projects')">
+        <div
+          class="quick-action modern-gradient-2"
+          @click="$router.push('/generation')"
+        >
           <div class="action-icon">
-            <el-icon size="24"><Folder /></el-icon>
+            <el-icon size="24">
+              <Film />
+            </el-icon>
           </div>
           <div class="action-content">
-            <h4>项目管理</h4>
-            <p>{{ projectCount }} 个项目</p>
+            <h4>视频生成</h4>
+            <p>AI 视频制作</p>
           </div>
           <div class="action-arrow">
-            <el-icon size="16"><ArrowRight /></el-icon>
+            <el-icon size="16">
+              <ArrowRight />
+            </el-icon>
           </div>
         </div>
 
-        <div class="quick-action modern-gradient-3" @click="$router.push('/publish')">
+        <div
+          class="quick-action modern-gradient-3"
+          @click="$router.push('/publish')"
+        >
           <div class="action-icon">
-            <el-icon size="24"><Promotion /></el-icon>
+            <el-icon size="24">
+              <Promotion />
+            </el-icon>
           </div>
           <div class="action-content">
             <h4>内容分发</h4>
             <p>一键发布</p>
           </div>
           <div class="action-arrow">
-            <el-icon size="16"><ArrowRight /></el-icon>
+            <el-icon size="16">
+              <ArrowRight />
+            </el-icon>
           </div>
         </div>
 
-        <div class="quick-action modern-gradient-4" @click="$router.push('/settings')">
+        <div
+          class="quick-action modern-gradient-4"
+          @click="$router.push('/settings')"
+        >
           <div class="action-icon">
-            <el-icon size="24"><Setting /></el-icon>
+            <el-icon size="24">
+              <Setting />
+            </el-icon>
           </div>
           <div class="action-content">
             <h4>系统设置</h4>
             <p>配置管理</p>
           </div>
           <div class="action-arrow">
-            <el-icon size="16"><ArrowRight /></el-icon>
+            <el-icon size="16">
+              <ArrowRight />
+            </el-icon>
           </div>
         </div>
       </div>
@@ -80,8 +112,12 @@
               <el-icon><Folder /></el-icon>
             </div>
             <div class="mini-stat-info">
-              <div class="mini-stat-number">{{ projectCount }}</div>
-              <div class="mini-stat-label">项目</div>
+              <div class="mini-stat-number">
+                {{ projectCount }}
+              </div>
+              <div class="mini-stat-label">
+                项目
+              </div>
             </div>
           </div>
 
@@ -90,8 +126,12 @@
               <el-icon><Timer /></el-icon>
             </div>
             <div class="mini-stat-info">
-              <div class="mini-stat-number">{{ runningTasks }}</div>
-              <div class="mini-stat-label">进行中</div>
+              <div class="mini-stat-number">
+                {{ runningTasks }}
+              </div>
+              <div class="mini-stat-label">
+                进行中
+              </div>
             </div>
           </div>
 
@@ -100,8 +140,12 @@
               <el-icon><Share /></el-icon>
             </div>
             <div class="mini-stat-info">
-              <div class="mini-stat-number">{{ publishedVideos }}</div>
-              <div class="mini-stat-label">已发布</div>
+              <div class="mini-stat-number">
+                {{ publishedVideos }}
+              </div>
+              <div class="mini-stat-label">
+                已发布
+              </div>
             </div>
           </div>
 
@@ -118,7 +162,9 @@
                   ≈¥{{ totalCost.toFixed(2) }}
                 </div>
               </el-tooltip>
-              <div class="mini-stat-label">成本估算</div>
+              <div class="mini-stat-label">
+                成本估算
+              </div>
             </div>
           </div>
         </div>
@@ -127,20 +173,43 @@
         <div class="recent-projects">
           <div class="section-header">
             <h3>最近项目</h3>
-            <el-button link @click="$router.push('/projects')">查看全部</el-button>
+            <el-button
+              link
+              @click="$router.push('/projects')"
+            >
+              查看全部
+            </el-button>
           </div>
           <div class="projects-list">
-            <div v-if="loading" class="loading-skeleton">
-              <el-skeleton :rows="3" animated />
+            <div
+              v-if="loading"
+              class="loading-skeleton"
+            >
+              <el-skeleton
+                :rows="3"
+                animated
+              />
             </div>
-            <div v-else-if="recentProjects.length === 0" class="empty-projects">
-              <el-icon size="32"><Document /></el-icon>
+            <div
+              v-else-if="recentProjects.length === 0"
+              class="empty-projects"
+            >
+              <el-icon size="32">
+                <Document />
+              </el-icon>
               <p>暂无项目</p>
-              <el-button type="primary" plain @click="$router.push('/projects')">
+              <el-button
+                type="primary"
+                plain
+                @click="$router.push('/projects')"
+              >
                 创建第一个项目
               </el-button>
             </div>
-            <div v-else class="project-items">
+            <div
+              v-else
+              class="project-items"
+            >
               <div
                 v-for="project in recentProjects"
                 :key="project.id"
@@ -152,7 +221,10 @@
                   <p>{{ project.chapter_count }} 章节 · {{ project.word_count }} 字</p>
                 </div>
                 <div class="project-meta">
-                  <el-tag :type="getStatusType(project.status)" size="small">
+                  <el-tag
+                    :type="getStatusType(project.status)"
+                    size="small"
+                  >
                     {{ getStatusText(project.status) }}
                   </el-tag>
                   <span class="project-time">{{ formatTime(project.updated_at) }}</span>
@@ -172,20 +244,43 @@
               <el-icon><Timer /></el-icon>
               生成队列
             </h3>
-            <el-button link @click="$router.push('/generation')">管理</el-button>
+            <el-button
+              link
+              @click="$router.push('/generation')"
+            >
+              管理
+            </el-button>
           </div>
           <div class="queue-content">
-            <div v-if="loading" class="loading-skeleton">
-              <el-skeleton :rows="2" animated />
+            <div
+              v-if="loading"
+              class="loading-skeleton"
+            >
+              <el-skeleton
+                :rows="2"
+                animated
+              />
             </div>
-            <div v-else-if="!taskQueue || taskQueue.running_tasks === 0" class="empty-queue">
-              <el-icon size="32"><VideoCamera /></el-icon>
+            <div
+              v-else-if="!taskQueue || taskQueue.running_tasks === 0"
+              class="empty-queue"
+            >
+              <el-icon size="32">
+                <VideoCamera />
+              </el-icon>
               <p>队列为空</p>
-              <el-button type="primary" plain @click="$router.push('/generation')">
+              <el-button
+                type="primary"
+                plain
+                @click="$router.push('/generation')"
+              >
                 开始生成视频
               </el-button>
             </div>
-            <div v-else class="task-items">
+            <div
+              v-else
+              class="task-items"
+            >
               <div
                 v-for="task in taskQueue.tasks"
                 :key="task.id"
@@ -215,14 +310,28 @@
             </h3>
           </div>
           <div class="activity-list">
-            <div v-if="loading" class="loading-skeleton">
-              <el-skeleton :rows="3" animated />
+            <div
+              v-if="loading"
+              class="loading-skeleton"
+            >
+              <el-skeleton
+                :rows="3"
+                animated
+              />
             </div>
-            <div v-else-if="recentActivities.length === 0" class="empty-activity">
-              <el-icon size="32"><Document /></el-icon>
+            <div
+              v-else-if="recentActivities.length === 0"
+              class="empty-activity"
+            >
+              <el-icon size="32">
+                <Document />
+              </el-icon>
               <p>暂无活动记录</p>
             </div>
-            <div v-else class="activity-items">
+            <div
+              v-else
+              class="activity-items"
+            >
               <div
                 v-for="activity in recentActivities"
                 :key="activity.id"
@@ -232,7 +341,9 @@
                   <el-icon :component="getActivityIcon(activity.type)" />
                 </div>
                 <div class="activity-content">
-                  <p class="activity-desc">{{ activity.description }}</p>
+                  <p class="activity-desc">
+                    {{ activity.description }}
+                  </p>
                   <span class="activity-time">{{ formatTime(activity.timestamp) }}</span>
                 </div>
               </div>
@@ -247,10 +358,12 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useBrandStore } from '@/stores/brand'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
   Folder,
+  Film,
   VideoPlay,
   Promotion,
   Timer,
@@ -266,6 +379,7 @@ import {
 import { dashboardService } from '@/services/dashboard'
 
 const authStore = useAuthStore()
+const brandStore = useBrandStore()
 const router = useRouter()
 
 // 数据状态

@@ -14,7 +14,10 @@
             <p>定期更改密码以保护账户安全</p>
           </div>
         </div>
-        <el-button @click="showPasswordDialog = true" type="primary">
+        <el-button
+          type="primary"
+          @click="showPasswordDialog = true"
+        >
           修改密码
         </el-button>
       </div>
@@ -27,7 +30,12 @@
           <div class="card-content">
             <h3>账户状态</h3>
             <p>
-              <el-tag type="success" size="small">安全</el-tag>
+              <el-tag
+                type="success"
+                size="small"
+              >
+                安全
+              </el-tag>
               上次登录：{{ formatDate(authStore.user?.last_login, {}, userTimezone) }}
             </p>
           </div>
@@ -46,7 +54,9 @@
       <template #header>
         <div class="password-dialog-header compact">
           <div class="dialog-icon">
-            <el-icon size="28"><Lock /></el-icon>
+            <el-icon size="28">
+              <Lock />
+            </el-icon>
           </div>
           <div class="dialog-title">
             <h3>修改密码</h3>
@@ -56,7 +66,12 @@
       </template>
 
       <div class="password-form-container compact">
-        <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-position="top">
+        <el-form
+          ref="passwordFormRef"
+          :model="passwordForm"
+          :rules="passwordRules"
+          label-position="top"
+        >
           <div class="form-group compact">
             <el-form-item prop="current">
               <el-input
@@ -91,7 +106,10 @@
               </el-input>
 
               <!-- 紧凑的密码强度指示器和要求 -->
-              <div class="compact-password-info" v-if="passwordForm.new">
+              <div
+                v-if="passwordForm.new"
+                class="compact-password-info"
+              >
                 <!-- 密码强度条 -->
                 <div class="compact-strength">
                   <div class="strength-label">
@@ -99,33 +117,62 @@
                     <span :class="getPasswordStrengthClass()">{{ getPasswordStrengthText() }}</span>
                   </div>
                   <div class="strength-bar">
-                    <div class="strength-fill" :class="getPasswordStrengthClass()" :style="getPasswordStrengthWidth()"></div>
+                    <div
+                      class="strength-fill"
+                      :class="getPasswordStrengthClass()"
+                      :style="getPasswordStrengthWidth()"
+                    />
                   </div>
                 </div>
 
                 <!-- 紧凑的密码要求 -->
                 <div class="compact-requirements">
                   <div class="requirement-row">
-                    <div class="requirement-item" :class="{ 'satisfied': passwordForm.new.length >= 8 }">
-                      <el-icon size="12"><Check v-if="passwordForm.new.length >= 8" /><Close v-else /></el-icon>
+                    <div
+                      class="requirement-item"
+                      :class="{ 'satisfied': passwordForm.new.length >= 8 }"
+                    >
+                      <el-icon size="12">
+                        <Check v-if="passwordForm.new.length >= 8" /><Close v-else />
+                      </el-icon>
                       <span>8位+</span>
                     </div>
-                    <div class="requirement-item" :class="{ 'satisfied': /[A-Z]/.test(passwordForm.new) }">
-                      <el-icon size="12"><Check v-if="/[A-Z]/.test(passwordForm.new)" /><Close v-else /></el-icon>
+                    <div
+                      class="requirement-item"
+                      :class="{ 'satisfied': /[A-Z]/.test(passwordForm.new) }"
+                    >
+                      <el-icon size="12">
+                        <Check v-if="/[A-Z]/.test(passwordForm.new)" /><Close v-else />
+                      </el-icon>
                       <span>大写</span>
                     </div>
-                    <div class="requirement-item" :class="{ 'satisfied': /[a-z]/.test(passwordForm.new) }">
-                      <el-icon size="12"><Check v-if="/[a-z]/.test(passwordForm.new)" /><Close v-else /></el-icon>
+                    <div
+                      class="requirement-item"
+                      :class="{ 'satisfied': /[a-z]/.test(passwordForm.new) }"
+                    >
+                      <el-icon size="12">
+                        <Check v-if="/[a-z]/.test(passwordForm.new)" /><Close v-else />
+                      </el-icon>
                       <span>小写</span>
                     </div>
                   </div>
                   <div class="requirement-row">
-                    <div class="requirement-item" :class="{ 'satisfied': /\d/.test(passwordForm.new) }">
-                      <el-icon size="12"><Check v-if="/\d/.test(passwordForm.new)" /><Close v-else /></el-icon>
+                    <div
+                      class="requirement-item"
+                      :class="{ 'satisfied': /\d/.test(passwordForm.new) }"
+                    >
+                      <el-icon size="12">
+                        <Check v-if="/\d/.test(passwordForm.new)" /><Close v-else />
+                      </el-icon>
                       <span>数字</span>
                     </div>
-                    <div class="requirement-item" :class="{ 'satisfied': hasSpecialCharacter }">
-                      <el-icon size="12"><Check v-if="hasSpecialCharacter" /><Close v-else /></el-icon>
+                    <div
+                      class="requirement-item"
+                      :class="{ 'satisfied': hasSpecialCharacter }"
+                    >
+                      <el-icon size="12">
+                        <Check v-if="hasSpecialCharacter" /><Close v-else />
+                      </el-icon>
                       <span>特殊字符</span>
                     </div>
                   </div>
@@ -150,9 +197,17 @@
               </el-input>
 
               <!-- 紧凑的密码匹配状态 -->
-              <div class="compact-match" v-if="passwordForm.confirm">
-                <div class="match-item" :class="{ 'matched': passwordForm.new === passwordForm.confirm }">
-                  <el-icon size="14"><Check v-if="passwordForm.new === passwordForm.confirm" /><Close v-else /></el-icon>
+              <div
+                v-if="passwordForm.confirm"
+                class="compact-match"
+              >
+                <div
+                  class="match-item"
+                  :class="{ 'matched': passwordForm.new === passwordForm.confirm }"
+                >
+                  <el-icon size="14">
+                    <Check v-if="passwordForm.new === passwordForm.confirm" /><Close v-else />
+                  </el-icon>
                   <span>密码匹配</span>
                 </div>
               </div>
@@ -163,12 +218,14 @@
 
       <template #footer>
         <div class="password-dialog-footer compact">
-          <el-button @click="closePasswordDialog">取消</el-button>
+          <el-button @click="closePasswordDialog">
+            取消
+          </el-button>
           <el-button
             type="primary"
-            @click="changePassword"
             :loading="passwordLoading"
             :disabled="!isFormValid"
+            @click="changePassword"
           >
             {{ passwordLoading ? '修改中...' : '确认修改' }}
           </el-button>

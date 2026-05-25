@@ -102,6 +102,7 @@ class StoryboardService(BaseService):
         for idx, shot_item in enumerate(shot_data.get("shots", [])): # 创建分镜
             shot = MovieShot(
                 scene_id=scene.id,
+                chapter_id=str(scene.script.chapter_id),
                 order_index=shot_item.get("order_index", idx + 1),
                 shot=shot_item.get("shot", ""),
                 dialogue=shot_item.get("dialogue"),
@@ -263,6 +264,7 @@ class StoryboardService(BaseService):
                     for idx, shot_info in enumerate(shots_data, 1):
                         shot = MovieShot(
                             scene_id=scene_id,
+                            chapter_id=str(script.chapter_id),
                             order_index=idx,
                             shot=shot_info.get("shot", ""),
                             dialogue=shot_info.get("dialogue", ""),

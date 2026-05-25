@@ -2,54 +2,103 @@
   <div class="account-management">
     <div class="page-header">
       <h1>Bilibili账号管理</h1>
-      <p class="page-description">管理您的B站账号,用于视频发布</p>
+      <p class="page-description">
+        管理您的B站账号,用于视频发布
+      </p>
     </div>
 
     <!-- 账号列表 -->
-    <el-card class="accounts-card" shadow="never">
+    <el-card
+      class="accounts-card"
+      shadow="never"
+    >
       <template #header>
         <div class="card-header">
           <span>我的账号</span>
-          <el-button type="primary" @click="showAddDialog">
+          <el-button
+            type="primary"
+            @click="showAddDialog"
+          >
             <el-icon><Plus /></el-icon>
             添加账号
           </el-button>
         </div>
       </template>
 
-      <el-empty v-if="accounts.length === 0" description="暂无账号,请添加">
-        <el-button type="primary" @click="showAddDialog">添加第一个账号</el-button>
+      <el-empty
+        v-if="accounts.length === 0"
+        description="暂无账号,请添加"
+      >
+        <el-button
+          type="primary"
+          @click="showAddDialog"
+        >
+          添加第一个账号
+        </el-button>
       </el-empty>
 
-      <el-table v-else :data="accounts" v-loading="loading">
-        <el-table-column prop="account_name" label="账号名称" min-width="150" />
+      <el-table
+        v-else
+        v-loading="loading"
+        :data="accounts"
+      >
+        <el-table-column
+          prop="account_name"
+          label="账号名称"
+          min-width="150"
+        />
         
-        <el-table-column label="登录状态" width="120">
+        <el-table-column
+          label="登录状态"
+          width="120"
+        >
           <template #default="{ row }">
-            <el-tag v-if="row.cookie_valid" type="success">
+            <el-tag
+              v-if="row.cookie_valid"
+              type="success"
+            >
               <el-icon><CircleCheck /></el-icon>
               已登录
             </el-tag>
-            <el-tag v-else type="danger">
+            <el-tag
+              v-else
+              type="danger"
+            >
               <el-icon><CircleClose /></el-icon>
               未登录
             </el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column label="默认账号" width="100">
+        <el-table-column
+          label="默认账号"
+          width="100"
+        >
           <template #default="{ row }">
-            <el-tag v-if="row.is_default" type="primary">默认</el-tag>
+            <el-tag
+              v-if="row.is_default"
+              type="primary"
+            >
+              默认
+            </el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column prop="last_login_at" label="最后登录" width="180">
+        <el-table-column
+          prop="last_login_at"
+          label="最后登录"
+          width="180"
+        >
           <template #default="{ row }">
             {{ formatTime(row.last_login_at) }}
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column
+          label="操作"
+          width="200"
+          fixed="right"
+        >
           <template #default="{ row }">
             <el-button 
               v-if="!row.is_default && row.cookie_valid" 
@@ -77,7 +126,11 @@
       width="700px"
       :close-on-click-modal="false"
     >
-      <el-steps :active="currentStep" align-center finish-status="success">
+      <el-steps
+        :active="currentStep"
+        align-center
+        finish-status="success"
+      >
         <el-step title="输入账号名称" />
         <el-step title="执行登录命令" />
         <el-step title="验证登录状态" />
@@ -85,8 +138,14 @@
 
       <div class="step-content">
         <!-- 步骤1: 输入账号名称 -->
-        <div v-if="currentStep === 0" class="step-1">
-          <el-form :model="addForm" label-width="100px">
+        <div
+          v-if="currentStep === 0"
+          class="step-1"
+        >
+          <el-form
+            :model="addForm"
+            label-width="100px"
+          >
             <el-form-item label="账号名称">
               <el-input 
                 v-model="addForm.account_name" 
@@ -99,7 +158,10 @@
         </div>
 
         <!-- 步骤2: 显示登录命令 -->
-        <div v-if="currentStep === 1" class="step-2">
+        <div
+          v-if="currentStep === 1"
+          class="step-2"
+        >
           <el-alert
             title="请按照以下步骤在服务器终端操作"
             type="warning"
@@ -112,14 +174,19 @@
             <div class="command-box">
               <div class="command-header">
                 <span>登录命令</span>
-                <el-button size="small" @click="copyCommand(loginCommand)">
+                <el-button
+                  size="small"
+                  @click="copyCommand(loginCommand)"
+                >
                   <el-icon><CopyDocument /></el-icon>
                   复制
                 </el-button>
               </div>
               <pre class="command-text">{{ loginCommand }}</pre>
             </div>
-            <p class="command-tip">执行后选择"扫码登录",使用B站APP扫描二维码</p>
+            <p class="command-tip">
+              执行后选择"扫码登录",使用B站APP扫描二维码
+            </p>
           </div>
 
           <div class="command-section">
@@ -127,14 +194,19 @@
             <div class="command-box">
               <div class="command-header">
                 <span>移动命令</span>
-                <el-button size="small" @click="copyCommand(postCommand)">
+                <el-button
+                  size="small"
+                  @click="copyCommand(postCommand)"
+                >
                   <el-icon><CopyDocument /></el-icon>
                   复制
                 </el-button>
               </div>
               <pre class="command-text">{{ postCommand }}</pre>
             </div>
-            <p class="command-tip">登录成功后,执行此命令将cookie文件移动到指定位置</p>
+            <p class="command-tip">
+              登录成功后,执行此命令将cookie文件移动到指定位置
+            </p>
           </div>
 
           <el-alert
@@ -152,9 +224,17 @@
         </div>
 
         <!-- 步骤3: 验证登录 -->
-        <div v-if="currentStep === 2" class="step-3">
-          <div v-if="!loginChecked" class="check-login">
-            <el-icon class="check-icon"><Loading /></el-icon>
+        <div
+          v-if="currentStep === 2"
+          class="step-3"
+        >
+          <div
+            v-if="!loginChecked"
+            class="check-login"
+          >
+            <el-icon class="check-icon">
+              <Loading />
+            </el-icon>
             <p>正在验证登录状态...</p>
           </div>
 
@@ -165,7 +245,12 @@
             sub-title="您的B站账号已成功添加"
           >
             <template #extra>
-              <el-button type="primary" @click="finishAdd">完成</el-button>
+              <el-button
+                type="primary"
+                @click="finishAdd"
+              >
+                完成
+              </el-button>
             </template>
           </el-result>
 
@@ -176,8 +261,15 @@
             sub-title="请确认已在服务器终端完成扫码登录"
           >
             <template #extra>
-              <el-button @click="currentStep = 1">返回上一步</el-button>
-              <el-button type="primary" @click="checkLogin">重新检查</el-button>
+              <el-button @click="currentStep = 1">
+                返回上一步
+              </el-button>
+              <el-button
+                type="primary"
+                @click="checkLogin"
+              >
+                重新检查
+              </el-button>
             </template>
           </el-result>
         </div>
@@ -185,7 +277,9 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="addDialogVisible = false">取消</el-button>
+          <el-button @click="addDialogVisible = false">
+            取消
+          </el-button>
           <el-button 
             v-if="currentStep > 0 && currentStep < 2" 
             @click="prevStep"
@@ -195,9 +289,9 @@
           <el-button 
             v-if="currentStep < 2" 
             type="primary" 
-            @click="nextStep"
             :disabled="!canProceed"
             :loading="creating"
+            @click="nextStep"
           >
             {{ currentStep === 0 ? '创建账号' : '下一步' }}
           </el-button>

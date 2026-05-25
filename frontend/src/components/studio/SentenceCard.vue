@@ -40,14 +40,21 @@
             <el-icon><Microphone /></el-icon>
             音频
           </el-tag>
-          <el-dropdown @command="handlePromptAction" trigger="click">
+          <el-dropdown
+            trigger="click"
+            @command="handlePromptAction"
+          >
             <span class="el-dropdown-link">
               <el-icon><MoreFilled /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="view">查看提示词</el-dropdown-item>
-                <el-dropdown-item command="edit">编辑提示词</el-dropdown-item>
+                <el-dropdown-item command="view">
+                  查看提示词
+                </el-dropdown-item>
+                <el-dropdown-item command="edit">
+                  编辑提示词
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -56,43 +63,57 @@
     </template>
     
     <div class="card-content">
-      <p class="sentence-text">{{ sentence.content }}</p>
+      <p class="sentence-text">
+        {{ sentence.content }}
+      </p>
     </div>
     
     <div class="card-actions">
-      <el-tooltip content="重新生成提示词" placement="top" :show-after="500">
+      <el-tooltip
+        content="重新生成提示词"
+        placement="top"
+        :show-after="500"
+      >
         <el-button
           class="action-btn"
           :class="{ 'has-content': sentence.image_prompt }"
           :loading="loadingStates.generatingPrompt"
-          @click="handleRegeneratePrompt"
           text
+          @click="handleRegeneratePrompt"
         >
           <el-icon><MagicStick /></el-icon>
         </el-button>
       </el-tooltip>
       
-      <el-tooltip content="生成图片" placement="top" :show-after="500">
+      <el-tooltip
+        content="生成图片"
+        placement="top"
+        :show-after="500"
+      >
         <el-button
           class="action-btn"
           :class="{ 'has-content': sentence.image_url }"
           :loading="loadingStates.generatingImage"
           :disabled="!sentence.image_prompt"
-          @click="handleGenerateImage"
           text
+          @click="handleGenerateImage"
         >
           <el-icon><Picture /></el-icon>
         </el-button>
       </el-tooltip>
       
-      <el-tooltip content="生成音频" placement="top" :show-after="500">
+      <el-tooltip
+        content="生成音频"
+        placement="top"
+        :show-after="500"
+      >
         <el-button
           class="action-btn"
           :class="{ 'has-content': sentence.audio_url }"
           :loading="loadingStates.generatingAudio"
           :disabled="!sentence.image_prompt"
-          @click="handleGenerateAudio"
           text
+          @click="handleGenerateAudio"
         >
           <el-icon><Microphone /></el-icon>
         </el-button>

@@ -31,11 +31,11 @@ class TestFileUploadAPI:
             storage_client = AsyncMock()
             storage_client.upload_file.return_value = {
                 "success": True,
-                "bucket": "aicg-files",
+                "bucket": "txtovideo-files",
                 "object_key": "uploads/test-user-123/test.txt",
                 "size": len(content),
                 "etag": "test-etag-123",
-                "url": "http://minio:9000/aicg-files/uploads/test-user-123/test.txt"
+                "url": "http://minio:9000/txtovideo-files/uploads/test-user-123/test.txt"
             }
             mock_storage.return_value = storage_client
 

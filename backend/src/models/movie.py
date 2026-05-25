@@ -21,6 +21,7 @@ class GenerationType(str, Enum):
     SHOT_KEYFRAME = "shot_keyframe"
     CHARACTER_AVATAR = "character_avatar"
     TRANSITION_VIDEO = "transition_video"
+    PROP_IMAGE = "prop_image"
 
 class MediaType(str, Enum):
     """媒体类型枚举"""
@@ -114,22 +115,28 @@ class MovieShot(BaseModel):
     __tablename__ = 'movie_shots'
 
     scene_id = Column(PostgreSQLUUID(as_uuid=True), ForeignKey('movie_scenes.id'), nullable=False, index=True)
+    chapter_id = Column(PostgreSQLUUID(as_uuid=True), ForeignKey('chapters.id', ondelete='SET NULL'), nullable=True, index=True, comment="章节外键")
     order_index = Column(Integer, nullable=False, comment="镜头顺序")
     shot = Column(Text, nullable=False, comment="分镜描述")
     dialogue = Column(Text, comment="人物对话内容")
     characters = Column(JSON, default=list, comment="分镜中出现的角色名称列表")
-    
+
     # 关键帧资源
     keyframe_url = Column(String(500), comment="分镜关键帧图片URL")
-    
+
     # 关系
     scene = relationship("MovieScene", back_populates="shots")
+    chapter = relationship("Chapter")
     generation_history = relationship(
         "MovieGenerationHistory",
         primaryjoin="and_(MovieShot.id==foreign(MovieGenerationHistory.resource_id), "
                     "MovieGenerationHistory.resource_type=='shot_keyframe')",
         cascade="all, delete-orphan",
         viewonly=False
+    )
+
+    __table_args__ = (
+        Index('idx_shot_scene_order', 'scene_id', 'order_index'),
     )
 
     def __repr__(self) -> str:
@@ -144,18 +151,18 @@ class MovieShotTransition(BaseModel):
     from_shot_id = Column(PostgreSQLUUID(as_uuid=True), ForeignKey('movie_shots.id'), nullable=False, index=True)
     to_shot_id = Column(PostgreSQLUUID(as_uuid=True), ForeignKey('movie_shots.id'), nullable=False, index=True)
     order_index = Column(Integer, nullable=False, comment="过渡顺序")
-    
+
     # 视频生成相关
     video_prompt = Column(Text, comment="视频生成提示词")
     video_url = Column(String(500), comment="生成的视频URL")
     video_task_id = Column(String(100), comment="视频生成任务ID")
     status = Column(String(20), default="pending", index=True, comment="生成状态")
     error_message = Column(Text, nullable=True, comment="失败错误信息")
-    
+
     # 追踪信息
     api_key_id = Column(PostgreSQLUUID(as_uuid=True), ForeignKey('api_keys.id'), nullable=True, index=True, comment="使用的API Key")
     user_id = Column(PostgreSQLUUID(as_uuid=True), ForeignKey('users.id'), nullable=True, index=True, comment="所属用户")
-    
+
     # 关系
     script = relationship("MovieScript")
     from_shot = relationship("MovieShot", foreign_keys=[from_shot_id])
@@ -168,6 +175,10 @@ class MovieShotTransition(BaseModel):
                     "MovieGenerationHistory.resource_type=='transition_video')",
         cascade="all, delete-orphan",
         viewonly=False
+    )
+
+    __table_args__ = (
+        Index('idx_transition_script_status', 'script_id', 'status'),
     )
 
     def __repr__(self) -> str:
@@ -201,6 +212,10 @@ class MovieCharacter(BaseModel):
                     "MovieGenerationHistory.resource_type=='character_avatar')",
         cascade="all, delete-orphan",
         viewonly=False
+    )
+
+    __table_args__ = (
+        Index('idx_character_project_name', 'project_id', 'name'),
     )
 
     def __repr__(self) -> str:
@@ -266,4 +281,94 @@ class MovieCharacter(BaseModel):
             data["avatar_url"] = self.avatar_url
             data["reference_images"] = self.reference_images or []
         
+        return data
+
+
+class MovieProp(BaseModel):
+    """电影道具模型"""
+    __tablename__ = 'movie_props'
+
+    project_id = Column(PostgreSQLUUID(as_uuid=True), ForeignKey('projects.id'), nullable=False, index=True, comment="项目外键")
+    name = Column(String(100), nullable=False, comment="道具名称")
+    category = Column(String(50), comment="道具分类(武器/交通工具/家具/饰品/其他)")
+    description = Column(Text, comment="道具描述")
+    visual_traits = Column(Text, comment="视觉特征描述(用于提示词)")
+    era_background = Column(String(200), comment="时代背景")
+    key_visual_traits = Column(JSON, default=list, comment="核心视觉特征列表")
+    generated_prompt = Column(Text, comment="生成的道具图提示词")
+
+    image_url = Column(String(500), comment="道具图片URL")
+    reference_images = Column(JSON, default=list, comment="参考图URL列表")
+
+    project = relationship("Project")
+    generation_history = relationship(
+        "MovieGenerationHistory",
+        primaryjoin="and_(MovieProp.id==foreign(MovieGenerationHistory.resource_id), "
+                    "MovieGenerationHistory.resource_type=='prop_image')",
+        cascade="all, delete-orphan",
+        viewonly=False
+    )
+
+    __table_args__ = (
+        Index('idx_prop_project_name', 'project_id', 'name'),
+    )
+
+    def __repr__(self) -> str:
+        return f"<MovieProp(id={self.id}, name={self.name})>"
+
+    @classmethod
+    async def batch_create(cls, db_session, project_id: str, props_data: List[dict]):
+        props = []
+        for data in props_data:
+            prop = cls(
+                project_id=project_id,
+                name=data.get('name'),
+                category=data.get('category'),
+                description=data.get('description'),
+                visual_traits=data.get('visual_traits'),
+                era_background=data.get('era_background'),
+                key_visual_traits=data.get('key_visual_traits', []),
+                generated_prompt=data.get('generated_prompt'),
+                image_url=data.get('image_url'),
+                reference_images=data.get('reference_images', [])
+            )
+            db_session.add(prop)
+            props.append(prop)
+        await db_session.flush()
+        return props
+
+    def to_dict(self, sign_urls: bool = True):
+        from src.utils.storage import storage_client
+        from datetime import timedelta
+
+        data = {
+            "id": str(self.id),
+            "project_id": str(self.project_id),
+            "name": self.name,
+            "category": self.category,
+            "description": self.description,
+            "visual_traits": self.visual_traits,
+            "era_background": self.era_background,
+            "key_visual_traits": self.key_visual_traits or [],
+            "generated_prompt": self.generated_prompt,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
+        }
+
+        if sign_urls:
+            data["image_url"] = (
+                storage_client.get_presigned_url(self.image_url, timedelta(hours=24))
+                if self.image_url and not self.image_url.startswith("http")
+                else self.image_url
+            )
+            data["reference_images"] = [
+                storage_client.get_presigned_url(img, timedelta(hours=24))
+                if img and not img.startswith("http")
+                else img
+                for img in (self.reference_images or [])
+            ]
+        else:
+            data["image_url"] = self.image_url
+            data["reference_images"] = self.reference_images or []
+
         return data

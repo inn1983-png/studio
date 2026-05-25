@@ -48,7 +48,7 @@ class EncryptionService:
                 "生产环境必须设置此环境变量！"
             )
             encryption_key = Fernet.generate_key().decode()
-            logger.warning(f"临时加密密钥: {encryption_key}")
+        
         
         try:
             # 确保密钥是字节格式

@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
-class AICGException(Exception):
-    """AICG平台基础异常类"""
+class TxtovideoException(Exception):
+    """Txtovideo Studio 基础异常类"""
     def __init__(
         self,
         message: str,
@@ -15,7 +15,7 @@ class AICGException(Exception):
         self.details = details
         super().__init__(message)
 
-class NotFoundError(AICGException):
+class NotFoundError(TxtovideoException):
     """资源不存在异常"""
     def __init__(self, message: str, resource_type: str = None, resource_id: str = None):
         super().__init__(
@@ -25,7 +25,7 @@ class NotFoundError(AICGException):
             details={"resource_type": resource_type, "resource_id": resource_id}
         )
 
-class BusinessLogicError(AICGException):
+class BusinessLogicError(TxtovideoException):
     """业务逻辑异常"""
     def __init__(self, message: str, code: str = "BUSINESS_ERROR"):
         super().__init__(
@@ -34,7 +34,7 @@ class BusinessLogicError(AICGException):
             error_code=code
         )
 
-class PermissionDeniedError(AICGException):
+class PermissionDeniedError(TxtovideoException):
     """权限不足异常"""
     def __init__(self, message: str = "Permission denied"):
         super().__init__(
@@ -43,7 +43,7 @@ class PermissionDeniedError(AICGException):
             error_code="PERMISSION_DENIED"
         )
 
-class AuthenticationError(AICGException):
+class AuthenticationError(TxtovideoException):
     """认证失败异常"""
     def __init__(self, message: str = "Authentication failed"):
         super().__init__(
@@ -52,7 +52,7 @@ class AuthenticationError(AICGException):
             error_code="AUTHENTICATION_FAILED"
         )
 
-class ValidationError(AICGException):
+class ValidationError(TxtovideoException):
     """数据验证异常"""
     def __init__(self, message: str):
         super().__init__(
@@ -61,7 +61,7 @@ class ValidationError(AICGException):
             error_code="VALIDATION_ERROR"
         )
 
-class FileUploadError(AICGException):
+class FileUploadError(TxtovideoException):
     """文件上传异常"""
     def __init__(self, message: str):
         super().__init__(

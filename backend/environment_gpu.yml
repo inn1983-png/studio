@@ -1,4 +1,4 @@
-name: aicon-gpu
+name: txtovideo-gpu
 channels:
   - pytorch         # 确保 PyTorch 及其 CUDA 相关依赖能被找到
   - nvidia          # 官方 NVIDIA Conda channel

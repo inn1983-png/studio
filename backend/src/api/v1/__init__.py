@@ -4,7 +4,8 @@ API v1 模块
 
 from fastapi import APIRouter
 
-# 创建主路由器
+from src.core.config import settings
+
 api_router = APIRouter()
 
 
@@ -12,7 +13,7 @@ api_router = APIRouter()
 async def api_v1_info():
     """API v1 信息"""
     return {
-        "name": "AICG内容分发平台 API v1",
+        "name": f"{settings.APP_NAME} API v1",
         "version": "1.0.0",
         "status": "under_development",
         "message": "API v1 正在开发中",
@@ -42,6 +43,7 @@ from .movie_characters import router as movie_characters_router
 from .movie_scenes import router as movie_scenes_router
 from .movie_shots import router as movie_shots_router
 from .movie_transitions import router as movie_transitions_router
+from .movie_props import router as movie_props_router
 from .generation_history import router as generation_history_router
 from .canvas import router as canvas_router
 from .canvas_assistant import router as canvas_assistant_router
@@ -69,6 +71,7 @@ api_router.include_router(movie_characters_router, prefix="/movie", tags=["电�
 api_router.include_router(movie_scenes_router, prefix="/movie", tags=["电影-场景管理"])
 api_router.include_router(movie_shots_router, prefix="/movie", tags=["电影-分镜管理"])
 api_router.include_router(movie_transitions_router, prefix="/movie", tags=["电影-过渡视频"])
+api_router.include_router(movie_props_router, prefix="/movie", tags=["电影-道具管理"])
 api_router.include_router(generation_history_router, prefix="/movie", tags=["电影-生成历史"])
 api_router.include_router(canvas_router, tags=["Canvas"])
 api_router.include_router(canvas_assistant_router, tags=["Canvas Assistant"])

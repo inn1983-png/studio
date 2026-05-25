@@ -2,12 +2,18 @@
   <!-- 查看/编辑提示词对话框 -->
   <el-dialog
     :model-value="visible"
-    @update:model-value="$emit('update:visible', $event)"
     :title="dialogTitle"
     width="600px"
+    @update:model-value="$emit('update:visible', $event)"
   >
-    <el-form :inline="false" class="dialog-form">
-      <el-form-item label="句子内容" style="width: 100%">
+    <el-form
+      :inline="false"
+      class="dialog-form"
+    >
+      <el-form-item
+        label="句子内容"
+        style="width: 100%"
+      >
         <el-input
           v-model="localSentence.content"
           type="textarea"
@@ -17,7 +23,10 @@
         />
       </el-form-item>
       
-      <el-form-item label="图片 Prompt" style="width: 100%">
+      <el-form-item
+        label="图片 Prompt"
+        style="width: 100%"
+      >
         <el-input
           v-model="localSentence.image_prompt"
           type="textarea"
@@ -31,7 +40,11 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleClose">关闭</el-button>
-        <el-button v-if="isEditing" type="primary" @click="handleSave">
+        <el-button
+          v-if="isEditing"
+          type="primary"
+          @click="handleSave"
+        >
           保存
         </el-button>
       </span>

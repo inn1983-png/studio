@@ -117,6 +117,27 @@ export const movieService = {
         return put(`/movie/shots/${shotId}`, data)
     },
 
+    /**
+     * 删除分镜
+     */
+    deleteShot(shotId) {
+        return del(`/movie/shots/${shotId}`)
+    },
+
+    /**
+     * 更新分镜顺序
+     */
+    updateShotOrder(shotId, orderIndex) {
+        return put(`/movie/shots/${shotId}/order`, { order_index: orderIndex })
+    },
+
+    /**
+     * 获取章节的所有分镜
+     */
+    getShotsByChapter(chapterId) {
+        return get(`/movie/shots/by-chapter/${chapterId}`)
+    },
+
 
     // ==================== 关键帧管理 ====================
 
@@ -206,6 +227,57 @@ export const movieService = {
      */
     deleteReferenceImage(characterId, imageIndex) {
         return del(`/movie/characters/${characterId}/reference-images/${imageIndex}`)
+    },
+
+    // ==================== 道具管理 ====================
+
+    getProps(projectId) {
+        return get(`/movie/projects/${projectId}/props`)
+    },
+
+    extractProps(chapterId, data) {
+        return post(`/movie/chapters/${chapterId}/extract-props`, data)
+    },
+
+    generatePropImage(propId, data) {
+        const formData = new FormData()
+        formData.append('api_key_id', data.api_key_id)
+        if (data.model) formData.append('model', data.model)
+        if (data.prompt) formData.append('prompt', data.prompt)
+        if (data.style) formData.append('style', data.style)
+
+        return api.post(`/movie/props/${propId}/generate`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+
+    batchGeneratePropImages(projectId, data) {
+        return post(`/movie/projects/${projectId}/props/batch-generate`, data)
+    },
+
+    updateProp(propId, data) {
+        return put(`/movie/props/${propId}`, data)
+    },
+
+    deleteProp(propId) {
+        return del(`/movie/props/${propId}`)
+    },
+
+    uploadPropReferenceImage(propId, file) {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        return api.post(`/movie/props/${propId}/reference-images`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+    },
+
+    deletePropReferenceImage(propId, imageIndex) {
+        return del(`/movie/props/${propId}/reference-images/${imageIndex}`)
     }
 }
 

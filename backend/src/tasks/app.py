@@ -9,7 +9,7 @@ from src.core.database import initialize_database, close_database_connections
 from src.tasks.base import run_async_task
 
 celery_app = Celery(
-    "aicon",
+    settings.APP_CELERY_NAME,
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
     include=[
@@ -45,6 +45,8 @@ celery_app.conf.update(
     task_acks_late=True,
     task_reject_on_worker_lost=True,
     result_expires=3600,
+    task_default_max_retries=3,
+    task_default_retry_delay=60,
     beat_schedule={
         "sync-video-status-every-30s": {
             "task": "movie.sync_transition_video_status",

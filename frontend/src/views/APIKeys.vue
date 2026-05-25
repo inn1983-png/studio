@@ -5,7 +5,10 @@
         <h1>API密钥管理</h1>
         <p>管理您的AI服务提供商API密钥</p>
       </div>
-      <el-button type="primary" @click="showAddDialog">
+      <el-button
+        type="primary"
+        @click="showAddDialog"
+      >
         <el-icon><Plus /></el-icon>
         添加密钥
       </el-button>
@@ -17,10 +20,13 @@
         v-model="filterProvider"
         placeholder="服务提供商"
         clearable
-        @change="loadAPIKeys"
         style="width: 180px"
+        @change="loadAPIKeys"
       >
-        <el-option label="全部提供商" value="" />
+        <el-option
+          label="全部提供商"
+          value=""
+        />
         <el-option
           v-for="provider in apiKeyUtils.getProviderOptions()"
           :key="provider.value"
@@ -32,10 +38,13 @@
         v-model="filterStatus"
         placeholder="状态"
         clearable
-        @change="loadAPIKeys"
         style="width: 150px"
+        @change="loadAPIKeys"
       >
-        <el-option label="全部状态" value="" />
+        <el-option
+          label="全部状态"
+          value=""
+        />
         <el-option
           v-for="status in apiKeyUtils.getStatusOptions()"
           :key="status.value"
@@ -46,8 +55,16 @@
     </div>
 
     <!-- API密钥列表 -->
-    <el-table :data="apiKeys" v-loading="loading" class="api-keys-table">
-      <el-table-column prop="name" label="名称" min-width="150">
+    <el-table
+      v-loading="loading"
+      :data="apiKeys"
+      class="api-keys-table"
+    >
+      <el-table-column
+        prop="name"
+        label="名称"
+        min-width="150"
+      >
         <template #default="{ row }">
           <div class="key-name">
             <el-icon><Key /></el-icon>
@@ -55,39 +72,83 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="provider" label="服务提供商" width="140">
+      <el-table-column
+        prop="provider"
+        label="服务提供商"
+        width="140"
+      >
         <template #default="{ row }">
-          <el-tag type="info" size="small">
+          <el-tag
+            type="info"
+            size="small"
+          >
             {{ apiKeyUtils.getProviderName(row.provider) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="api_key" label="API密钥" min-width="180">
+      <el-table-column
+        prop="api_key"
+        label="API密钥"
+        min-width="180"
+      >
         <template #default="{ row }">
           <code class="api-key-display">{{ row.api_key }}</code>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" width="100">
+      <el-table-column
+        prop="status"
+        label="状态"
+        width="100"
+      >
         <template #default="{ row }">
-          <el-tag :type="apiKeyUtils.getStatusType(row.status)" size="small">
+          <el-tag
+            :type="apiKeyUtils.getStatusType(row.status)"
+            size="small"
+          >
             {{ apiKeyUtils.getStatusText(row.status) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="usage_count" label="使用次数" width="100" align="center">
+      <el-table-column
+        prop="usage_count"
+        label="使用次数"
+        width="100"
+        align="center"
+      >
         <template #default="{ row }">
           {{ apiKeyUtils.formatNumber(row.usage_count) }}
         </template>
       </el-table-column>
-      <el-table-column prop="last_used_at" label="最后使用" width="160">
+      <el-table-column
+        prop="last_used_at"
+        label="最后使用"
+        width="160"
+      >
         <template #default="{ row }">
           {{ apiKeyUtils.formatDateTime(row.last_used_at) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150" fixed="right">
+      <el-table-column
+        label="操作"
+        width="150"
+        fixed="right"
+      >
         <template #default="{ row }">
-          <el-button size="small" @click="showEditDialog(row)" link>编辑</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(row)" link>删除</el-button>
+          <el-button
+            size="small"
+            link
+            @click="showEditDialog(row)"
+          >
+            编辑
+          </el-button>
+          <el-button
+            size="small"
+            type="danger"
+            link
+            @click="handleDelete(row)"
+          >
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -118,7 +179,10 @@
         :rules="formRules"
         label-width="100px"
       >
-        <el-form-item label="名称" prop="name">
+        <el-form-item
+          label="名称"
+          prop="name"
+        >
           <el-input
             v-model="formData.name"
             placeholder="请输入密钥名称"
@@ -126,7 +190,10 @@
             show-word-limit
           />
         </el-form-item>
-        <el-form-item label="服务提供商" prop="provider">
+        <el-form-item
+          label="服务提供商"
+          prop="provider"
+        >
           <el-select
             v-model="formData.provider"
             placeholder="请选择服务提供商"
@@ -141,31 +208,59 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="API密钥" prop="api_key" v-if="!isEdit">
+        <el-form-item
+          v-if="!isEdit"
+          label="API密钥"
+          prop="api_key"
+        >
           <el-input
             v-model="formData.api_key"
             type="password"
             show-password
             placeholder="请输入API密钥"
           />
-          <div class="form-tip">密钥将被加密存储，仅显示前4个字符</div>
+          <div class="form-tip">
+            密钥将被加密存储，仅显示前4个字符
+          </div>
         </el-form-item>
-        <el-form-item label="Base URL" prop="base_url">
+        <el-form-item
+          label="Base URL"
+          prop="base_url"
+        >
           <el-input
             v-model="formData.base_url"
-            placeholder="默认: https://api.aiconapi.me/v1，可按需改成你自己的兼容地址"
+            :placeholder="formData.provider === 'local' ? '本地模型地址，如 http://localhost:8081/v1' : '默认: https://api.aiconapi.me/v1，可按需改成你自己的兼容地址'"
           />
         </el-form-item>
-        <el-form-item label="状态" prop="status" v-if="isEdit">
-          <el-select v-model="formData.status" style="width: 100%">
-            <el-option label="激活" value="active" />
-            <el-option label="未激活" value="inactive" />
+        <el-form-item
+          v-if="isEdit"
+          label="状态"
+          prop="status"
+        >
+          <el-select
+            v-model="formData.status"
+            style="width: 100%"
+          >
+            <el-option
+              label="激活"
+              value="active"
+            />
+            <el-option
+              label="未激活"
+              value="inactive"
+            />
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="submitting">
+        <el-button @click="dialogVisible = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="submitting"
+          @click="handleSubmit"
+        >
           确定
         </el-button>
       </template>
@@ -174,12 +269,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Key } from '@element-plus/icons-vue'
 import { apiKeysService, apiKeyUtils } from '@/services/apiKeys'
 
 const DEFAULT_CUSTOM_BASE_URL = 'https://api.aiconapi.me/v1'
+const DEFAULT_LOCAL_BASE_URL = 'http://localhost:8081/v1'
+
+const PROVIDER_DEFAULTS = {
+  custom: DEFAULT_CUSTOM_BASE_URL,
+  local: DEFAULT_LOCAL_BASE_URL,
+}
 
 // 状态
 const loading = ref(false)
@@ -352,6 +453,12 @@ const handleDelete = async (row) => {
 
 onMounted(() => {
   loadAPIKeys()
+})
+
+watch(() => formData.provider, (newProvider) => {
+  if (PROVIDER_DEFAULTS[newProvider] && !formData.base_url) {
+    formData.base_url = PROVIDER_DEFAULTS[newProvider]
+  }
 })
 </script>
 

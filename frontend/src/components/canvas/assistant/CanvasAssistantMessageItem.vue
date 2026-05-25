@@ -7,18 +7,28 @@
       { 'assistant-message--live-placeholder': isLivePlaceholder }
     ]"
   >
-    <div v-if="!isLivePlaceholder" class="assistant-message__meta">
+    <div
+      v-if="!isLivePlaceholder"
+      class="assistant-message__meta"
+    >
       <span class="assistant-message__role">{{ roleLabel }}</span>
-      <span v-if="message.order !== undefined" class="assistant-message__order">#{{ message.order }}</span>
+      <span
+        v-if="message.order !== undefined"
+        class="assistant-message__order"
+      >#{{ message.order }}</span>
     </div>
     <div class="assistant-message__content">
       {{ displayedContent || contentFallback }}
       <span
         v-if="showCursor"
         class="assistant-message__cursor"
-      ></span>
-      <span v-if="showWave" class="assistant-message__wave" aria-hidden="true">
-        <span></span><span></span><span></span><span></span>
+      />
+      <span
+        v-if="showWave"
+        class="assistant-message__wave"
+        aria-hidden="true"
+      >
+        <span /><span /><span /><span />
       </span>
     </div>
   </article>

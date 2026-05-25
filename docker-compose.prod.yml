@@ -1,6 +1,6 @@
 version: '3.8'
 
-# AICG平台 - 生产环境完整部署
+# Txtovideo Studio - 生产环境完整部署
 # 包含所有服务:前端、后端、Worker、数据库、缓存、存储
 
 services:
@@ -11,21 +11,21 @@ services:
   # PostgreSQL 数据库
   postgres:
     image: postgres:15-alpine
-    container_name: aicon-postgres
+    container_name: txtovideo-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-aicg_platform}
-      POSTGRES_USER: ${POSTGRES_USER:-aicg_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aicg_password}
+      POSTGRES_DB: ${POSTGRES_DB:-txtovideo_studio}
+      POSTGRES_USER: ${POSTGRES_USER:-txtovideo_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-txtovideo_password}
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - aicon-network
+      - txtovideo-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aicg_user} -d ${POSTGRES_DB:-aicg_platform}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-txtovideo_user} -d ${POSTGRES_DB:-txtovideo_studio}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,7 +33,7 @@ services:
   # Redis 缓存和消息队列
   redis:
     image: redis:7-alpine
-    container_name: aicon-redis
+    container_name: txtovideo-redis
     restart: unless-stopped
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
     ports:
@@ -41,7 +41,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - aicon-network
+      - txtovideo-network
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 10s
@@ -51,7 +51,7 @@ services:
   # MinIO 对象存储
   minio:
     image: minio/minio:latest
-    container_name: aicon-minio
+    container_name: txtovideo-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
@@ -63,7 +63,7 @@ services:
     volumes:
       - minio_data:/data
     networks:
-      - aicon-network
+      - txtovideo-network
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 30s
@@ -76,12 +76,12 @@ services:
 
   # 后端 API 服务
   backend:
-    image: qingshui869413421/aicon-backend:latest
-    container_name: aicon-backend
+    image: txtovideo/txtovideo-backend:latest
+    container_name: txtovideo-backend
     restart: unless-stopped
     environment:
       # 数据库配置
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aicg_user}:${POSTGRES_PASSWORD:-aicg_password}@postgres:5432/${POSTGRES_DB:-aicg_platform}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-txtovideo_user}:${POSTGRES_PASSWORD:-txtovideo_password}@postgres:5432/${POSTGRES_DB:-txtovideo_studio}
 
       # Redis配置
       REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
@@ -92,12 +92,12 @@ services:
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin123}
-      MINIO_BUCKET: ${MINIO_BUCKET:-aicg-platform}
+      MINIO_BUCKET: ${MINIO_BUCKET:-txtovideo-studio}
       MINIO_SECURE: "false"
 
       # 应用配置
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-secret-key-change-in-production}
-      API_KEY_ENCRYPTION_KEY: ${API_KEY_ENCRYPTION_KEY:-zWpJNO3LF7RpaOvkpOG-edszCEQVWe24dcent10bSrY=}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set}
+      API_KEY_ENCRYPTION_KEY: ${API_KEY_ENCRYPTION_KEY:?API_KEY_ENCRYPTION_KEY must be set}
       DEBUG: ${DEBUG:-false}
       ENVIRONMENT: production
       MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-localhost:9000}
@@ -112,7 +112,7 @@ services:
       minio:
         condition: service_healthy
     networks:
-      - aicon-network
+      - txtovideo-network
     volumes:
       - ./backend/src:/app/src # 挂载源代码，支持热重载
       - ./backend/logs:/app/logs
@@ -124,28 +124,28 @@ services:
 
   # Celery Worker - 异步任务处理
   celery-worker:
-    image: qingshui869413421/aicon-backend:latest
-    container_name: aicon-celery-worker
+    image: txtovideo/txtovideo-backend:latest
+    container_name: txtovideo-celery-worker
     restart: unless-stopped
     environment:
       # 使用与backend相同的环境变量
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aicg_user}:${POSTGRES_PASSWORD:-aicg_password}@postgres:5432/${POSTGRES_DB:-aicg_platform}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-txtovideo_user}:${POSTGRES_PASSWORD:-txtovideo_password}@postgres:5432/${POSTGRES_DB:-txtovideo_studio}
       REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
       CELERY_BROKER_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
       CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin123}
-      MINIO_BUCKET: ${MINIO_BUCKET:-aicg-platform}
+      MINIO_BUCKET: ${MINIO_BUCKET:-txtovideo-studio}
       MINIO_SECURE: "false"
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-secret-key-change-in-production}
-      API_KEY_ENCRYPTION_KEY: ${API_KEY_ENCRYPTION_KEY:-zWpJNO3LF7RpaOvkpOG-edszCEQVWe24dcent10bSrY=}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set}
+      API_KEY_ENCRYPTION_KEY: ${API_KEY_ENCRYPTION_KEY:?API_KEY_ENCRYPTION_KEY must be set}
       MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-localhost:9000}
     depends_on:
       - backend
       - redis
     networks:
-      - aicon-network
+      - txtovideo-network
     volumes:
       - ./backend/src:/app/src # 挂载源代码，支持热重载
       - ./backend/logs:/app/logs
@@ -153,22 +153,22 @@ services:
 
   # Celery Beat - 定时任务调度
   celery-beat:
-    image: qingshui869413421/aicon-backend:latest
-    container_name: aicon-celery-beat
+    image: txtovideo/txtovideo-backend:latest
+    container_name: txtovideo-celery-beat
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aicg_user}:${POSTGRES_PASSWORD:-aicg_password}@postgres:5432/${POSTGRES_DB:-aicg_platform}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-txtovideo_user}:${POSTGRES_PASSWORD:-txtovideo_password}@postgres:5432/${POSTGRES_DB:-txtovideo_studio}
       REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
       CELERY_BROKER_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
       CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-secret-key-change-in-production}
-      API_KEY_ENCRYPTION_KEY: ${API_KEY_ENCRYPTION_KEY:-zWpJNO3LF7RpaOvkpOG-edszCEQVWe24dcent10bSrY=}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set}
+      API_KEY_ENCRYPTION_KEY: ${API_KEY_ENCRYPTION_KEY:?API_KEY_ENCRYPTION_KEY must be set}
       MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-localhost:9000}
     depends_on:
       - backend
       - redis
     networks:
-      - aicon-network
+      - txtovideo-network
     volumes:
       - ./backend/src:/app/src # 挂载源代码，支持热重载
       - ./backend/logs:/app/logs
@@ -176,21 +176,21 @@ services:
 
   # 前端服务
   frontend:
-    image: qingshui869413421/aicon-frontend:latest
-    container_name: aicon-frontend
+    image: txtovideo/txtovideo-frontend:latest
+    container_name: txtovideo-frontend
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-80}:80"
     depends_on:
       - backend
     networks:
-      - aicon-network
+      - txtovideo-network
 
 # ==========================================
 # 网络配置
 # ==========================================
 networks:
-  aicon-network:
+  txtovideo-network:
     driver: bridge
     ipam:
       config:

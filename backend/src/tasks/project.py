@@ -11,10 +11,12 @@ logger = get_logger(__name__)
 
 @celery_app.task(
     bind=True,
-    max_retries=0,
-    name="file_processing.process_uploaded_file"
+    max_retries=2,
+    name="file_processing.process_uploaded_file",
+    autoretry_for=(ConnectionError, TimeoutError, OSError),
+    retry_backoff=False,
 )
-@async_task_decorator
+@async_task_decorator(max_retries=2, retry_delays=[30, 120])
 async def process_uploaded_file(db_session: AsyncSession, self, project_id: str, owner_id: str) -> Dict[str, Any]:
     """处理上传文件的 Celery 任务"""
     from src.services.project_processing import ProjectProcessingService
@@ -28,10 +30,12 @@ async def process_uploaded_file(db_session: AsyncSession, self, project_id: str,
 
 @celery_app.task(
     bind=True,
-    max_retries=0,
-    name="file_processing.retry_failed_project"
+    max_retries=2,
+    name="file_processing.retry_failed_project",
+    autoretry_for=(ConnectionError, TimeoutError, OSError),
+    retry_backoff=False,
 )
-@async_task_decorator
+@async_task_decorator(max_retries=2, retry_delays=[30, 120])
 async def retry_failed_project(db_session: AsyncSession, self, project_id: str, owner_id: str) -> Dict[str, Any]:
     """重试失败项目的 Celery 任务"""
     from src.services.project_processing import ProjectProcessingService

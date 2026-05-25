@@ -10,7 +10,7 @@ from enum import Enum
 from typing import Dict, Optional
 
 from sqlalchemy import Column, ForeignKey, Index, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID as PostgreSQLUUID
 
 from src.core.logging import get_logger
 from .base import BaseModel
@@ -67,6 +67,9 @@ class VideoTask(BaseModel):
     # 错误信息
     error_message = Column(Text, nullable=True, comment="错误信息")
     error_sentence_id = Column(PostgreSQLUUID(as_uuid=True), nullable=True, comment="出错的句子ID（用于调试）")
+
+    # 依赖关系
+    depends_on = Column(JSONB, default=[], server_default='[]', nullable=False, comment="依赖的任务ID列表（JSON数组）")
 
     # 关系定义
     from sqlalchemy.orm import relationship

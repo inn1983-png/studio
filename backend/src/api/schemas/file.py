@@ -56,7 +56,7 @@ class FileUploadResult(BaseModel):
                     "encoding": "utf-8"
                 },
                 "storage_info": {
-                    "bucket": "aicg-files",
+                    "bucket": "txtovideo-files",
                     "url": "https://example.com/files/uuid-file.txt"
                 }
             }

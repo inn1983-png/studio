@@ -1,7 +1,7 @@
 import uuid
 from enum import Enum
 
-from sqlalchemy import CHAR, Column, Float, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import CHAR, Column, Float, ForeignKey, Index, Integer, JSON, String, Text
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 from sqlalchemy.types import TypeDecorator
 from sqlalchemy.orm import relationship
@@ -95,6 +95,10 @@ class CanvasItem(BaseModel):
 
     document = relationship("CanvasDocument", back_populates="items")
     generations = relationship("CanvasItemGeneration", back_populates="item", cascade="all, delete-orphan")
+
+    __table_args__ = (
+        Index('idx_canvas_item_doc_type', 'document_id', 'item_type'),
+    )
 
 
 class CanvasConnection(BaseModel):

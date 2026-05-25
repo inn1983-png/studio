@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { get, post, put, del } from '@/services/api'
+import { get, post, del } from '@/services/api'
 
 export const useGenerationStore = defineStore('generations', () => {
   const tasks = ref([])

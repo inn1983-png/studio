@@ -3,16 +3,33 @@
     <div class="sidebar-header">
       <h3>剧组成员</h3>
       <div class="header-actions">
-        <el-button type="primary" link size="small" @click="$emit('detect')" :loading="extracting">
+        <el-button
+          type="primary"
+          link
+          size="small"
+          :loading="extracting"
+          @click="$emit('detect')"
+        >
           <el-icon><MagicStick /></el-icon> 智能提取
         </el-button>
-        <el-button type="success" link size="small" @click="$emit('batch-generate')" v-if="characters.length > 0">
+        <el-button
+          v-if="characters.length > 0"
+          type="success"
+          link
+          size="small"
+          @click="$emit('batch-generate')"
+        >
           <el-icon><Picture /></el-icon> 批量定妆
         </el-button>
       </div>
     </div>
     <div class="cast-list">
-      <el-card v-for="char in characters" :key="char.id" class="char-card" :body-style="{ padding: '10px' }">
+      <el-card
+        v-for="char in characters"
+        :key="char.id"
+        class="char-card"
+        :body-style="{ padding: '10px' }"
+      >
         <div class="char-header">
           <el-image 
             :src="char.avatar_url" 
@@ -28,9 +45,14 @@
             </template>
           </el-image>
           <div class="char-info">
-            <div class="char-name">{{ char.name }}</div>
+            <div class="char-name">
+              {{ char.name }}
+            </div>
             <div class="char-status-row">
-              <el-tag size="small" :type="char.avatar_url ? 'success' : 'info'">
+              <el-tag
+                size="small"
+                :type="char.avatar_url ? 'success' : 'info'"
+              >
                 {{ char.avatar_url ? '已定妆' : '待定妆' }}
               </el-tag>
               <el-button 
@@ -38,25 +60,30 @@
                 circle 
                 size="small" 
                 :icon="MagicStick" 
-                @click="$emit('generate-avatar', char)"
                 style="margin-left: 10px;"
                 title="定妆/重绘形象"
+                @click="$emit('generate-avatar', char)"
               />
               <el-button 
                 type="danger" 
                 circle 
                 size="small" 
                 :icon="Delete" 
-                @click="$emit('delete-character', char)"
                 style="margin-left: 5px;"
                 title="删除角色"
+                @click="$emit('delete-character', char)"
               />
             </div>
           </div>
         </div>
-        <div class="char-desc text-truncate">{{ char.description }}</div>
+        <div class="char-desc text-truncate">
+          {{ char.description }}
+        </div>
       </el-card>
-      <div v-if="characters.length === 0" class="empty-cast">
+      <div
+        v-if="characters.length === 0"
+        class="empty-cast"
+      >
         暂无角色,请点击智能提取
       </div>
     </div>
@@ -67,8 +94,14 @@
 import { MagicStick, User, Delete, Picture } from '@element-plus/icons-vue'
 
 defineProps({
-  characters: Array,
-  extracting: Boolean
+  characters: {
+    type: Array,
+    default: () => ([])
+  },
+  extracting: {
+    type: Boolean,
+    default: false
+  }
 })
 
 defineEmits(['detect', 'generate-avatar', 'delete-character', 'batch-generate'])

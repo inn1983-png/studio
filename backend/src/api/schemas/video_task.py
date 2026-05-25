@@ -61,6 +61,7 @@ class VideoTaskResponse(UUIDMixin):
     video_url: Optional[str] = Field(None, description="视频预签名URL")
     video_duration: Optional[int] = Field(None, description="视频时长（秒）")
     error_message: Optional[str] = Field(None, description="错误信息")
+    depends_on: List[str] = Field(default_factory=list, description="依赖的任务ID列表")
     gen_setting: Optional[Dict] = Field(None, description="生成设置")
     created_at: str = Field(..., description="创建时间")
     updated_at: str = Field(..., description="更新时间")

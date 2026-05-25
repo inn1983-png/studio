@@ -11,10 +11,12 @@ logger = get_logger(__name__)
 
 @celery_app.task(
     bind=True,
-    max_retries=0,
-    name="generate.generate_prompts"
+    max_retries=3,
+    name="generate.generate_prompts",
+    autoretry_for=(ConnectionError, TimeoutError, OSError),
+    retry_backoff=False,
 )
-@async_task_decorator
+@async_task_decorator(max_retries=3)
 async def generate_prompts(db_session: AsyncSession, self, chapter_id: str, api_key_id: str, style: str, model: str = None, custom_prompt: str = None):
     """为章节生成提示词的 Celery 任务"""
     from src.services.prompt import PromptService
@@ -28,10 +30,12 @@ async def generate_prompts(db_session: AsyncSession, self, chapter_id: str, api_
 
 @celery_app.task(
     bind=True,
-    max_retries=0,
-    name="generate.generate_prompts_by_ids"
+    max_retries=3,
+    name="generate.generate_prompts_by_ids",
+    autoretry_for=(ConnectionError, TimeoutError, OSError),
+    retry_backoff=False,
 )
-@async_task_decorator
+@async_task_decorator(max_retries=3)
 async def generate_prompts_by_ids(db_session: AsyncSession, self, sentence_ids: List[str], api_key_id: str, style: str, model: str = None, custom_prompt: str = None):
     """为指定句子生成提示词的 Celery 任务"""
     from src.services.prompt import PromptService
@@ -45,10 +49,12 @@ async def generate_prompts_by_ids(db_session: AsyncSession, self, sentence_ids: 
 
 @celery_app.task(
     bind=True,
-    max_retries=0,
-    name="generate.generate_images"
+    max_retries=3,
+    name="generate.generate_images",
+    autoretry_for=(ConnectionError, TimeoutError, OSError),
+    retry_backoff=False,
 )
-@async_task_decorator
+@async_task_decorator(max_retries=3)
 async def generate_images(db_session: AsyncSession, self, api_key_id: str, sentences_ids: list[str], model: str = None):
     """批量生成图片的 Celery 任务"""
     from src.services.image import ImageService
@@ -62,10 +68,12 @@ async def generate_images(db_session: AsyncSession, self, api_key_id: str, sente
 
 @celery_app.task(
     bind=True,
-    max_retries=0,
-    name="generate.generate_audio"
+    max_retries=3,
+    name="generate.generate_audio",
+    autoretry_for=(ConnectionError, TimeoutError, OSError),
+    retry_backoff=False,
 )
-@async_task_decorator
+@async_task_decorator(max_retries=3)
 async def generate_audio(db_session: AsyncSession, self, api_key_id: str, sentences_ids: list[str], voice: str = "alloy", model: str = "tts-1"):
     """批量生成音频的 Celery 任务"""
     from src.services.audio import AudioService
@@ -79,10 +87,12 @@ async def generate_audio(db_session: AsyncSession, self, api_key_id: str, senten
 
 @celery_app.task(
     bind=True,
-    max_retries=0,
-    name="generate.synthesize_video"
+    max_retries=2,
+    name="generate.synthesize_video",
+    autoretry_for=(ConnectionError, TimeoutError, OSError),
+    retry_backoff=False,
 )
-@async_task_decorator
+@async_task_decorator(max_retries=2, retry_delays=[120, 600])
 async def synthesize_video(db_session: AsyncSession, self, video_task_id: str):
     """视频合成的 Celery 任务 - 根据项目类型路由到不同服务"""
     from src.services.video_task import VideoTaskService

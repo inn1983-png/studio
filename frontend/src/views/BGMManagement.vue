@@ -1,14 +1,26 @@
 <template>
   <div class="bgm-management">
     <!-- 统计卡片 -->
-    <el-row :gutter="20" class="stats-row">
+    <el-row
+      :gutter="20"
+      class="stats-row"
+    >
       <el-col :span="8">
         <el-card shadow="hover">
           <div class="stat-card">
-            <el-icon class="stat-icon" color="#409EFF"><Headset /></el-icon>
+            <el-icon
+              class="stat-icon"
+              color="#409EFF"
+            >
+              <Headset />
+            </el-icon>
             <div class="stat-content">
-              <div class="stat-value">{{ stats.total_count }}</div>
-              <div class="stat-label">总BGM数量</div>
+              <div class="stat-value">
+                {{ stats.total_count }}
+              </div>
+              <div class="stat-label">
+                总BGM数量
+              </div>
             </div>
           </div>
         </el-card>
@@ -16,10 +28,19 @@
       <el-col :span="8">
         <el-card shadow="hover">
           <div class="stat-card">
-            <el-icon class="stat-icon" color="#67C23A"><FolderOpened /></el-icon>
+            <el-icon
+              class="stat-icon"
+              color="#67C23A"
+            >
+              <FolderOpened />
+            </el-icon>
             <div class="stat-content">
-              <div class="stat-value">{{ stats.total_size_mb }} MB</div>
-              <div class="stat-label">总存储空间</div>
+              <div class="stat-value">
+                {{ stats.total_size_mb }} MB
+              </div>
+              <div class="stat-label">
+                总存储空间
+              </div>
             </div>
           </div>
         </el-card>
@@ -27,9 +48,17 @@
       <el-col :span="8">
         <el-card shadow="hover">
           <div class="stat-card">
-            <el-icon class="stat-icon" color="#E6A23C"><Upload /></el-icon>
+            <el-icon
+              class="stat-icon"
+              color="#E6A23C"
+            >
+              <Upload />
+            </el-icon>
             <div class="stat-content">
-              <el-button type="primary" @click="showUploadDialog = true">
+              <el-button
+                type="primary"
+                @click="showUploadDialog = true"
+              >
                 <el-icon><Upload /></el-icon> 上传BGM
               </el-button>
             </div>
@@ -43,7 +72,10 @@
       <template #header>
         <div class="card-header">
           <span>BGM列表</span>
-          <el-button type="primary" @click="refreshList">
+          <el-button
+            type="primary"
+            @click="refreshList"
+          >
             <el-icon><Refresh /></el-icon> 刷新
           </el-button>
         </div>
@@ -55,30 +87,59 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column prop="name" label="名称" min-width="200" />
-        <el-table-column prop="file_name" label="文件名" min-width="200" />
-        <el-table-column label="时长" width="100">
+        <el-table-column
+          prop="name"
+          label="名称"
+          min-width="200"
+        />
+        <el-table-column
+          prop="file_name"
+          label="文件名"
+          min-width="200"
+        />
+        <el-table-column
+          label="时长"
+          width="100"
+        >
           <template #default="{ row }">
             {{ formatDuration(row.duration) }}
           </template>
         </el-table-column>
-        <el-table-column label="文件大小" width="120">
+        <el-table-column
+          label="文件大小"
+          width="120"
+        >
           <template #default="{ row }">
             {{ formatFileSize(row.file_size) }}
           </template>
         </el-table-column>
-        <el-table-column prop="created_at" label="上传时间" width="180">
+        <el-table-column
+          prop="created_at"
+          label="上传时间"
+          width="180"
+        >
           <template #default="{ row }">
             {{ formatDate(row.created_at) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column
+          label="操作"
+          width="200"
+          fixed="right"
+        >
           <template #default="{ row }">
             <el-button-group>
-              <el-button size="small" @click="previewBGM(row)">
+              <el-button
+                size="small"
+                @click="previewBGM(row)"
+              >
                 <el-icon><VideoPlay /></el-icon> 试听
               </el-button>
-              <el-button size="small" type="danger" @click="handleDelete(row)">
+              <el-button
+                size="small"
+                type="danger"
+                @click="handleDelete(row)"
+              >
                 <el-icon><Delete /></el-icon> 删除
               </el-button>
             </el-button-group>
@@ -112,7 +173,10 @@
       title="试听BGM"
       width="500px"
     >
-      <div v-if="currentBGM" class="preview-container">
+      <div
+        v-if="currentBGM"
+        class="preview-container"
+      >
         <div class="preview-info">
           <p><strong>名称：</strong>{{ currentBGM.name }}</p>
           <p><strong>时长：</strong>{{ formatDuration(currentBGM.duration) }}</p>
@@ -132,7 +196,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { ElMessageBox, ElMessage } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { Headset, FolderOpened, Upload, Refresh, VideoPlay, Delete } from '@element-plus/icons-vue'
 import { useBGM } from '@/composables/useBGM'
 import { formatDate } from '@/utils/dateUtils'

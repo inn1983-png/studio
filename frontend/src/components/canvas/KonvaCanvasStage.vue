@@ -1,5 +1,8 @@
 <template>
-  <div ref="containerRef" class="konva-stage-shell">
+  <div
+    ref="containerRef"
+    class="konva-stage-shell"
+  >
     <v-stage
       v-if="stageReady"
       ref="stageRef"
@@ -28,7 +31,10 @@
           :config="buildItemGroupConfig(item)"
         >
           <v-rect :config="buildItemRectConfig(item)" />
-          <v-image v-if="hasItemMedia(item)" :config="buildItemMediaConfig(item)" />
+          <v-image
+            v-if="hasItemMedia(item)"
+            :config="buildItemMediaConfig(item)"
+          />
           <v-text :config="buildItemTitleConfig(item)" />
           <v-text :config="buildItemPreviewConfig(item)" />
           <v-circle :config="buildHandleConfig(item, 'left')" />
@@ -37,9 +43,18 @@
       </v-layer>
     </v-stage>
 
-    <div v-else class="konva-stage-placeholder">画布加载中...</div>
+    <div
+      v-else
+      class="konva-stage-placeholder"
+    >
+      画布加载中...
+    </div>
 
-    <div v-if="marqueeOverlayStyle" class="stage-selection-overlay" :style="marqueeOverlayStyle"></div>
+    <div
+      v-if="marqueeOverlayStyle"
+      class="stage-selection-overlay"
+      :style="marqueeOverlayStyle"
+    />
 
     <div
       v-for="item in textOverlayItems"
@@ -48,8 +63,15 @@
       :class="{ 'stage-text-overlay--selected': selectedItemIds.includes(item.id) }"
       :style="buildTextOverlayStyle(item)"
     >
-      <div class="stage-text-overlay__title">{{ item.title || fallbackTitle(item.item_type) }}</div>
-      <div class="stage-text-overlay__body canvas-rich-text-content" v-html="item.richTextHtml"></div>
+      <div class="stage-text-overlay__title">
+        {{ item.title || fallbackTitle(item.item_type) }}
+      </div>
+      <!-- eslint-disable vue/no-v-html -->
+      <div
+        class="stage-text-overlay__body canvas-rich-text-content"
+        v-html="item.richTextHtml"
+      />
+      <!-- eslint-enable vue/no-v-html -->
     </div>
 
     <div
@@ -59,7 +81,9 @@
       :class="`stage-status-chip--${item.statusMeta.tone}`"
       :style="buildStatusOverlayStyle(item)"
     >
-      <div class="stage-status-chip__label">{{ item.statusMeta.label }}</div>
+      <div class="stage-status-chip__label">
+        {{ item.statusMeta.label }}
+      </div>
     </div>
 
     <div

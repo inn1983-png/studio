@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { videoTasksAPI } from '@/services/videoTasks'
 import { ElMessage } from 'element-plus'
 
@@ -14,6 +14,10 @@ export function useVideoTasks() {
         completed: 0,
         failed: 0,
         success_rate: 0
+    })
+
+    onUnmounted(() => {
+        stopPolling()
     })
 
     // 获取任务列表

@@ -6,8 +6,8 @@
         type="primary"
         size="small"
         :icon="Plus"
-        @click="$emit('create')"
         style="width: 100%; margin-bottom: 10px;"
+        @click="$emit('create')"
       >
         新增章节
       </el-button>
@@ -32,7 +32,10 @@
       </span>
     </div>
 
-    <div v-loading="loading" class="chapter-list">
+    <div
+      v-loading="loading"
+      class="chapter-list"
+    >
       <div 
         v-for="chapter in filteredChapters" 
         :key="chapter.id"
@@ -45,14 +48,20 @@
           <span class="chapter-preview">{{ getPreview(chapter.content) }}</span>
         </div>
         <div class="chapter-meta">
-          <el-tag :type="getStatusType(chapter.status)" size="small">
+          <el-tag
+            :type="getStatusType(chapter.status)"
+            size="small"
+          >
             {{ getStatusLabel(chapter.status) }}
           </el-tag>
           <span class="chapter-date">{{ formatDate(chapter.updated_at) }}</span>
         </div>
       </div>
       
-      <div v-if="filteredChapters.length === 0 && !loading" class="empty-state">
+      <div
+        v-if="filteredChapters.length === 0 && !loading"
+        class="empty-state"
+      >
         无匹配章节
       </div>
     </div>
@@ -61,16 +70,22 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { Search, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import chaptersService from '@/services/chapters'
 
 const props = defineProps({
-  modelValue: String,
-  projectId: String
+  modelValue: {
+    type: String,
+    default: ''
+  },
+  projectId: {
+    type: String,
+    default: ''
+  }
 })
 
-const emit = defineEmits(['update:modelValue', 'select', 'create'])
+defineEmits(['update:modelValue', 'select', 'create'])
 
 const loading = ref(false)
 const chapters = ref([])

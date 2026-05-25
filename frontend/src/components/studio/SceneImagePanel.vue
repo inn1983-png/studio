@@ -15,9 +15,15 @@
     </div>
 
     <div class="scene-list">
-      <el-empty v-if="scenes.length === 0" description="暂无场景数据，请先提取场景" />
+      <el-empty
+        v-if="scenes.length === 0"
+        description="暂无场景数据，请先提取场景"
+      />
       
-      <div v-else class="scene-grid">
+      <div
+        v-else
+        class="scene-grid"
+      >
         <div 
           v-for="scene in scenes" 
           :key="scene.id"
@@ -62,20 +68,37 @@
           </div>
 
           <!-- 场景图预览 -->
-          <div v-if="scene.scene_image_url" class="scene-image" @click="handlePreviewImage(scene.scene_image_url)">
-            <img :src="scene.scene_image_url" alt="场景图" />
+          <div
+            v-if="scene.scene_image_url"
+            class="scene-image"
+            @click="handlePreviewImage(scene.scene_image_url)"
+          >
+            <img
+              :src="scene.scene_image_url"
+              alt="场景图"
+            >
             <div class="scene-overlay">
               <el-icon><ZoomIn /></el-icon>
             </div>
           </div>
-          <div v-else class="scene-placeholder">
-            <el-icon :size="40"><Picture /></el-icon>
+          <div
+            v-else
+            class="scene-placeholder"
+          >
+            <el-icon :size="40">
+              <Picture />
+            </el-icon>
             <p>待生成场景图</p>
-            <p class="hint">无人物环境图</p>
+            <p class="hint">
+              无人物环境图
+            </p>
           </div>
 
           <!-- 场景中的角色 -->
-          <div v-if="scene.characters && scene.characters.length > 0" class="scene-characters">
+          <div
+            v-if="scene.characters && scene.characters.length > 0"
+            class="scene-characters"
+          >
             <el-tag 
               v-for="char in scene.characters" 
               :key="char"
@@ -96,9 +119,16 @@
       title="批量生成场景图"
       width="500px"
     >
-      <el-form :model="batchFormData" label-width="100px">
+      <el-form
+        :model="batchFormData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="batchFormData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="batchFormData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -127,11 +157,13 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showBatchDialog = false">取消</el-button>
+        <el-button @click="showBatchDialog = false">
+          取消
+        </el-button>
         <el-button 
           type="primary" 
-          @click="handleBatchDialogConfirm" 
-          :disabled="!batchFormData.apiKeyId || !batchFormData.model"
+          :disabled="!batchFormData.apiKeyId || !batchFormData.model" 
+          @click="handleBatchDialogConfirm"
         >
           确定
         </el-button>
@@ -144,9 +176,16 @@
       :title="sceneImageDialogType === 'generate' ? '生成场景图' : '重新生成场景图'"
       width="700px"
     >
-      <el-form :model="sceneImageFormData" label-width="100px">
+      <el-form
+        :model="sceneImageFormData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="sceneImageFormData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="sceneImageFormData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -187,11 +226,13 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showSceneImageDialog = false">取消</el-button>
+        <el-button @click="showSceneImageDialog = false">
+          取消
+        </el-button>
         <el-button 
           type="primary" 
-          @click="handleSceneImageDialogConfirm" 
-          :disabled="!sceneImageFormData.apiKeyId || !sceneImageFormData.model"
+          :disabled="!sceneImageFormData.apiKeyId || !sceneImageFormData.model" 
+          @click="handleSceneImageDialogConfirm"
         >
           确定
         </el-button>
@@ -284,7 +325,7 @@ const handleShowHistory = (sceneId) => {
 }
 
 // 历史记录选择后的处理
-const handleHistorySelected = async (history) => {
+const handleHistorySelected = async () => {
   ElMessage.success('已切换到选中的历史版本')
   emit('refresh')
 }

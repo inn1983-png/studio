@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 
 from src.core.config import settings
 from src.core.logging import logger
-from src.core.exceptions import AICGException
+from src.core.exceptions import TxtovideoException
 
 
 async def error_handler_middleware(request: Request, call_next: Callable) -> Response:
@@ -19,10 +19,10 @@ async def error_handler_middleware(request: Request, call_next: Callable) -> Res
         response = await call_next(request)
         return response
 
-    except AICGException as exc:
+    except TxtovideoException as exc:
         # 处理自定义异常
         logger.error(
-            f"AICG应用异常 - {type(exc).__name__}: {exc.message} - "
+            f"{settings.APP_LOGO_TEXT}应用异常 - {type(exc).__name__}: {exc.message} - "
             f"错误码: {exc.error_code} - 状态码: {exc.status_code} - "
             f"路径: {request.method} {request.url.path}"
         )

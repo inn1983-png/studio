@@ -1,33 +1,59 @@
 <template>
   <div class="project-detail">
     <!-- 加载状态 -->
-    <div v-if="loading" class="loading-container">
-      <el-skeleton :rows="8" animated />
+    <div
+      v-if="loading"
+      class="loading-container"
+    >
+      <el-skeleton
+        :rows="8"
+        animated
+      />
     </div>
 
     <!-- 项目详情内容 -->
-    <div v-else-if="project" class="detail-content">
+    <div
+      v-else-if="project"
+      class="detail-content"
+    >
       <!-- 头部操作栏 -->
       <div class="detail-header">
-        <el-button :icon="ArrowLeft" @click="handleBack">
+        <el-button
+          :icon="ArrowLeft"
+          @click="handleBack"
+        >
           返回
         </el-button>
-        <h2 class="page-title">{{ project.title }}</h2>
+        <h2 class="page-title">
+          {{ project.title }}
+        </h2>
       </div>
 
       <!-- 项目基本信息 -->
       <el-card class="info-card">
         <template #header>
           <div class="card-header">
-            <h2 class="card-title">{{ project.title }}</h2>
+            <h2 class="card-title">
+              {{ project.title }}
+            </h2>
             <div class="status-tags">
-              <el-tag :type="projectsStore.getStatusType(project.status)" effect="plain">
+              <el-tag
+                :type="projectsStore.getStatusType(project.status)"
+                effect="plain"
+              >
                 {{ projectsStore.getStatusText(project.status) }}
               </el-tag>
-              <el-tag :type="project.type === 'ai_movie' ? 'primary' : 'success'" effect="plain">
+              <el-tag
+                :type="project.type === 'ai_movie' ? 'primary' : 'success'"
+                effect="plain"
+              >
                 {{ project.type === 'ai_movie' ? 'AI 电影' : '解说视频' }}
               </el-tag>
-              <el-tag v-if="project.is_public" type="info" effect="plain">
+              <el-tag
+                v-if="project.is_public"
+                type="info"
+                effect="plain"
+              >
                 公开
               </el-tag>
             </div>
@@ -40,7 +66,10 @@
             <!-- 文件信息 -->
             <div class="file-info-section">
               <h3>文件信息</h3>
-              <el-descriptions :column="1" border>
+              <el-descriptions
+                :column="1"
+                border
+              >
                 <el-descriptions-item label="文件名">
                   {{ project.file_name || '-' }}
                 </el-descriptions-item>
@@ -59,26 +88,42 @@
               <el-row :gutter="16">
                 <el-col :span="12">
                   <div class="stat-item">
-                    <div class="stat-value">{{ projectsStore.formatNumber(project.word_count) }}</div>
-                    <div class="stat-label">总字数</div>
+                    <div class="stat-value">
+                      {{ projectsStore.formatNumber(project.word_count) }}
+                    </div>
+                    <div class="stat-label">
+                      总字数
+                    </div>
                   </div>
                 </el-col>
                 <el-col :span="12">
                   <div class="stat-item">
-                    <div class="stat-value">{{ projectsStore.formatNumber(project.paragraph_count) }}</div>
-                    <div class="stat-label">段落数</div>
+                    <div class="stat-value">
+                      {{ projectsStore.formatNumber(project.paragraph_count) }}
+                    </div>
+                    <div class="stat-label">
+                      段落数
+                    </div>
                   </div>
                 </el-col>
                 <el-col :span="12">
                   <div class="stat-item">
-                    <div class="stat-value">{{ projectsStore.formatNumber(project.sentence_count) }}</div>
-                    <div class="stat-label">句子数</div>
+                    <div class="stat-value">
+                      {{ projectsStore.formatNumber(project.sentence_count) }}
+                    </div>
+                    <div class="stat-label">
+                      句子数
+                    </div>
                   </div>
                 </el-col>
                 <el-col :span="12">
                   <div class="stat-item">
-                    <div class="stat-value">{{ projectsStore.formatNumber(project.chapter_count) }}</div>
-                    <div class="stat-label">章节数</div>
+                    <div class="stat-value">
+                      {{ projectsStore.formatNumber(project.chapter_count) }}
+                    </div>
+                    <div class="stat-label">
+                      章节数
+                    </div>
                   </div>
                 </el-col>
               </el-row>
@@ -88,7 +133,10 @@
           <!-- 右侧信息 -->
           <el-col :span="12">
             <!-- 处理进度 -->
-            <div v-if="project.status === 'parsing' || project.status === 'generating'" class="progress-card">
+            <div
+              v-if="project.status === 'parsing' || project.status === 'generating'"
+              class="progress-card"
+            >
               <h3>处理进度</h3>
               <el-progress
                 type="circle"
@@ -104,9 +152,16 @@
             <!-- 时间和状态信息 -->
             <div class="info-section">
               <h3>项目信息</h3>
-              <el-descriptions :column="1" border size="small">
+              <el-descriptions
+                :column="1"
+                border
+                size="small"
+              >
                 <el-descriptions-item label="状态">
-                  <el-tag :type="projectsStore.getStatusType(project.status)" effect="plain">
+                  <el-tag
+                    :type="projectsStore.getStatusType(project.status)"
+                    effect="plain"
+                  >
                     {{ projectsStore.getStatusText(project.status) }}
                   </el-tag>
                 </el-descriptions-item>
@@ -116,7 +171,10 @@
                 <el-descriptions-item label="更新时间">
                   {{ projectsStore.formatDateTime(project.updated_at) }}
                 </el-descriptions-item>
-                <el-descriptions-item v-if="project.processed_at" label="处理完成时间">
+                <el-descriptions-item
+                  v-if="project.processed_at"
+                  label="处理完成时间"
+                >
                   {{ projectsStore.formatDateTime(project.processed_at) }}
                 </el-descriptions-item>
               </el-descriptions>
@@ -151,6 +209,15 @@
           @click="handleOpenMovieStudio"
         >
           进入电影工作室
+        </el-button>
+        <el-button
+          v-if="project.type === 'ai_movie'"
+          type="success"
+          :icon="Download"
+          :loading="exporting"
+          @click="handleExportVideo"
+        >
+          导出视频
         </el-button>
         <el-button
           v-if="project.type !== 'ai_movie'"
@@ -188,21 +255,31 @@
         </el-button>
 
         <!-- 刷新 -->
-        <el-button :icon="Refresh" @click="handleRefresh" :loading="refreshing">
+        <el-button
+          :icon="Refresh"
+          :loading="refreshing"
+          @click="handleRefresh"
+        >
           刷新数据
         </el-button>
       </div>
     </div>
 
     <!-- 错误状态 -->
-    <div v-else-if="error" class="error-state">
+    <div
+      v-else-if="error"
+      class="error-state"
+    >
       <el-result
         icon="error"
         title="加载失败"
         :sub-title="error"
       >
         <template #extra>
-          <el-button type="primary" @click="handleRefresh">
+          <el-button
+            type="primary"
+            @click="handleRefresh"
+          >
             重新加载
           </el-button>
           <el-button @click="handleBack">
@@ -238,7 +315,7 @@
   import { useProjectsStore } from '@/stores/projects'
   import { useProject } from '@/composables/useProject'
   import ProjectEditor from '@/components/project/ProjectEditor.vue'
-  import { VideoCamera, Edit, VideoPlay, Lock, Refresh, RefreshRight, ArrowLeft } from '@element-plus/icons-vue'
+  import { VideoCamera, Edit, Lock, Refresh, RefreshRight, ArrowLeft, Download } from '@element-plus/icons-vue'
 
   // Props定义
   const props = defineProps({
@@ -282,6 +359,7 @@
   const showEditorDialog = ref(false)
   const editingProject = ref(null)
   const editorLoading = ref(false)
+  const exporting = ref(false)
 
   // 状态轮询
   const pollingInterval = ref(null)
@@ -300,9 +378,7 @@
     handleRefresh: handleProjectRefresh,
     handleEdit: handleProjectEdit,
     handleArchive,
-    handleReprocess,
-    handleStartGeneration,
-    handleManageChapters
+    handleReprocess
   } = useProject(projectIdRef, emitRef)
 
   // 进入内容工坊
@@ -323,9 +399,7 @@
 
   // 进入电影工作室
   const handleOpenMovieStudio = async () => {
-    // 如果是电影，通常需要先选择章节。简单起见，这里如果只有一个章节则直接进入，否则跳转到章节选择或默认第一章
     try {
-      // 获取章节列表以获得第一个章节的ID
       const chapters = await projectsStore.fetchProjectChapters(props.projectId)
       if (chapters && chapters.length > 0) {
         router.push({
@@ -341,6 +415,48 @@
     } catch (error) {
       console.error('获取章节列表失败:', error)
       ElMessage.error('无法进入电影工作室')
+    }
+  }
+
+  const handleExportVideo = async () => {
+    exporting.value = true
+    try {
+      const chapters = await projectsStore.fetchProjectChapters(props.projectId)
+      if (!chapters || chapters.length === 0) {
+        ElMessage.warning('项目暂无章节')
+        return
+      }
+
+      const chaptersWithVideo = chapters.filter(c => c.video_url)
+      if (chaptersWithVideo.length === 0) {
+        ElMessage.warning('暂无已生成视频的章节，请先完成视频合成')
+        return
+      }
+
+      const exportService = (await import('@/services/export')).default
+
+      if (chaptersWithVideo.length === 1) {
+        const result = await exportService.exportVideo(chaptersWithVideo[0].id)
+        if (result.success) {
+          await exportService.downloadFile(result.download_url, result.filename)
+          ElMessage.success('视频导出成功')
+        }
+      } else {
+        const result = await exportService.batchExportVideos(chaptersWithVideo.map(c => c.id))
+        if (result.results) {
+          for (const r of result.results) {
+            if (r.success) {
+              await exportService.downloadFile(r.download_url, r.filename)
+            }
+          }
+          ElMessage.success(result.message)
+        }
+      }
+    } catch (error) {
+      console.error('视频导出失败:', error)
+      ElMessage.error('视频导出失败: ' + (error.message || '未知错误'))
+    } finally {
+      exporting.value = false
     }
   }
 

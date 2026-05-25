@@ -1,8 +1,16 @@
 <template>
   <div class="assistant-timeline">
-    <div ref="scrollRef" class="assistant-timeline__scroll">
-      <div v-if="!items.length" class="assistant-timeline__empty">
-        <div class="assistant-timeline__empty-title">从一句话开始</div>
+    <div
+      ref="scrollRef"
+      class="assistant-timeline__scroll"
+    >
+      <div
+        v-if="!items.length"
+        class="assistant-timeline__empty"
+      >
+        <div class="assistant-timeline__empty-title">
+          从一句话开始
+        </div>
         <div class="assistant-timeline__empty-hint">
           先给我一句创意、一个剧本想法，或者告诉我要从哪一步开始。我会按视频工作流一步一步帮你把节点创建好，后续生成由你在画布里手动触发。
         </div>
@@ -11,8 +19,14 @@
         </div>
       </div>
 
-      <div v-if="items.length" class="assistant-timeline__list">
-        <template v-for="item in conversationItems" :key="item.id">
+      <div
+        v-if="items.length"
+        class="assistant-timeline__list"
+      >
+        <template
+          v-for="item in conversationItems"
+          :key="item.id"
+        >
           <CanvasAssistantMessageItem
             v-if="item.type === 'user_message' || item.type === 'assistant_message'"
             :message="item.message"
@@ -35,7 +49,10 @@
         </template>
       </div>
 
-      <div v-if="activitySummary" class="assistant-timeline__activity">
+      <div
+        v-if="activitySummary"
+        class="assistant-timeline__activity"
+      >
         <CanvasAssistantToolSummary
           :thinking-buffer="activitySummary.thinkingBuffer"
           :tool-calls="activitySummary.toolCalls"

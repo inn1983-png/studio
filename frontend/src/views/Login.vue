@@ -2,7 +2,9 @@
   <div class="login-form">
     <!-- 表单标题 -->
     <div class="form-header">
-      <el-icon class="header-icon"><User /></el-icon>
+      <el-icon class="header-icon">
+        <User />
+      </el-icon>
       <h2>账户登录</h2>
     </div>
 
@@ -11,12 +13,15 @@
       ref="loginFormRef"
       :model="loginForm"
       :rules="loginRules"
-      @submit.prevent="handleLogin"
       label-position="top"
       size="large"
       class="login-form-content"
+      @submit.prevent="handleLogin"
     >
-      <el-form-item label="用户名" prop="username">
+      <el-form-item
+        label="用户名"
+        prop="username"
+      >
         <el-input
           v-model="loginForm.username"
           placeholder="请输入用户名"
@@ -26,7 +31,10 @@
         />
       </el-form-item>
 
-      <el-form-item label="密码" prop="password">
+      <el-form-item
+        label="密码"
+        prop="password"
+      >
         <el-input
           v-model="loginForm.password"
           type="password"
@@ -43,8 +51,8 @@
           type="primary"
           size="large"
           :loading="authStore.loading"
-          @click="handleLogin"
           class="submit-button"
+          @click="handleLogin"
         >
           <span v-if="!authStore.loading">登录</span>
           <span v-else>登录中...</span>
@@ -54,8 +62,12 @@
 
     <!-- 底部链接 -->
     <div class="form-footer">
-      <p>还没有账户？
-        <router-link to="/register" class="link">
+      <p>
+        还没有账户？
+        <router-link
+          to="/register"
+          class="link"
+        >
           立即注册
         </router-link>
       </p>

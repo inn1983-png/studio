@@ -29,7 +29,7 @@ async def health_check():
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "version": "1.0.0",
-        "service": "aicg-backend",
+        "service": settings.APP_SERVICE_NAME,
     }
 
 
@@ -181,7 +181,7 @@ async def detailed_health_check():
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "version": "1.0.0",
-        "service": "aicg-backend",
+        "service": settings.APP_SERVICE_NAME,
         "environment": settings.ENVIRONMENT,
         "checks": {},
         "response_time_ms": 0,

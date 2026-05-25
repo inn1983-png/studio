@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AICG平台启动脚本 - 启动PostgreSQL、Redis、MinIO基础设施服务
+# Txtovideo Studio 启动脚本 - 启动PostgreSQL、Redis、MinIO基础设施服务
 
 set -e
 
@@ -103,7 +103,7 @@ show_services_info() {
 
 # 主函数
 main() {
-    echo "🐳 AICG平台启动"
+    echo "🐳 Txtovideo Studio 启动"
     echo "=================="
 
     check_dependencies

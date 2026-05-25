@@ -15,10 +15,17 @@
     </div>
 
     <div class="keyframe-list">
-      <el-empty v-if="sceneGroups.length === 0" description="暂无分镜数据，请先提取分镜" />
+      <el-empty
+        v-if="sceneGroups.length === 0"
+        description="暂无分镜数据，请先提取分镜"
+      />
       
       <!-- 按场景分组显示 -->
-      <el-collapse v-else v-model="activeScenes" class="scene-collapse">
+      <el-collapse
+        v-else
+        v-model="activeScenes"
+        class="scene-collapse"
+      >
         <el-collapse-item 
           v-for="group in sceneGroups" 
           :key="group.scene.id"
@@ -28,7 +35,12 @@
             <div class="scene-header">
               <div class="scene-title-row">
                 <span class="scene-number">场景 {{ group.scene.order_index }}</span>
-                <el-tag size="small" type="info">{{ group.shots.length }} 个分镜</el-tag>
+                <el-tag
+                  size="small"
+                  type="info"
+                >
+                  {{ group.shots.length }} 个分镜
+                </el-tag>
               </div>
             </div>
           </template>
@@ -79,19 +91,34 @@
               </div>
 
               <!-- 关键帧图片 - 可点击放大 -->
-              <div v-if="shot.keyframe_url" class="keyframe-image" @click="handlePreviewImage(shot.keyframe_url)">
-                <img :src="shot.keyframe_url" alt="关键帧" />
+              <div
+                v-if="shot.keyframe_url"
+                class="keyframe-image"
+                @click="handlePreviewImage(shot.keyframe_url)"
+              >
+                <img
+                  :src="shot.keyframe_url"
+                  alt="关键帧"
+                >
                 <div class="keyframe-overlay">
                   <el-icon><ZoomIn /></el-icon>
                 </div>
               </div>
-              <div v-else class="keyframe-placeholder">
-                <el-icon :size="40"><Picture /></el-icon>
+              <div
+                v-else
+                class="keyframe-placeholder"
+              >
+                <el-icon :size="40">
+                  <Picture />
+                </el-icon>
                 <p>待生成关键帧</p>
               </div>
 
-<!-- 分镜包含的角色 -->
-              <div v-if="shot.characters && shot.characters.length > 0" class="shot-characters">
+              <!-- 分镜包含的角色 -->
+              <div
+                v-if="shot.characters && shot.characters.length > 0"
+                class="shot-characters"
+              >
                 <el-tag 
                   v-for="charName in shot.characters" 
                   :key="charName"
@@ -102,7 +129,6 @@
                   {{ charName }}
                 </el-tag>
               </div>
-
             </div>
           </div>
         </el-collapse-item>
@@ -115,9 +141,16 @@
       title="批量生成关键帧"
       width="500px"
     >
-      <el-form :model="batchFormData" label-width="100px">
+      <el-form
+        :model="batchFormData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="batchFormData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="batchFormData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -146,11 +179,13 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showBatchDialog = false">取消</el-button>
+        <el-button @click="showBatchDialog = false">
+          取消
+        </el-button>
         <el-button 
           type="primary" 
-          @click="handleBatchDialogConfirm" 
-          :disabled="!batchFormData.apiKeyId || !batchFormData.model"
+          :disabled="!batchFormData.apiKeyId || !batchFormData.model" 
+          @click="handleBatchDialogConfirm"
         >
           确定
         </el-button>
@@ -163,9 +198,16 @@
       :title="keyframeDialogType === 'generate' ? '生成关键帧' : '重新生成关键帧'"
       width="700px"
     >
-      <el-form :model="keyframeFormData" label-width="100px">
+      <el-form
+        :model="keyframeFormData"
+        label-width="100px"
+      >
         <el-form-item label="API Key">
-          <el-select v-model="keyframeFormData.apiKeyId" placeholder="请选择API Key" style="width: 100%">
+          <el-select
+            v-model="keyframeFormData.apiKeyId"
+            placeholder="请选择API Key"
+            style="width: 100%"
+          >
             <el-option
               v-for="key in apiKeys"
               :key="key.id"
@@ -206,11 +248,13 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showKeyframeDialog = false">取消</el-button>
+        <el-button @click="showKeyframeDialog = false">
+          取消
+        </el-button>
         <el-button 
           type="primary" 
-          @click="handleKeyframeDialogConfirm" 
-          :disabled="!keyframeFormData.apiKeyId || !keyframeFormData.model"
+          :disabled="!keyframeFormData.apiKeyId || !keyframeFormData.model" 
+          @click="handleKeyframeDialogConfirm"
         >
           确定
         </el-button>
@@ -303,7 +347,7 @@ const handleShowHistory = (shotId) => {
   showHistory.value = true
 }
 
-const handleHistorySelected = async (history) => {
+const handleHistorySelected = async () => {
   ElMessage.success('已切换到选中的历史版本')
   emit('refresh')
 }

@@ -1,20 +1,27 @@
 <template>
   <Transition name="overlay-fade">
-    <div v-if="visible" class="canvas-generating-overlay">
-      <div class="shimmer-sweep"></div>
+    <div
+      v-if="visible"
+      class="canvas-generating-overlay"
+    >
+      <div class="shimmer-sweep" />
       <div class="overlay-content">
         <div class="pulse-dots">
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
+          <span class="dot" />
+          <span class="dot" />
+          <span class="dot" />
         </div>
-        <div class="overlay-label">{{ label }}</div>
+        <div class="overlay-label">
+          {{ label }}
+        </div>
         <div class="progress-track">
           <div class="progress-bar-fill">
-            <div class="progress-shine"></div>
+            <div class="progress-shine" />
           </div>
         </div>
-        <div class="overlay-hint">{{ hint }}</div>
+        <div class="overlay-hint">
+          {{ hint }}
+        </div>
       </div>
     </div>
   </Transition>

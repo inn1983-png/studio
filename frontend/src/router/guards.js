@@ -1,9 +1,14 @@
 import { useAuthStore } from '@/stores/auth'
+import { useBrandStore } from '@/stores/brand'
 
 export function setupAuthGuard(router) {
-  // 全局前置守卫
   router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore()
+    const brandStore = useBrandStore()
+
+    if (!brandStore.loaded) {
+      await brandStore.fetchBrand()
+    }
 
     // 如果用户已登录但还没有获取用户信息，先获取
     if (authStore.isAuthenticated && !authStore.user) {
@@ -39,9 +44,9 @@ export function setupAuthGuard(router) {
   })
 
   // 全局后置钩子
-  router.afterEach((to, from) => {
-    // 可以在这里添加页面访问日志、统计等
-    document.title = `${to.meta.title || 'AICG Platform'} - Content Distribution Platform`
+  router.afterEach((to) => {
+    const brandStore = useBrandStore()
+    document.title = `${to.meta.title || brandStore.appName} - ${brandStore.appDescription}`
   })
 }
 

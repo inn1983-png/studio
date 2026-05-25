@@ -5,14 +5,34 @@
 
     <div class="profile-section">
       <div class="avatar-section">
-        <div class="avatar-container" @click="triggerFileSelect" :class="{ 'uploading': isUploadingAvatar }">
-          <el-avatar :size="80" :src="previewAvatar || userForm.avatar_url" class="user-avatar">
-            <el-icon size="40"><User /></el-icon>
+        <div
+          class="avatar-container"
+          :class="{ 'uploading': isUploadingAvatar }"
+          @click="triggerFileSelect"
+        >
+          <el-avatar
+            :size="80"
+            :src="previewAvatar || userForm.avatar_url"
+            class="user-avatar"
+          >
+            <el-icon size="40">
+              <User />
+            </el-icon>
           </el-avatar>
-          <div v-if="isUploadingAvatar" class="upload-overlay">
-            <el-progress type="circle" :percentage="uploadProgress" :width="60" />
+          <div
+            v-if="isUploadingAvatar"
+            class="upload-overlay"
+          >
+            <el-progress
+              type="circle"
+              :percentage="uploadProgress"
+              :width="60"
+            />
           </div>
-          <div v-else class="avatar-hover-overlay">
+          <div
+            v-else
+            class="avatar-hover-overlay"
+          >
             <el-icon><Camera /></el-icon>
             <span>点击更换头像</span>
           </div>
@@ -24,13 +44,13 @@
             accept="image/jpeg,image/jpg,image/png"
             style="display: none"
             @change="handleAvatarSelect"
-          />
+          >
           <el-button
             type="primary"
             plain
-            @click="triggerFileSelect"
             :loading="isUploadingAvatar"
             :disabled="isUploadingAvatar"
+            @click="triggerFileSelect"
           >
             {{ isUploadingAvatar ? '上传中...' : '更换头像' }}
           </el-button>
@@ -39,18 +59,27 @@
             type="danger"
             plain
             size="small"
-            @click="removeAvatar"
             :disabled="isUploadingAvatar"
+            @click="removeAvatar"
           >
             移除头像
           </el-button>
-          <p class="upload-tip">支持 JPG、PNG 格式，建议尺寸 200x200px，最大5MB</p>
+          <p class="upload-tip">
+            支持 JPG、PNG 格式，建议尺寸 200x200px，最大5MB
+          </p>
         </div>
       </div>
 
-      <el-form :model="userForm" label-width="120px" class="profile-form">
+      <el-form
+        :model="userForm"
+        label-width="120px"
+        class="profile-form"
+      >
         <el-form-item label="用户名">
-          <el-input v-model="userForm.username" disabled>
+          <el-input
+            v-model="userForm.username"
+            disabled
+          >
             <template #prefix>
               <el-icon><User /></el-icon>
             </template>
@@ -71,7 +100,10 @@
         </el-form-item>
 
         <el-form-item label="邮箱地址">
-          <el-input v-model="userForm.email" disabled>
+          <el-input
+            v-model="userForm.email"
+            disabled
+          >
             <template #prefix>
               <el-icon><Message /></el-icon>
             </template>
@@ -79,7 +111,10 @@
         </el-form-item>
 
         <el-form-item label="注册时间">
-          <el-input :value="formatDate(userForm.created_at, {}, userTimezone)" disabled>
+          <el-input
+            :value="formatDate(userForm.created_at, {}, userTimezone)"
+            disabled
+          >
             <template #prefix>
               <el-icon><Clock /></el-icon>
             </template>
@@ -89,12 +124,14 @@
         <el-form-item>
           <el-button
             type="primary"
-            @click="saveProfile"
             :loading="profileLoading"
+            @click="saveProfile"
           >
             保存更改
           </el-button>
-          <el-button @click="resetProfileForm">重置</el-button>
+          <el-button @click="resetProfileForm">
+            重置
+          </el-button>
         </el-form-item>
       </el-form>
     </div>

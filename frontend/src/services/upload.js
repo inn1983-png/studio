@@ -1,26 +1,33 @@
-import { get, post, del, upload } from './api'
+import { get, del, upload } from './api'
 
-/**
- * 文件管理服务 - 职责分离后的纯文件操作
- */
+const MAX_RETRIES = 3
+const RETRY_DELAY = 2000
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
 export const fileService = {
-  /**
-   * 纯文件上传，返回文件ID
-   * @param {FormData} formData - 包含文件的表单数据
-   * @param {Function} onProgress - 进度回调函数
-   * @returns {Promise} 上传结果，包含file_id
-   */
-  async uploadFile(formData, onProgress) {
-    return await upload('/files/upload', formData, {
-      onUploadProgress: (progressEvent) => {
-        if (onProgress) {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          )
-          onProgress(percentCompleted)
+  async uploadFile(formData, onProgress, retryCount = 0) {
+    try {
+      return await upload('/files/upload', formData, {
+        onUploadProgress: (progressEvent) => {
+          if (onProgress) {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            )
+            onProgress(percentCompleted)
+          }
         }
+      })
+    } catch (error) {
+      const isRetryable = !error.response || error.code === 'ECONNABORTED' || error.response?.status >= 500
+      if (isRetryable && retryCount < MAX_RETRIES) {
+        const delay = RETRY_DELAY * Math.pow(2, retryCount)
+        console.warn(`上传失败，${delay / 1000}秒后第${retryCount + 1}次重试...`)
+        await sleep(delay)
+        return fileService.uploadFile(formData, onProgress, retryCount + 1)
       }
-    })
+      throw error
+    }
   },
 
   /**

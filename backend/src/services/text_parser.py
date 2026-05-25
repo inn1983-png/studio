@@ -411,13 +411,16 @@ class TextParserService:
 
         # 0. 标准化换行符
         cleaned_text = text.replace('\r\n', '\n').replace('\r', '\n')
+        if cleaned_text.startswith('\ufeff'):
+            cleaned_text = cleaned_text[1:]
 
         # 1. 检测章节
         chapters = self.detector.detect_chapters(cleaned_text)
         logger.info(f"检测到 {len(chapters)} 个章节")
         
         # 1.5 过滤和合并章节（移除空章节，合并卷标题）
-        chapters = self.detector._filter_and_merge_chapters(chapters, min_content_length=100)
+        effective_min = max(20, min_chapter_length // 10)
+        chapters = self.detector._filter_and_merge_chapters(chapters, min_content_length=effective_min)
         logger.info(f"过滤后剩余 {len(chapters)} 个有效章节")
 
         # 2. 如果章节太长，尝试进一步分割

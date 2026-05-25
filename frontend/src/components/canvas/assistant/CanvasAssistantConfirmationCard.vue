@@ -2,18 +2,31 @@
   <article class="assistant-confirmation">
     <div class="assistant-confirmation__header">
       <div>
-        <div class="assistant-confirmation__eyebrow">{{ interrupt.kind || 'interrupt' }}</div>
-        <h3 class="assistant-confirmation__title">{{ interrupt.title || '请确认' }}</h3>
+        <div class="assistant-confirmation__eyebrow">
+          {{ interrupt.kind || 'interrupt' }}
+        </div>
+        <h3 class="assistant-confirmation__title">
+          {{ interrupt.title || '请确认' }}
+        </h3>
       </div>
       <span class="assistant-confirmation__badge">待确认</span>
     </div>
 
-    <p v-if="interrupt.message" class="assistant-confirmation__message">
+    <p
+      v-if="interrupt.message"
+      class="assistant-confirmation__message"
+    >
       {{ interrupt.message }}
     </p>
 
-    <div v-if="interrupt.modelOptions.length" class="assistant-confirmation__section">
-      <label class="assistant-confirmation__label" for="assistant-model-select">执行模型</label>
+    <div
+      v-if="interrupt.modelOptions.length"
+      class="assistant-confirmation__section"
+    >
+      <label
+        class="assistant-confirmation__label"
+        for="assistant-model-select"
+      >执行模型</label>
       <select
         id="assistant-model-select"
         class="assistant-confirmation__select"
@@ -21,7 +34,9 @@
         :value="draftSelectedModelId"
         @change="handleModelChange"
       >
-        <option value="">保持默认</option>
+        <option value="">
+          保持默认
+        </option>
         <option
           v-for="option in interrupt.modelOptions"
           :key="option.modelId || option.label"
@@ -32,16 +47,29 @@
       </select>
     </div>
 
-    <details v-if="interrupt.actions.length" class="assistant-confirmation__details">
+    <details
+      v-if="interrupt.actions.length"
+      class="assistant-confirmation__details"
+    >
       <summary>查看可用动作</summary>
       <pre>{{ formatJson(interrupt.actions) }}</pre>
     </details>
 
     <div class="assistant-confirmation__actions">
-      <button class="assistant-confirmation__button assistant-confirmation__button--ghost" type="button" :disabled="busy" @click="$emit('reject')">
+      <button
+        class="assistant-confirmation__button assistant-confirmation__button--ghost"
+        type="button"
+        :disabled="busy"
+        @click="$emit('reject')"
+      >
         拒绝
       </button>
-      <button class="assistant-confirmation__button assistant-confirmation__button--primary" type="button" :disabled="busy" @click="$emit('approve', draftSelectedModelId)">
+      <button
+        class="assistant-confirmation__button assistant-confirmation__button--primary"
+        type="button"
+        :disabled="busy"
+        @click="$emit('approve', draftSelectedModelId)"
+      >
         {{ busy ? '处理中' : '确认执行' }}
       </button>
     </div>

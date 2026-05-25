@@ -245,7 +245,7 @@ class ProjectProcessingService(BaseService):
 
         # 根据项目设置解析选项
         parse_options = {
-            'min_chapter_length': 1000,  # 最小章节长度
+            'min_chapter_length': 50,
         }
 
         return await text_parser_service.parse_to_models(project_id, file_content, parse_options)

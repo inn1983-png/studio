@@ -3,90 +3,137 @@
     <!-- 生成配置对话框 -->
     <el-dialog
       :model-value="visible"
-      @update:model-value="(val) => $emit('update:visible', val)"
       :title="title"
       width="500px"
       destroy-on-close
+      @update:model-value="(val) => $emit('update:visible', val)"
     >
-      <el-form :model="genConfig" label-width="100px">
-        <el-form-item label="API Key" v-if="!genConfig.api_key_id">
-            <el-select 
-              :model-value="genConfig.api_key_id" 
-              @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, api_key_id: val })"
-              placeholder="请选择 API Key" 
-              style="width: 100%"
-            >
-              <el-option v-for="k in apiKeys" :key="k.id" :label="k.name" :value="k.id" />
-            </el-select>
+      <el-form
+        :model="genConfig"
+        label-width="100px"
+      >
+        <el-form-item
+          v-if="!genConfig.api_key_id"
+          label="API Key"
+        >
+          <el-select 
+            :model-value="genConfig.api_key_id" 
+            placeholder="请选择 API Key"
+            style="width: 100%" 
+            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, api_key_id: val })"
+          >
+            <el-option
+              v-for="k in apiKeys"
+              :key="k.id"
+              :label="k.name"
+              :value="k.id"
+            />
+          </el-select>
         </el-form-item>
         
-        <el-form-item label="画面风格" v-if="['avatar', 'keyframes', 'regen-keyframe', 'regen-last-frame'].includes(mode)">
+        <el-form-item
+          v-if="['avatar', 'keyframes', 'regen-keyframe', 'regen-last-frame'].includes(mode)"
+          label="画面风格"
+        >
           <el-select 
             :model-value="genConfig.style" 
-            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, style: val })"
             placeholder="选择风格"
+            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, style: val })"
           >
-            <el-option label="电影质感 (Cinematic)" value="cinematic" />
-            <el-option label="日漫风格 (Anime)" value="anime" />
-            <el-option label="赛博朋克 (Cyberpunk)" value="cyberpunk" />
-            <el-option label="油画风格 (Oil Painting)" value="oil_painting" />
+            <el-option
+              label="电影质感 (Cinematic)"
+              value="cinematic"
+            />
+            <el-option
+              label="日漫风格 (Anime)"
+              value="anime"
+            />
+            <el-option
+              label="赛博朋克 (Cyberpunk)"
+              value="cyberpunk"
+            />
+            <el-option
+              label="油画风格 (Oil Painting)"
+              value="oil_painting"
+            />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="提示词" v-if="mode === 'avatar'">
+        <el-form-item
+          v-if="mode === 'avatar'"
+          label="提示词"
+        >
           <el-input 
             :model-value="genConfig.prompt" 
-            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, prompt: val })"
-            type="textarea" 
+            type="textarea"
             :rows="6" 
-            placeholder="生成形象的提示词"
+            placeholder="生成形象的提示词" 
+            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, prompt: val })"
           />
         </el-form-item>
 
         <el-form-item label="选择模型">
           <el-select 
             :model-value="genConfig.model" 
-            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, model: val })"
-            placeholder="请选择或输入模型" 
+            placeholder="请选择或输入模型"
             filterable 
             allow-create 
-            :loading="loadingModels"
+            :loading="loadingModels" 
             style="width: 100%"
+            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, model: val })"
           >
-            <el-option v-for="model in modelOptions" :key="model" :label="model" :value="model" />
+            <el-option
+              v-for="model in modelOptions"
+              :key="model"
+              :label="model"
+              :value="model"
+            />
           </el-select>
         </el-form-item>
 
         <!-- BGM选择 (仅视频生成时显示) -->
-        <el-form-item label="背景音乐" v-if="mode === 'generate-video'">
+        <el-form-item
+          v-if="mode === 'generate-video'"
+          label="背景音乐"
+        >
           <el-select 
             :model-value="genConfig.background_id" 
-            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, background_id: val })"
-            placeholder="选择BGM(可选)" 
-            clearable
+            placeholder="选择BGM(可选)"
+            clearable 
             style="width: 100%"
+            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, background_id: val })"
           >
-            <el-option label="无背景音乐" :value="null" />
+            <el-option
+              label="无背景音乐"
+              :value="null"
+            />
             <!-- TODO: 从BGM列表加载 -->
           </el-select>
         </el-form-item>
 
-        <el-form-item label="BGM音量" v-if="mode === 'generate-video' && genConfig.background_id">
+        <el-form-item
+          v-if="mode === 'generate-video' && genConfig.background_id"
+          label="BGM音量"
+        >
           <el-slider 
             :model-value="genConfig.bgm_volume || 0.15" 
-            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, bgm_volume: val })"
-            :min="0" 
+            :min="0"
             :max="1" 
-            :step="0.05"
+            :step="0.05" 
             show-input
             :input-size="'small'"
+            @update:model-value="(val) => $emit('update:genConfig', { ...genConfig, bgm_volume: val })"
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="$emit('update:visible', false)">取消</el-button>
-          <el-button type="primary" @click="$emit('confirm')" :loading="loading">
+          <el-button
+            type="primary"
+            :loading="loading"
+            @click="$emit('confirm')"
+          >
             {{ confirmText }}
           </el-button>
         </span>
@@ -97,16 +144,37 @@
 
 <script setup>
 const props = defineProps({
-  visible: Boolean,
-  mode: String,
-  genConfig: Object,
-  apiKeys: Array,
-  modelOptions: Array,
-  loadingModels: Boolean,
-  loading: Boolean
+  visible: {
+    type: Boolean,
+    default: false
+  },
+  mode: {
+    type: String,
+    default: ''
+  },
+  genConfig: {
+    type: Object,
+    default: () => ({})
+  },
+  apiKeys: {
+    type: Array,
+    default: () => ([])
+  },
+  modelOptions: {
+    type: Array,
+    default: () => ([])
+  },
+  loadingModels: {
+    type: Boolean,
+    default: false
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  }
 })
 
-const emit = defineEmits(['update:visible', 'update:genConfig', 'confirm'])
+defineEmits(['update:visible', 'update:genConfig', 'confirm'])
 
 const getDialogTitle = () => {
   const titles = {
