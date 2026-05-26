@@ -29,5 +29,21 @@ export const txtovideoProjectsService = {
 
   getDraft(projectId) {
     return get(`${BASE}/${projectId}/draft`)
+  },
+
+  getWorkflowSteps(projectId) {
+    return get(`${BASE}/${projectId}/steps`)
+  },
+
+  updateWorkflowStep(projectId, stepName, data) {
+    return put(`${BASE}/${projectId}/steps/${stepName}`, data)
+  },
+
+  retryWorkflowStep(projectId, stepName) {
+    return post(`${BASE}/${projectId}/steps/${stepName}/retry`)
+  },
+
+  markDownstreamStale(projectId, stepName) {
+    return post(`${BASE}/${projectId}/steps/mark-stale`, { step_name: stepName })
   }
 }

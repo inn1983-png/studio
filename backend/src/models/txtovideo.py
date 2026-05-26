@@ -92,6 +92,7 @@ class ShortDramaProject(BaseModel):
     video_prompts = relationship("VideoPrompt", back_populates="project", cascade="all, delete-orphan")
     quality_reports = relationship("QualityReport", back_populates="project", cascade="all, delete-orphan")
     export_packages = relationship("ExportPackage", back_populates="project", cascade="all, delete-orphan")
+    workflow_steps = relationship("WorkflowStep", back_populates="project", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("idx_txtovideo_project_mode", "workflow_mode"),
@@ -321,6 +322,45 @@ class QualityReport(BaseModel):
     )
 
 
+class StepState(str, Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    SUCCESS = "success"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+    WAITING_DEPENDENCY = "waiting_dependency"
+    STALE = "stale"
+
+
+class WorkflowStep(BaseModel):
+    __tablename__ = "txtovideo_workflow_steps"
+
+    project_id = Column(
+        PostgreSQLUUID(as_uuid=True),
+        ForeignKey("txtovideo_projects.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    step_name = Column(String(50), nullable=False, comment="步骤名称")
+    status = Column(String(30), nullable=False, default=StepState.PENDING.value, comment="步骤状态")
+    input_hash = Column(String(64), nullable=True, comment="输入内容哈希")
+    input_snapshot = Column(Text, nullable=True, comment="输入快照")
+    output_snapshot = Column(Text, nullable=True, comment="输出快照")
+    error_message = Column(Text, nullable=True, comment="错误信息")
+    retry_count = Column(Integer, nullable=False, default=0, comment="重试次数")
+    model_used = Column(String(100), nullable=True, comment="使用的模型")
+    prompt_used = Column(Text, nullable=True, comment="使用的提示词")
+    started_at = Column(None, nullable=True, comment="开始时间")
+    finished_at = Column(None, nullable=True, comment="完成时间")
+
+    project = relationship("ShortDramaProject", back_populates="workflow_steps")
+
+    __table_args__ = (
+        UniqueConstraint("project_id", "step_name", name="uq_txtovideo_step_project_name"),
+        Index("idx_txtovideo_step_status", "status"),
+    )
+
+
 class ExportPackage(BaseModel):
     __tablename__ = "txtovideo_export_packages"
 
@@ -352,9 +392,11 @@ __all__ = [
     "ScriptVersion",
     "ShortDramaProject",
     "SourceType",
+    "StepState",
     "StoryboardShot",
     "TargetPlatform",
     "TxtovideoStatus",
     "TxtovideoWorkflowMode",
     "VideoPrompt",
+    "WorkflowStep",
 ]

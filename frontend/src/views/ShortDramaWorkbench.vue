@@ -124,10 +124,32 @@
               <small>{{ step.caption }}</small>
             </span>
             <el-icon
-              v-if="isStepSaved(step.id)"
+              v-if="getStepStatus(step) === 'success'"
               class="step-check"
+              color="var(--el-color-success)"
             >
               <Check />
+            </el-icon>
+            <el-icon
+              v-else-if="getStepStatus(step) === 'failed'"
+              class="step-check"
+              color="var(--el-color-danger)"
+            >
+              <CircleClose />
+            </el-icon>
+            <el-icon
+              v-else-if="getStepStatus(step) === 'stale'"
+              class="step-check"
+              color="var(--el-color-warning)"
+            >
+              <Warning />
+            </el-icon>
+            <el-icon
+              v-else-if="getStepStatus(step) === 'running'"
+              class="step-check step-spin"
+              color="var(--el-color-primary)"
+            >
+              <Loading />
             </el-icon>
           </button>
         </aside>
@@ -450,12 +472,15 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  CircleClose,
   Download,
   Folder,
+  Loading,
   Refresh,
   Share,
   Upload,
-  VideoCamera
+  VideoCamera,
+  Warning
 } from '@element-plus/icons-vue'
 import { useProjectsStore } from '@/stores/projects'
 import { txtovideoPromptsService } from '@/services/txtovideoPrompts'
@@ -493,6 +518,18 @@ const TEMPLATE_STEP_MAP = {
   videoPrompts: 'video_prompt_ltx',
   quality: 'quality_score',
   export: 'rewrite_fix'
+}
+
+const STEP_NAME_MAP = {
+  script: 'script_adapt',
+  characters: 'character_extract',
+  scenes: 'scene_extract',
+  props: 'prop_extract',
+  storyboard: 'storyboard_generate',
+  imagePrompts: 'image_prompt_generate',
+  videoPrompts: 'video_prompt_generate',
+  quality: 'quality_score',
+  export: 'export_package'
 }
 
 const FALLBACK_TEMPLATES = [
@@ -619,6 +656,7 @@ const steps = [
 const project = ref(null)
 const projectLoading = ref(false)
 const zipExporting = ref(false)
+const stepStates = ref({})
 const activeStepIndex = ref(0)
 const savedStepIds = ref([])
 const promptTemplates = ref([])
@@ -821,6 +859,17 @@ async function initialiseWorkbench() {
       console.warn('服务端草稿加载失败，使用本地草稿:', draftError)
     }
 
+    try {
+      const stepsData = await txtovideoProjectsService.getWorkflowSteps(resolvedProjectId.value)
+      if (stepsData && stepsData.steps) {
+        const stateMap = {}
+        stepsData.steps.forEach(s => { stateMap[s.step_name] = s.status })
+        stepStates.value = stateMap
+      }
+    } catch (stepsError) {
+      console.warn('步骤状态加载失败:', stepsError)
+    }
+
     if (!workbench.value.source.text) {
       await hydrateSourceFromProject()
     }
@@ -975,6 +1024,23 @@ function saveCurrent(options = {}) {
   }
   persistDraft()
 
+  const stepName = STEP_NAME_MAP[currentStep.value.outputKey]
+  if (stepName && resolvedProjectId.value) {
+    txtovideoProjectsService.updateWorkflowStep(resolvedProjectId.value, stepName, {
+      status: 'success'
+    }).catch(err => console.warn('步骤状态更新失败:', err))
+
+    if (currentStep.value.outputKey && currentStep.value.outputKey !== 'export') {
+      txtovideoProjectsService.markDownstreamStale(resolvedProjectId.value, stepName)
+        .then(res => {
+          if (res.marked_stale && res.marked_stale.length > 0) {
+            res.marked_stale.forEach(s => { stepStates.value[s] = 'stale' })
+          }
+        })
+        .catch(err => console.warn('下游标记失败:', err))
+    }
+  }
+
   if (!options.silent) {
     ElMessage.success('已保存当前步骤')
   }
@@ -1020,6 +1086,15 @@ function markStepDirty(stepId) {
 
 function isStepSaved(stepId) {
   return savedStepIds.value.includes(stepId)
+}
+
+function getStepStatus(step) {
+  const stepName = STEP_NAME_MAP[step.outputKey]
+  if (stepName && stepStates.value[stepName]) {
+    return stepStates.value[stepName]
+  }
+  if (isStepSaved(step.id)) return 'success'
+  return 'pending'
 }
 
 function validateStep(step) {

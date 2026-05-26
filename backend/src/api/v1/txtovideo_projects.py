@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies import get_current_user_required
@@ -13,6 +14,7 @@ from src.api.schemas.txtovideo import (
 )
 from src.core.database import get_db
 from src.core.logging import get_logger
+from src.models.txtovideo import WorkflowStep, StepState
 from src.models.user import User
 from src.services.txtovideo_service import TxtovideoProjectService
 
@@ -155,3 +157,212 @@ async def get_txtovideo_draft(
 
 
 __all__ = ["router"]
+
+
+WORKFLOW_STEPS = [
+    "script_adapt",
+    "character_extract",
+    "scene_extract",
+    "prop_extract",
+    "storyboard_generate",
+    "image_prompt_generate",
+    "video_prompt_generate",
+    "quality_score",
+    "export_package",
+]
+
+STEP_DEPENDENCIES = {
+    "script_adapt": [],
+    "character_extract": ["script_adapt"],
+    "scene_extract": ["script_adapt"],
+    "prop_extract": ["script_adapt"],
+    "storyboard_generate": ["character_extract", "scene_extract", "prop_extract"],
+    "image_prompt_generate": ["storyboard_generate"],
+    "video_prompt_generate": ["image_prompt_generate"],
+    "quality_score": ["video_prompt_generate"],
+    "export_package": ["quality_score"],
+}
+
+
+@router.get("/{project_id}/steps")
+async def get_workflow_steps(
+    project_id: str,
+    current_user: User = Depends(get_current_user_required),
+    db: AsyncSession = Depends(get_db),
+):
+    service = TxtovideoProjectService(db)
+    project = await service.get_project(project_id, str(current_user.id))
+    if not project:
+        raise HTTPException(status_code=404, detail="项目不存在")
+
+    result = await db.execute(
+        select(WorkflowStep).filter(WorkflowStep.project_id == project_id)
+    )
+    steps = result.scalars().all()
+    step_map = {s.step_name: s for s in steps}
+
+    response = []
+    for step_name in WORKFLOW_STEPS:
+        step = step_map.get(step_name)
+        if step:
+            response.append(step.to_dict())
+        else:
+            response.append({
+                "step_name": step_name,
+                "status": StepState.PENDING.value,
+                "retry_count": 0,
+                "dependencies": STEP_DEPENDENCIES.get(step_name, []),
+            })
+    return {"steps": response, "dependencies": STEP_DEPENDENCIES}
+
+
+@router.put("/{project_id}/steps/{step_name}")
+async def update_workflow_step(
+    project_id: str,
+    step_name: str,
+    body: Dict[str, Any],
+    current_user: User = Depends(get_current_user_required),
+    db: AsyncSession = Depends(get_db),
+):
+    service = TxtovideoProjectService(db)
+    project = await service.get_project(project_id, str(current_user.id))
+    if not project:
+        raise HTTPException(status_code=404, detail="项目不存在")
+
+    if step_name not in WORKFLOW_STEPS:
+        raise HTTPException(status_code=400, detail=f"无效步骤名: {step_name}")
+
+    result = await db.execute(
+        select(WorkflowStep).filter(
+            WorkflowStep.project_id == project_id,
+            WorkflowStep.step_name == step_name,
+        )
+    )
+    step = result.scalar_one_or_none()
+
+    if not step:
+        step = WorkflowStep(
+            project_id=project_id,
+            step_name=step_name,
+            status=StepState.PENDING.value,
+        )
+        db.add(step)
+
+    new_status = body.get("status")
+    if new_status:
+        step.status = new_status
+    if "error_message" in body:
+        step.error_message = body["error_message"]
+    if "input_hash" in body:
+        step.input_hash = body["input_hash"]
+    if "input_snapshot" in body:
+        step.input_snapshot = body["input_snapshot"]
+    if "output_snapshot" in body:
+        step.output_snapshot = body["output_snapshot"]
+    if "model_used" in body:
+        step.model_used = body["model_used"]
+    if "prompt_used" in body:
+        step.prompt_used = body["prompt_used"]
+    if new_status == StepState.RUNNING.value:
+        step.retry_count = (step.retry_count or 0) + 1
+    if new_status in (StepState.SUCCESS.value, StepState.FAILED.value):
+        from datetime import datetime, timezone
+        step.finished_at = datetime.now(timezone.utc)
+
+    await db.commit()
+    await db.refresh(step)
+    return step.to_dict()
+
+
+@router.post("/{project_id}/steps/{step_name}/retry")
+async def retry_workflow_step(
+    project_id: str,
+    step_name: str,
+    current_user: User = Depends(get_current_user_required),
+    db: AsyncSession = Depends(get_db),
+):
+    service = TxtovideoProjectService(db)
+    project = await service.get_project(project_id, str(current_user.id))
+    if not project:
+        raise HTTPException(status_code=404, detail="项目不存在")
+
+    result = await db.execute(
+        select(WorkflowStep).filter(
+            WorkflowStep.project_id == project_id,
+            WorkflowStep.step_name == step_name,
+        )
+    )
+    step = result.scalar_one_or_none()
+    if not step:
+        step = WorkflowStep(
+            project_id=project_id,
+            step_name=step_name,
+            status=StepState.PENDING.value,
+        )
+        db.add(step)
+
+    step.status = StepState.PENDING.value
+    step.error_message = None
+    step.finished_at = None
+    await db.commit()
+    await db.refresh(step)
+    return step.to_dict()
+
+
+@router.post("/{project_id}/steps/mark-stale")
+async def mark_downstream_stale(
+    project_id: str,
+    body: Dict[str, Any],
+    current_user: User = Depends(get_current_user_required),
+    db: AsyncSession = Depends(get_db),
+):
+    service = TxtovideoProjectService(db)
+    project = await service.get_project(project_id, str(current_user.id))
+    if not project:
+        raise HTTPException(status_code=404, detail="项目不存在")
+
+    changed_step = body.get("step_name")
+    if not changed_step:
+        raise HTTPException(status_code=400, detail="缺少 step_name")
+
+    downstream = _get_downstream_steps(changed_step)
+    if not downstream:
+        return {"marked_stale": []}
+
+    result = await db.execute(
+        select(WorkflowStep).filter(
+            WorkflowStep.project_id == project_id,
+            WorkflowStep.step_name.in_(downstream),
+        )
+    )
+    steps = result.scalars().all()
+    step_map = {s.step_name: s for s in steps}
+
+    marked = []
+    for step_name in downstream:
+        step = step_map.get(step_name)
+        if not step:
+            step = WorkflowStep(
+                project_id=project_id,
+                step_name=step_name,
+                status=StepState.STALE.value,
+            )
+            db.add(step)
+        elif step.status in (StepState.SUCCESS.value, StepState.PENDING.value):
+            step.status = StepState.STALE.value
+        marked.append(step_name)
+
+    await db.commit()
+    return {"marked_stale": marked}
+
+
+def _get_downstream_steps(step_name: str) -> List[str]:
+    visited = set()
+    queue = [step_name]
+    while queue:
+        current = queue.pop(0)
+        for s, deps in STEP_DEPENDENCIES.items():
+            if current in deps and s not in visited:
+                visited.add(s)
+                queue.append(s)
+    return list(visited)
