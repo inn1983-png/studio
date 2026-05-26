@@ -171,7 +171,6 @@ export function useUpload(options = {}) {
 
     // 工具函数
     formatFileSize: fileValidator.formatFileSize,
-    getFileTypeDescription: fileValidator.getFileTypeDescription
   }
 }
 

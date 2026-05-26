@@ -41,6 +41,8 @@ class TxtovideoProjectService:
             legacy = await self.db.get(Project, project.project_id)
             if legacy is None or str(legacy.owner_id) != str(user_id):
                 return None
+        else:
+            return None
         return project
 
     async def create_project(self, user_id: str, data: dict) -> ShortDramaProject:

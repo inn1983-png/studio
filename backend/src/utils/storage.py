@@ -3,6 +3,7 @@
 MinIO 不可用时自动降级为本地文件存储
 """
 
+import asyncio
 import os
 import shutil
 import uuid
@@ -425,28 +426,35 @@ class MinIOStorage:
 
     async def download_file(self, object_key: str) -> bytes:
         try:
-            response = self.client.get_object(self.bucket_name, object_key)
-            return response.read()
+            def _download():
+                response = self.client.get_object(self.bucket_name, object_key)
+                data = response.read()
+                response.close()
+                response.release_conn()
+                return data
+            return await asyncio.to_thread(_download)
         except Exception as e:
             logger.error(f"下载文件失败: {e}")
             raise StorageError(f"下载文件失败: {str(e)}")
 
     async def download_file_to_path(self, object_key: str, dest_path: str) -> None:
         try:
-            response = self.client.get_object(self.bucket_name, object_key)
-            Path(dest_path).parent.mkdir(parents=True, exist_ok=True)
-            with open(dest_path, 'wb') as f:
-                for chunk in response.stream(8192):
-                    f.write(chunk)
-            response.close()
-            response.release_conn()
+            def _download_to_path():
+                response = self.client.get_object(self.bucket_name, object_key)
+                Path(dest_path).parent.mkdir(parents=True, exist_ok=True)
+                with open(dest_path, 'wb') as f:
+                    for chunk in response.stream(8192):
+                        f.write(chunk)
+                response.close()
+                response.release_conn()
+            await asyncio.to_thread(_download_to_path)
         except Exception as e:
             logger.error(f"下载文件失败: {e}")
             raise StorageError(f"下载文件失败: {str(e)}")
 
     async def delete_file(self, object_key: str) -> bool:
         try:
-            self.client.remove_object(self.bucket_name, object_key)
+            await asyncio.to_thread(self.client.remove_object, self.bucket_name, object_key)
             return True
         except Exception as e:
             logger.error(f"删除文件失败: {e}")
@@ -467,49 +475,53 @@ class MinIOStorage:
 
     async def list_files(self, prefix: str, limit: int = 100) -> List[Dict[str, Any]]:
         try:
-            objects = self.client.list_objects(
-                bucket_name=self.bucket_name,
-                prefix=prefix,
-                recursive=True
-            )
-            files = []
-            for i, obj in enumerate(objects):
-                if i >= limit:
-                    break
-                if obj.object_name.endswith('/'):
-                    continue
-                files.append({
-                    "object_key": obj.object_name,
-                    "size": obj.size,
-                    "last_modified": obj.last_modified.isoformat() if obj.last_modified else None,
-                    "etag": obj.etag,
-                    "content_type": obj.content_type,
-                    "url": self.get_presigned_url(obj.object_name),
-                })
-            return files
+            def _list():
+                objects = self.client.list_objects(
+                    bucket_name=self.bucket_name,
+                    prefix=prefix,
+                    recursive=True
+                )
+                files = []
+                for i, obj in enumerate(objects):
+                    if i >= limit:
+                        break
+                    if obj.object_name.endswith('/'):
+                        continue
+                    files.append({
+                        "object_key": obj.object_name,
+                        "size": obj.size,
+                        "last_modified": obj.last_modified.isoformat() if obj.last_modified else None,
+                        "etag": obj.etag,
+                        "content_type": obj.content_type,
+                        "url": self.get_presigned_url(obj.object_name),
+                    })
+                return files
+            return await asyncio.to_thread(_list)
         except Exception as e:
             logger.error(f"列出文件失败: {e}")
             raise StorageError(f"列出文件失败: {str(e)}")
 
     async def get_file_info(self, object_key: str) -> Optional[Dict[str, Any]]:
         try:
-            stat = self.client.stat_object(self.bucket_name, object_key)
-            return {
-                "object_key": object_key,
-                "size": stat.size,
-                "last_modified": stat.last_modified.isoformat() if stat.last_modified else None,
-                "etag": stat.etag,
-                "content_type": stat.content_type,
-                "metadata": stat.metadata,
-                "url": self.get_presigned_url(object_key),
-            }
+            def _stat():
+                stat = self.client.stat_object(self.bucket_name, object_key)
+                return {
+                    "object_key": object_key,
+                    "size": stat.size,
+                    "last_modified": stat.last_modified.isoformat() if stat.last_modified else None,
+                    "etag": stat.etag,
+                    "content_type": stat.content_type,
+                    "metadata": stat.metadata,
+                    "url": self.get_presigned_url(object_key),
+                }
+            return await asyncio.to_thread(_stat)
         except Exception as e:
             logger.error(f"获取文件信息失败: {e}")
             return None
 
     async def file_exists(self, object_key: str) -> bool:
         try:
-            self.client.stat_object(self.bucket_name, object_key)
+            await asyncio.to_thread(self.client.stat_object, self.bucket_name, object_key)
             return True
         except Exception:
             return False

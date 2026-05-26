@@ -19,13 +19,20 @@ export const exportService = {
 
     async downloadFile(downloadUrl, filename) {
         try {
-            const token = localStorage.getItem('token')
+            const { useAuthStore } = await import('@/stores/auth')
+            const authStore = useAuthStore()
+            const token = authStore.token
             const response = await fetch(downloadUrl, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             })
+
+            if (response.status === 401) {
+                authStore.logout()
+                throw new Error('登录已过期，请重新登录')
+            }
 
             if (!response.ok) {
                 throw new Error(`下载失败: ${response.statusText}`)

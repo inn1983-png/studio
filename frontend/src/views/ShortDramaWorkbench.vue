@@ -536,7 +536,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
@@ -839,6 +839,8 @@ const previewContent = computed(() => {
 })
 
 const currentValidation = computed(() => validateStep(currentStep.value))
+
+const _pendingTimers = []
 
 onMounted(async () => {
   await loadPromptTemplates()
@@ -1539,9 +1541,10 @@ async function generateCanvas() {
     const res = await txtovideoProjectsService.generateCanvas(resolvedProjectId.value)
     if (res.document_id) {
       ElMessage.success('画布已生成，即将跳转...')
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         router.push({ name: 'CanvasEditor', params: { canvasId: res.document_id } })
       }, 1000)
+      _pendingTimers.push(timer)
     }
   } catch (error) {
     console.error('生成画布失败:', error)
@@ -1659,6 +1662,11 @@ function pickTheme(index) {
 function pickCamera(index) {
   return ['低机位跟拍', '缓慢推进', '特写切入', '横移追随', '定镜压迫'][index % 5]
 }
+
+onBeforeUnmount(() => {
+  _pendingTimers.forEach(clearTimeout)
+  _pendingTimers.length = 0
+})
 </script>
 
 <style scoped>

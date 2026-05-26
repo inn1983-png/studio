@@ -4,7 +4,7 @@ WebSocket API - 实时通信
 
 import json
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 import asyncio
@@ -42,8 +42,8 @@ class ConnectionManager:
         # 保存连接元数据
         self.connection_metadata[user_id] = self.connection_metadata.get(user_id, {})
         self.connection_metadata[user_id][connection_id] = {
-            "connected_at": datetime.utcnow().isoformat(),
-            "last_ping": datetime.utcnow().isoformat(),
+            "connected_at": datetime.now(timezone.utc).isoformat(),
+            "last_ping": datetime.now(timezone.utc).isoformat(),
         }
 
         logger.info(f"WebSocket连接建立: user_id={user_id}, connection_id={connection_id}")
@@ -52,7 +52,7 @@ class ConnectionManager:
         await self.send_to_connection(user_id, connection_id, {
             "type": "connection_established",
             "connection_id": connection_id,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         })
 
     def disconnect(self, user_id: str, connection_id: str):
@@ -110,7 +110,7 @@ class ConnectionManager:
         await self.send_to_connection(user_id, connection_id, {
             "type": "task_subscribed",
             "task_id": task_id,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         })
 
     def get_task_subscribers(self, task_id: str) -> Dict[str, set]:
@@ -123,7 +123,7 @@ class ConnectionManager:
         message = {
             "type": "task_update",
             "task_id": task_id,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             **update_data
         }
 
@@ -137,7 +137,7 @@ class ConnectionManager:
             for connection_id in list(self.active_connections[user_id].keys()):
                 await self.send_to_connection(user_id, connection_id, {
                     "type": "ping",
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                 })
 
     def get_stats(self) -> dict:
@@ -151,7 +151,7 @@ class ConnectionManager:
             "active_users": active_users,
             "total_connections": total_connections,
             "task_subscriptions": len(self.task_subscriptions),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
 
@@ -178,7 +178,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str = None):
         await websocket.close(code=4003, reason="Invalid token")
         return
 
-    connection_id = f"{user_id}_{datetime.utcnow().timestamp()}"
+    connection_id = f"{user_id}_{datetime.now(timezone.utc).timestamp()}"
 
     try:
         await manager.connect(websocket, user_id, connection_id)
@@ -199,14 +199,14 @@ async def websocket_endpoint(websocket: WebSocket, token: str = None):
                 await manager.send_to_connection(user_id, connection_id, {
                     "type": "error",
                     "message": "Invalid JSON format",
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                 })
             except Exception as e:
                 logger.error(f"处理WebSocket消息时出错: {e}")
                 await manager.send_to_connection(user_id, connection_id, {
                     "type": "error",
                     "message": "Internal server error",
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                 })
 
     except WebSocketDisconnect:
@@ -223,13 +223,13 @@ async def handle_websocket_message(user_id: str, connection_id: str, message: di
         # 响应ping
         await manager.send_to_connection(user_id, connection_id, {
             "type": "pong",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         })
 
         # 更新最后ping时间
         if (user_id in manager.connection_metadata and
             connection_id in manager.connection_metadata[user_id]):
-            manager.connection_metadata[user_id][connection_id]["last_ping"] = datetime.utcnow().isoformat()
+            manager.connection_metadata[user_id][connection_id]["last_ping"] = datetime.now(timezone.utc).isoformat()
 
     elif message_type == "subscribe_task":
         # 订阅任务进度
@@ -240,7 +240,7 @@ async def handle_websocket_message(user_id: str, connection_id: str, message: di
             await manager.send_to_connection(user_id, connection_id, {
                 "type": "error",
                 "message": "Missing task_id for subscription",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             })
 
     elif message_type == "unsubscribe_task":
@@ -255,7 +255,7 @@ async def handle_websocket_message(user_id: str, connection_id: str, message: di
             await manager.send_to_connection(user_id, connection_id, {
                 "type": "task_unsubscribed",
                 "task_id": task_id,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             })
 
     else:
@@ -263,7 +263,7 @@ async def handle_websocket_message(user_id: str, connection_id: str, message: di
         await manager.send_to_connection(user_id, connection_id, {
             "type": "error",
             "message": f"Unknown message type: {message_type}",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         })
 
 
@@ -285,7 +285,7 @@ async def setup_celery_events():
             update_data = {
                 "event_type": event_type,
                 "status": event_type.split("-")[1],  # succeeded, failed, etc.
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
 
             if event_type == "task-succeeded":
@@ -327,7 +327,7 @@ async def send_task_progress(task_id: str, progress: int, message: str = None):
     update_data = {
         "progress": progress,
         "message": message,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
     await manager.broadcast_task_update(task_id, update_data)
 
@@ -338,7 +338,7 @@ async def send_task_status(task_id: str, status: str, details: dict = None):
     update_data = {
         "status": status,
         "details": details or {},
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
     await manager.broadcast_task_update(task_id, update_data)
 

@@ -2,7 +2,7 @@
 发布任务数据模型
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -93,7 +93,7 @@ class PublishTask(BaseModel):
         self.bvid = bvid
         self.aid = aid
         self.progress = 100
-        self.published_at = datetime.utcnow()
+        self.published_at = datetime.now(timezone.utc)
 
     def mark_as_failed(self, error_message: str) -> None:
         """标记为失败"""
@@ -133,7 +133,7 @@ class BilibiliAccount(BaseModel):
         """标记登录成功"""
         self.login_status = "success"
         self.is_active = True
-        self.last_login_at = datetime.utcnow()
+        self.last_login_at = datetime.now(timezone.utc)
     
     def mark_login_failed(self) -> None:
         """标记登录失败"""

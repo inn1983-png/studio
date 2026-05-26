@@ -495,4 +495,18 @@ async def score_project_quality(
             outputs["videoPrompts"].append(vp.to_dict())
 
     result = quality_service.score_project(outputs)
+
+    from src.models.txtovideo import QualityReport
+    from datetime import datetime, timezone
+    report = QualityReport(
+        project_id=project_id,
+        target_type="overall",
+        target_id=None,
+        score=result.get("overall_score", 0),
+        issues=result.get("checks", []),
+        suggestions=result.get("fix_suggestions", []),
+    )
+    db.add(report)
+    await db.commit()
+
     return result

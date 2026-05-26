@@ -20,11 +20,7 @@ export function useMovieWorkflow() {
     const loading = ref(false)
     const apiKeys = ref([])
 
-    console.log('useMovieWorkflow init:', {
-        chapterId: selectedChapterId.value,
-        projectId: projectId.value,
-        routeParams: route.params
-    })
+    // removed debug log
 
     // Initialize workflows
     const characterWorkflow = useCharacterWorkflow(projectId)
@@ -36,7 +32,7 @@ export function useMovieWorkflow() {
     const loadApiKeys = async () => {
         const res = await apiKeysService.getAPIKeys()
         apiKeys.value = res.api_keys || []
-        console.log('Loaded API keys:', apiKeys.value)
+        // removed debug log
     }
 
     // Computed states
@@ -104,7 +100,7 @@ export function useMovieWorkflow() {
                         await transitionWorkflow.loadTransitions(sceneWorkflow.script.value.id)
                     }
                 } catch (error) {
-                    console.log('No script found for this chapter yet')
+                    // removed debug log
                 }
             }
 
@@ -144,7 +140,7 @@ export function useMovieWorkflow() {
 
     // Watch for route changes
     watch(() => route.params, (newParams) => {
-        console.log('Route params changed:', newParams)
+        // removed debug log
         if (newParams.projectId) {
             projectId.value = newParams.projectId
         }
@@ -191,3 +187,4 @@ export function useMovieWorkflow() {
         goBack
     }
 }
+

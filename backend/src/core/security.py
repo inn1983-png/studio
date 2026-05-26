@@ -2,16 +2,12 @@
 安全相关功能模块 - 简化版，只保留核心功能
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from src.core.config import settings
-
-# 密码加密上下文
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class SecurityError(Exception):
@@ -40,7 +36,6 @@ def get_password_hash(password: str) -> str:
     """生成密码哈希"""
     try:
         import bcrypt
-        # 直接使用 bcrypt 库，避免 passlib 兼容性问题
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
         return hashed.decode('utf-8')
@@ -54,15 +49,16 @@ def create_access_token(
 ) -> str:
     """创建访问令牌"""
     to_encode = data.copy()
+    now = datetime.now(timezone.utc)
 
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = now + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(
+        expire = now + timedelta(
             minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
-    to_encode.update({"exp": expire, "iat": datetime.utcnow()})
+    to_encode.update({"exp": expire, "iat": now})
 
     try:
         encoded_jwt = jwt.encode(
@@ -84,10 +80,9 @@ def verify_token(token: str) -> Dict[str, Any]:
             algorithms=[settings.JWT_ALGORITHM]
         )
 
-        # 检查过期时间
         exp = payload.get("exp")
-        if exp is None or datetime.fromtimestamp(exp) < datetime.utcnow():
-            raise TokenError("令牌已过期")
+        if exp is None:
+            raise TokenError("无效令牌")
 
         return payload
 

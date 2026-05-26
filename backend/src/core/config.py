@@ -71,7 +71,14 @@ class Settings(BaseSettings):
         env="JWT_SECRET_KEY"
     )
     JWT_ALGORITHM: str = "HS256"
-    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    @field_validator("JWT_SECRET_KEY", mode="after")
+    @classmethod
+    def validate_jwt_secret(cls, v: str, info) -> str:
+        if info.data.get("ENVIRONMENT") == "production" and v == "dev-only-jwt-secret-key":
+            raise ValueError("生产环境必须设置 JWT_SECRET_KEY 环境变量")
+        return v
 
     # =============================================================================
     # 加密配置

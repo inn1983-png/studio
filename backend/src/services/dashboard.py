@@ -14,7 +14,7 @@
 - 方法职责单一，保持简洁
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import func, select, desc, or_
@@ -80,7 +80,7 @@ class DashboardService(BaseService):
                 "generation": generation_stats,
                 "tasks": task_stats,
                 "cost": cost_estimate,
-                "last_updated": datetime.utcnow().isoformat()
+                "last_updated": datetime.now(timezone.utc).isoformat()
             }
             
         except Exception as e:

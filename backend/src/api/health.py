@@ -3,7 +3,7 @@
 """
 
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 import psutil
 from fastapi import APIRouter, Depends, HTTPException
@@ -29,7 +29,7 @@ async def health_check():
     """基础健康检查"""
     return {
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "version": "1.0.0",
         "service": settings.APP_SERVICE_NAME,
     }
@@ -50,7 +50,7 @@ async def database_health(
             return {
                 "status": "healthy",
                 "database": "connected",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
         else:
             raise HTTPException(status_code=503, detail="数据库查询失败")
@@ -77,7 +77,7 @@ async def redis_health(current_user: User = Depends(get_current_user_required)):
             return {
                 "status": "healthy",
                 "redis": "connected",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
         else:
             raise HTTPException(status_code=503, detail="Redis ping失败")
@@ -106,14 +106,14 @@ async def celery_health(current_user: User = Depends(get_current_user_required))
                 "celery": "connected",
                 "workers": workers,
                 "worker_count": len(workers),
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
         else:
             return {
                 "status": "warning",
                 "celery": "no_active_workers",
                 "message": "没有活跃的Celery workers",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
 
     except Exception as e:
@@ -142,7 +142,7 @@ async def system_health(current_user: User = Depends(get_current_user_required))
 
         return {
             "status": "healthy",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "system": {
                 "cpu_percent": cpu_percent,
                 "memory": {
@@ -184,7 +184,7 @@ async def detailed_health_check(current_user: User = Depends(get_current_user_re
 
     health_status = {
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "version": "1.0.0",
         "service": settings.APP_SERVICE_NAME,
         "environment": settings.ENVIRONMENT,

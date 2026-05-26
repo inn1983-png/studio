@@ -118,7 +118,7 @@ class APIKey(BaseModel):
     def update_usage(self) -> None:
         """更新使用统计"""
         self.usage_count += 1
-        self.last_used_at = datetime.utcnow()
+        self.last_used_at = datetime.now(timezone.utc)
         logger.debug(f"API密钥使用次数更新: {self.id} - {self.usage_count}")
 
     def is_active(self) -> bool:

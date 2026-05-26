@@ -4,7 +4,7 @@
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, TYPE_CHECKING
 
@@ -90,7 +90,7 @@ class Sentence(BaseModel):
         self.sentence_video_key = video_key
         self.sentence_video_duration = duration
         self.needs_regeneration = False
-        self.last_video_generated_at = datetime.utcnow()
+        self.last_video_generated_at = datetime.now(timezone.utc)
 
     def has_valid_cache(self) -> bool:
         """

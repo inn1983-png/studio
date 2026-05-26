@@ -5,9 +5,9 @@ const apiBase = '/api/v1'
 const getAccessToken = () => {
   try {
     const authStore = useAuthStore()
-    return authStore.token || localStorage.getItem('token') || ''
+    return authStore.token || ''
   } catch {
-    return localStorage.getItem('token') || ''
+    return ''
   }
 }
 
