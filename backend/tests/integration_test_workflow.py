@@ -293,7 +293,7 @@ async def test_error_handling():
 async def main():
     """主测试函数"""
     print("=" * 60)
-    print("🧪 AICG异步文件处理流程集成测试")
+    print("🧪 Txtovideo Studio 异步文件处理流程集成测试")
     print("=" * 60)
 
     # 环境检查

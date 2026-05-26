@@ -28,7 +28,14 @@
       <!-- 表单内容 -->
       <div class="auth-content">
         <div class="form-container">
-          <router-view v-slot="{ Component, route }">
+          <component
+            :is="explicitPageComponent"
+            v-if="explicitPageComponent"
+          />
+          <router-view
+            v-else
+            v-slot="{ Component, route }"
+          >
             <transition
               name="fade"
               mode="out-in"
@@ -70,11 +77,14 @@
 
 <script setup>
 import { VideoCamera } from '@element-plus/icons-vue'
+import { computed } from 'vue'
 import { useBrandStore } from '@/stores/brand'
+import Login from '@/views/Login.vue'
+import Register from '@/views/Register.vue'
 
 const brandStore = useBrandStore()
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     default: ''
@@ -82,7 +92,21 @@ defineProps({
   subtitle: {
     type: String,
     default: ''
+  },
+  page: {
+    type: String,
+    default: ''
   }
+})
+
+const explicitPageComponent = computed(() => {
+  if (props.page === 'login') {
+    return Login
+  }
+  if (props.page === 'register') {
+    return Register
+  }
+  return null
 })
 </script>
 

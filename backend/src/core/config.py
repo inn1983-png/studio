@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     # 应用基础配置
     # =============================================================================
     APP_NAME: str = "Txtovideo Studio"
-    APP_DESCRIPTION: str = "小说转短剧智能创作工作站"
-    APP_LOGO_TEXT: str = "Txtovideo"
+    APP_DESCRIPTION: str = "小说短剧工作站"
+    APP_LOGO_TEXT: str = "Txtovideo Studio"
     APP_COPYRIGHT: str = "© 2024-2026 Txtovideo Studio. All rights reserved."
     APP_SERVICE_NAME: str = "txtovideo-backend"
     APP_CELERY_NAME: str = "txtovideo"

@@ -92,6 +92,8 @@ class CanvasItem(BaseModel):
     last_run_error = Column(Text, nullable=True)
     last_output_json = Column(JSON, nullable=False, default=dict)
     z_index = Column(Integer, nullable=False, default=0)
+    source_type = Column(String(30), nullable=True, comment="来源类型: txtovideo/manual")
+    source_ref = Column(String(200), nullable=True, comment="来源引用: txtovideo://{project_id}/{step}/{asset_name}")
 
     document = relationship("CanvasDocument", back_populates="items")
     generations = relationship("CanvasItemGeneration", back_populates="item", cascade="all, delete-orphan")

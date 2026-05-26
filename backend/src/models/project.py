@@ -27,7 +27,7 @@ class ProjectStatus(str, Enum):
 class ProjectType(str, Enum):
     """项目类型枚举"""
     PICTURE_NARRATIVE = "picture_narrative"  # 图解说/视频解说
-    AI_MOVIE = "ai_movie"                    # AI电影
+    AI_MOVIE = "ai_movie"                    # 短剧项目
 
 
 class Project(BaseModel):

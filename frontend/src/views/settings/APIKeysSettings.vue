@@ -2,8 +2,8 @@
   <div class="setting-section">
     <div class="settings-header">
       <div>
-        <h2>API密钥管理</h2>
-        <p>管理您的AI服务提供商API密钥</p>
+        <h2>API 密钥设置</h2>
+        <p>管理用于短剧生成链路的服务密钥</p>
       </div>
       <el-button
         type="primary"

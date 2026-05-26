@@ -4,8 +4,8 @@ import axios from 'axios'
 
 const DEFAULT_BRAND = {
   appName: 'Txtovideo Studio',
-  appDescription: '小说转短剧智能创作工作站',
-  logoText: 'Txtovideo',
+  appDescription: '小说短剧工作站',
+  logoText: 'Txtovideo Studio',
   copyright: '© 2024-2026 Txtovideo Studio. All rights reserved.'
 }
 

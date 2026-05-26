@@ -17,11 +17,14 @@ from src.api.schemas.export import (
     VideoExportResponse,
     BatchExportRequest,
     BatchExportResponse,
+    TxtovideoExportRequest,
+    TxtovideoExportResponse,
 )
 from src.core.database import get_db
 from src.core.logging import get_logger
 from src.models.user import User
 from src.services.jianying_export import JianYingExportService, JianYingExportError
+from src.services.txtovideo_export import TxtovideoExportService
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -215,3 +218,65 @@ async def batch_export_videos(
 
 
 __all__ = ["router"]
+
+
+@router.post("/txtovideo", response_model=TxtovideoExportResponse)
+async def export_txtovideo_package(
+    req: TxtovideoExportRequest,
+    current_user: User = Depends(get_current_user_required)
+):
+    try:
+        export_service = TxtovideoExportService()
+        zip_path = await export_service.export_package(
+            package_name=req.package_name,
+            project_id=req.project_id,
+            source=req.source,
+            outputs=req.outputs,
+            prompt_used=req.prompt_used,
+        )
+        filename = Path(zip_path).name
+        encoded_filename = quote(filename)
+        return TxtovideoExportResponse(
+            success=True,
+            message="导出成功",
+            download_url=f"/api/v1/export/txtovideo/download/{encoded_filename}",
+            filename=filename,
+        )
+    except Exception as e:
+        logger.error(f"Txtovideo导出失败: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"导出失败: {str(e)}",
+        )
+
+
+@router.get("/txtovideo/download/{filename:path}")
+async def download_txtovideo_export(
+    filename: str,
+    current_user: User = Depends(get_current_user_required)
+):
+    decoded_filename = unquote(filename)
+    file_path = (Path(tempfile.gettempdir()) / decoded_filename).resolve()
+    if not str(file_path).startswith(str(Path(tempfile.gettempdir()).resolve())):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid file path")
+
+    if not file_path.exists():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="文件不存在或已过期")
+
+    def cleanup_file(path: str):
+        try:
+            if os.path.exists(path):
+                os.remove(path)
+        except Exception as e:
+            logger.error(f"清理文件失败: {e}")
+
+    encoded_filename = quote(decoded_filename)
+    response = FileResponse(
+        path=str(file_path),
+        filename=decoded_filename,
+        media_type="application/zip",
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"},
+    )
+    response.background = BackgroundTasks()
+    response.background.add_task(cleanup_file, str(file_path))
+    return response

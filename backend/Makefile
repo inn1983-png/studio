@@ -1,4 +1,4 @@
-# AICG内容分发平台 - 后端服务 Makefile
+# Txtovideo Studio - 后端服务 Makefile
 # 提供开发环境的快速启动和常用命令
 
 .PHONY: help start migrate setup worker beat test lint clean format check install
@@ -15,14 +15,14 @@ GRAY := \033[90m
 RESET := \033[0m
 
 # 项目配置
-PROJECT_NAME := aicg-platform-backend
+PROJECT_NAME := txtovideo-studio-backend
 PYTHON := python3
 UV := uv
 PORT := 8000
 HOST := 0.0.0.0
 
 help: ## 显示帮助信息
-	@echo "$(BLUE)AICG平台后端服务 - 开发命令集合$(RESET)"
+	@echo "$(BLUE)Txtovideo Studio 后端服务 - 开发命令集合$(RESET)"
 	@echo ""
 	@echo "$(GREEN)核心命令:$(RESET)"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(YELLOW)%-12s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort

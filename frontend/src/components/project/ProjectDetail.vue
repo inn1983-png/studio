@@ -47,7 +47,7 @@
                 :type="project.type === 'ai_movie' ? 'primary' : 'success'"
                 effect="plain"
               >
-                {{ project.type === 'ai_movie' ? 'AI 电影' : '解说视频' }}
+                {{ project.type === 'ai_movie' ? '短剧项目' : '图文解说' }}
               </el-tag>
               <el-tag
                 v-if="project.is_public"
@@ -206,9 +206,9 @@
           v-if="project.type === 'ai_movie'"
           type="primary"
           :icon="VideoCamera"
-          @click="handleOpenMovieStudio"
+          @click="handleOpenShortDramaWorkbench"
         >
-          进入电影工作室
+          进入短剧工作台
         </el-button>
         <el-button
           v-if="project.type === 'ai_movie'"
@@ -397,25 +397,14 @@
     })
   }
 
-  // 进入电影工作室
-  const handleOpenMovieStudio = async () => {
-    try {
-      const chapters = await projectsStore.fetchProjectChapters(props.projectId)
-      if (chapters && chapters.length > 0) {
-        router.push({
-          name: 'MovieStudio',
-          params: { 
-            projectId: props.projectId,
-            chapterId: chapters[0].id
-          }
-        })
-      } else {
-        ElMessage.warning('项目暂无章节，请先添加内容')
+  // 进入短剧工作台
+  const handleOpenShortDramaWorkbench = () => {
+    router.push({
+      name: 'ShortDramaProjectWorkbench',
+      params: {
+        projectId: props.projectId
       }
-    } catch (error) {
-      console.error('获取章节列表失败:', error)
-      ElMessage.error('无法进入电影工作室')
-    }
+    })
   }
 
   const handleExportVideo = async () => {

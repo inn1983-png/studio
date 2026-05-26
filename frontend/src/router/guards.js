@@ -30,7 +30,7 @@ export function setupAuthGuard(router) {
 
     // 检查是否需要游客状态（已登录用户不能访问登录/注册页面）
     if (to.meta.requiresGuest && authStore.isAuthenticated) {
-      next({ name: 'Dashboard' })
+      next({ name: 'ProjectsPage' })
       return
     }
 

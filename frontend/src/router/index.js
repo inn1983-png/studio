@@ -6,8 +6,6 @@ const AuthLayout = () => import('@/components/layout/AuthLayout.vue')
 const MainLayout = () => import('@/components/layout/MainLayout.vue')
 
 // 页面组件
-const Login = () => import('@/views/Login.vue')
-const Register = () => import('@/views/Register.vue')
 const Dashboard = () => import('@/views/Dashboard.vue')
 const Projects = () => import('@/views/Projects.vue')
 const ProjectDetail = () => import('@/components/project/ProjectDetail.vue')
@@ -16,6 +14,8 @@ const GenerationSettings = () => import('@/views/GenerationSettings.vue')
 const Publish = () => import('@/views/Publish.vue')
 const APIKeys = () => import('@/views/APIKeys.vue')
 const Settings = () => import('@/views/Settings.vue')
+const ShortDramaWorkbench = () => import('@/views/ShortDramaWorkbench.vue')
+const ExportCenter = () => import('@/views/ExportCenter.vue')
 const CanvasList = () => import('@/views/canvas/CanvasList.vue')
 const CanvasEditor = () => import('@/views/canvas/CanvasEditor.vue')
 
@@ -23,39 +23,27 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    redirect: '/dashboard'
+    redirect: '/projects'
   },
   {
     path: '/login',
     name: 'Login',
     component: AuthLayout,
-    meta: { requiresGuest: true },
-    children: [
-      {
-        path: '',
-        name: 'LoginPage',
-        component: Login,
-        props: {
-          title: '欢迎回来'
-        }
-      }
-    ]
+    props: {
+      page: 'login',
+      title: '欢迎回来'
+    },
+    meta: { requiresGuest: true }
   },
   {
     path: '/register',
     name: 'Register',
     component: AuthLayout,
-    meta: { requiresGuest: true },
-    children: [
-      {
-        path: '',
-        name: 'RegisterPage',
-        component: Register,
-        props: {
-          title: '创建账户'
-        }
-      }
-    ]
+    props: {
+      page: 'register',
+      title: '创建账户'
+    },
+    meta: { requiresGuest: true }
   },
   {
     path: '/dashboard',
@@ -103,7 +91,28 @@ const routes = [
         path: ':projectId/chapters/:chapterId/movie-studio',
         name: 'MovieStudio',
         component: () => import('@/views/studio/MovieStudio.vue'),
-        meta: { title: '电影工作室' },
+        meta: { title: '短剧工作台' },
+        props: true
+      }
+    ]
+  },
+  {
+    path: '/txtovideo',
+    name: 'ShortDramaWorkbench',
+    component: MainLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'ShortDramaWorkbenchPage',
+        component: ShortDramaWorkbench,
+        meta: { title: '短剧工作台' }
+      },
+      {
+        path: 'projects/:projectId/workbench',
+        name: 'ShortDramaProjectWorkbench',
+        component: ShortDramaWorkbench,
+        meta: { title: '短剧工作台' },
         props: true
       }
     ]
@@ -124,6 +133,20 @@ const routes = [
         name: 'CanvasEditor',
         component: CanvasEditor,
         props: true
+      }
+    ]
+  },
+  {
+    path: '/exports',
+    name: 'ExportCenter',
+    component: MainLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'ExportCenterPage',
+        component: ExportCenter,
+        meta: { title: '导出中心' }
       }
     ]
   },

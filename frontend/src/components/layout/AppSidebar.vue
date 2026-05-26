@@ -30,7 +30,7 @@
       <el-scrollbar class="nav-scrollbar">
         <ul class="nav-list">
           <li
-            v-for="item in menuItems"
+            v-for="item in primaryMenuItems"
             :key="item.path"
             class="nav-item"
           >
@@ -53,6 +53,48 @@
             </router-link>
           </li>
         </ul>
+        <div
+          v-show="!collapsed"
+          class="experimental-section"
+        >
+          <button
+            class="experimental-toggle"
+            type="button"
+            @click="experimentalOpen = !experimentalOpen"
+          >
+            <el-icon class="nav-icon">
+              <Operation />
+            </el-icon>
+            <span class="nav-text">实验功能</span>
+            <el-icon
+              class="toggle-icon"
+              :class="{ open: experimentalOpen }"
+            >
+              <ArrowDown />
+            </el-icon>
+          </button>
+          <ul
+            v-show="experimentalOpen"
+            class="nav-list experimental-list"
+          >
+            <li
+              v-for="item in experimentalMenuItems"
+              :key="item.path"
+              class="nav-item"
+            >
+              <router-link
+                :to="item.path"
+                class="nav-link experimental-link"
+                :class="{ active: isActive(item.path) }"
+              >
+                <el-icon class="nav-icon">
+                  <component :is="item.icon" />
+                </el-icon>
+                <span class="nav-text">{{ item.title }}</span>
+              </router-link>
+            </li>
+          </ul>
+        </div>
       </el-scrollbar>
     </nav>
 
@@ -95,7 +137,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useBrandStore } from '@/stores/brand'
@@ -111,7 +153,10 @@ import {
   Setting,
   Key,
   Headset,
-  Share
+  Share,
+  Download,
+  Operation,
+  ArrowDown
 } from '@element-plus/icons-vue'
 
 // Props
@@ -128,18 +173,13 @@ defineEmits(['toggle'])
 const route = useRoute()
 const authStore = useAuthStore()
 const brandStore = useBrandStore()
+const experimentalOpen = ref(false)
 
 // 计算属性
 const user = computed(() => authStore.user)
 
 // 菜单项配置
-const menuItems = [
-  {
-    title: '控制台',
-    path: '/dashboard',
-    icon: House,
-    badge: null
-  },
+const primaryMenuItems = [
   {
     title: '项目管理',
     path: '/projects',
@@ -147,9 +187,42 @@ const menuItems = [
     badge: null
   },
   {
-    title: '无限画布',
+    title: '短剧工作台',
+    path: '/txtovideo',
+    icon: VideoCamera,
+    badge: null
+  },
+  {
+    title: '画布工作台',
     path: '/canvas',
     icon: Share,
+    badge: null
+  },
+  {
+    title: 'API 密钥设置',
+    path: '/api-keys',
+    icon: Key,
+    badge: null
+  },
+  {
+    title: '导出中心',
+    path: '/exports',
+    icon: Download,
+    badge: null
+  },
+  {
+    title: '系统设置',
+    path: '/settings',
+    icon: Setting,
+    badge: null
+  }
+]
+
+const experimentalMenuItems = [
+  {
+    title: '控制台',
+    path: '/dashboard',
+    icon: House,
     badge: null
   },
   {
@@ -165,27 +238,15 @@ const menuItems = [
     badge: null
   },
   {
-    title: 'B站账号',
-    path: '/bilibili-accounts',
-    icon: User,
-    badge: null
-  },
-  {
-    title: '内容发布',
+    title: 'Bilibili 发布',
     path: '/publish',
     icon: Promotion,
     badge: null
   },
   {
-    title: 'API密钥',
-    path: '/api-keys',
-    icon: Key,
-    badge: null
-  },
-  {
-    title: '系统设置',
-    path: '/settings',
-    icon: Setting,
+    title: 'B站账号',
+    path: '/bilibili-accounts',
+    icon: User,
     badge: null
   }
 ]
@@ -360,6 +421,50 @@ const isActive = (path) => {
   min-width: 18px;
   text-align: center;
   line-height: 1;
+}
+
+.experimental-section {
+  margin: var(--space-sm) var(--space-md) 0;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-primary);
+}
+
+.experimental-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-md);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  transition: all var(--transition-base);
+}
+
+.experimental-toggle:hover {
+  color: var(--primary-color);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.toggle-icon {
+  font-size: 14px;
+  transition: transform var(--transition-base);
+}
+
+.toggle-icon.open {
+  transform: rotate(180deg);
+}
+
+.experimental-list {
+  padding: var(--space-xs) 0 0;
+}
+
+.experimental-link {
+  font-size: var(--text-sm);
 }
 
 /* 折叠状态下的切换按钮 */

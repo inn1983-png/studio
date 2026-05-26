@@ -41,8 +41,8 @@ app = FastAPI(
         "email": f"team@{settings.APP_CELERY_NAME}-studio.com",
     },
     license_info={
-        "name": "MIT",
-        "url": "https://opensource.org/licenses/MIT",
+        "name": "Apache License 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0",
     },
 )
 
