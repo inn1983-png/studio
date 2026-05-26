@@ -10,7 +10,7 @@ from src.core.database import get_db
 from src.services.generation_history_service import GenerationHistoryService
 from src.models.movie import GenerationType
 from src.models.user import User
-from src.core.security import get_current_user_required
+from src.api.dependencies import get_current_user_required
 from src.utils.storage import get_storage_client
 from src.api.schemas.generation_history import GenerationHistoryResponse, SelectHistoryRequest
 from datetime import timedelta

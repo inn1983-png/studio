@@ -6,7 +6,7 @@
 from .auth import auth_middleware, require_auth_middleware
 from .error import error_handler_middleware, not_found_handler, method_not_allowed_handler
 from .logging import logging_middleware, request_details_middleware, performance_monitoring_middleware
-from .security import security_middleware, https_redirect_middleware, rate_limit_middleware, cors_preflight_middleware
+from .security import security_middleware, https_redirect_middleware, rate_limit_middleware
 
 # 导出所有中间件
 __all__ = [
@@ -28,5 +28,4 @@ __all__ = [
     "security_middleware",
     "https_redirect_middleware",
     "rate_limit_middleware",
-    "cors_preflight_middleware",
 ]

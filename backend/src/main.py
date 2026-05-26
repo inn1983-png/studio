@@ -18,6 +18,8 @@ from src.middleware import (
     performance_monitoring_middleware,
 )
 from src.middleware.security import rate_limit_middleware
+from src.api.dependencies import get_current_user_required
+from src.models.user import User
 from src.api.v1 import api_router
 from src.api.websocket import router as websocket_router
 from src.core.config import settings

@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.config import settings
 from src.core.database import get_db
 from src.core.logging import logger
-from src.core.security import get_current_user_required
+from src.api.dependencies import get_current_user_required
 from src.models.user import User
 
 router = APIRouter()

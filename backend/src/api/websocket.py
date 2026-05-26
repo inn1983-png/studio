@@ -10,7 +10,8 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 import asyncio
 
 from src.core.logging import logger
-from src.core.security import verify_websocket_token, get_current_user_required
+from src.core.security import verify_websocket_token
+from src.api.dependencies import get_current_user_required
 from src.models.user import User
 # TODO: 在完成Celery配置后启用
 # from src.workers.base import app as celery_app
