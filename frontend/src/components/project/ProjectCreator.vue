@@ -246,19 +246,19 @@
               @click="textFormData.type = 'ai_movie'"
             >
               <div class="type-img">
-                  <img
-                    src="@/assets/images/ai_movie_type.png"
-                    alt="小说短剧"
-                  >
+                <img
+                  src="@/assets/images/ai_movie_type.png"
+                  alt="小说短剧"
+                >
+              </div>
+              <div class="type-info">
+                <div class="type-title">
+                  小说短剧
                 </div>
-                <div class="type-info">
-                  <div class="type-title">
-                    小说短剧
-                  </div>
-                  <div class="type-desc">
-                    角色场景分镜链路
-                  </div>
+                <div class="type-desc">
+                  角色场景分镜链路
                 </div>
+              </div>
               <div class="active-badge">
                 <el-icon><Check /></el-icon>
               </div>

@@ -45,5 +45,29 @@ export const txtovideoProjectsService = {
 
   markDownstreamStale(projectId, stepName) {
     return post(`${BASE}/${projectId}/steps/mark-stale`, { step_name: stepName })
+  },
+
+  getAudioTracks(projectId) {
+    return get(`${BASE}/${projectId}/audio-tracks`)
+  },
+
+  addAudioTrack(projectId, data) {
+    return post(`${BASE}/${projectId}/audio-tracks`, data)
+  },
+
+  deleteAudioTrack(projectId, trackId) {
+    return del(`${BASE}/${projectId}/audio-tracks/${trackId}`)
+  },
+
+  generateCanvas(projectId) {
+    return post(`${BASE}/${projectId}/generate-canvas`)
+  },
+
+  scoreProjectQuality(projectId) {
+    return post(`${BASE}/${projectId}/quality-score`)
+  },
+
+  listProjectTemplates() {
+    return get(`${BASE}/templates/list`)
   }
 }

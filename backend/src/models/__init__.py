@@ -24,6 +24,7 @@ from src.models.movie import MovieCharacter, MovieProp, MovieScript, MovieScene,
 from src.models.video_task import VideoTask, VideoTaskStatus
 from src.models.task_status import TaskStatus, TaskPriority, can_transition, validate_transition, get_retry_delay
 from src.models.txtovideo import (
+    AudioTrack,
     CharacterAsset,
     ExportPackage,
     ImagePrompt,
@@ -39,6 +40,11 @@ from src.models.txtovideo import (
     TxtovideoStatus,
     TxtovideoWorkflowMode,
     VideoPrompt,
+)
+from src.models.provider import (
+    Provider,
+    ProviderCapability,
+    ProviderType,
 )
 
 __all__ = [
@@ -97,4 +103,8 @@ __all__ = [
     "TxtovideoWorkflowMode",
     "TxtovideoStatus",
     "QualityTargetType",
+    "AudioTrack",
+    "Provider",
+    "ProviderType",
+    "ProviderCapability",
 ]

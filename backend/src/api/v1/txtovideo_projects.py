@@ -1,3 +1,4 @@
+import uuid
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -14,6 +15,7 @@ from src.api.schemas.txtovideo import (
 )
 from src.core.database import get_db
 from src.core.logging import get_logger
+from src.models.canvas import CanvasDocument, CanvasItem, CanvasConnection, CanvasItemType
 from src.models.txtovideo import WorkflowStep, StepState
 from src.models.user import User
 from src.services.txtovideo_service import TxtovideoProjectService
@@ -43,6 +45,16 @@ async def list_txtovideo_projects(
     service = TxtovideoProjectService(db)
     items = await service.list_projects(str(current_user.id), skip=skip, limit=limit)
     return TxtovideoProjectListResponse(items=items, total=len(items))
+
+
+@router.get("/templates/list")
+async def list_project_templates(
+    current_user: User = Depends(get_current_user_required),
+):
+    from src.services.txtovideo_templates import TxtovideoTemplateService
+
+    service = TxtovideoTemplateService()
+    return {"templates": service.list_templates()}
 
 
 @router.get("/{project_id}", response_model=TxtovideoProjectResponse)
@@ -366,3 +378,116 @@ def _get_downstream_steps(step_name: str) -> List[str]:
                 visited.add(s)
                 queue.append(s)
     return list(visited)
+
+
+@router.post("/{project_id}/generate-canvas")
+async def generate_canvas_from_project(
+    project_id: str,
+    current_user: User = Depends(get_current_user_required),
+    db: AsyncSession = Depends(get_db),
+):
+    service = TxtovideoProjectService(db)
+    project = await service.get_project(project_id, str(current_user.id))
+    if not project:
+        raise HTTPException(status_code=404, detail="项目不存在")
+
+    document = CanvasDocument(
+        user_id=uuid.UUID(str(current_user.id)),
+        title=f"短剧画布 - {project.title}",
+    )
+    db.add(document)
+    await db.flush()
+
+    shots = project.shots or []
+    image_items = []
+    video_items = []
+
+    for idx, shot in enumerate(shots):
+        row = idx // 4
+        col = idx % 4
+        x = col * 420
+        y = row * 500
+
+        image_item = CanvasItem(
+            document_id=document.id,
+            item_type=CanvasItemType.IMAGE.value,
+            title=f"镜头{shot.order_index} - 图片",
+            position_x=x,
+            position_y=y,
+            width=320,
+            height=220,
+            source_type="txtovideo",
+            source_ref=f"txtovideo://{project_id}/storyboard/{shot.order_index}",
+            content_json={"shot_no": shot.order_index, "theme": shot.theme, "cap": shot.cap},
+        )
+        db.add(image_item)
+        image_items.append(image_item)
+
+        video_item = CanvasItem(
+            document_id=document.id,
+            item_type=CanvasItemType.VIDEO.value,
+            title=f"镜头{shot.order_index} - 视频",
+            position_x=x,
+            position_y=y + 260,
+            width=320,
+            height=220,
+            source_type="txtovideo",
+            source_ref=f"txtovideo://{project_id}/storyboard/{shot.order_index}",
+            content_json={"shot_no": shot.order_index, "theme": shot.theme, "cap": shot.cap},
+        )
+        db.add(video_item)
+        video_items.append(video_item)
+
+    await db.flush()
+
+    for image_item, video_item in zip(image_items, video_items):
+        connection = CanvasConnection(
+            document_id=document.id,
+            source_item_id=image_item.id,
+            target_item_id=video_item.id,
+            source_handle="source",
+            target_handle="target",
+        )
+        db.add(connection)
+
+    await db.commit()
+    await db.refresh(document)
+
+    return {"document_id": str(document.id)}
+
+
+@router.post("/{project_id}/quality-score")
+async def score_project_quality(
+    project_id: str,
+    current_user: User = Depends(get_current_user_required),
+    db: AsyncSession = Depends(get_db),
+):
+    service = TxtovideoProjectService(db)
+    project = await service.get_project(project_id, str(current_user.id))
+    if not project:
+        raise HTTPException(status_code=404, detail="项目不存在")
+
+    from src.services.txtovideo_quality import TxtovideoQualityService
+    quality_service = TxtovideoQualityService()
+
+    outputs = {}
+    if project.source_text:
+        outputs["source"] = {"text": project.source_text}
+    outputs["script"] = ""
+    if project.scripts:
+        latest = max(project.scripts, key=lambda s: s.version)
+        outputs["script"] = latest.script_text
+    outputs["characters"] = [c.to_dict() for c in project.characters] if project.characters else []
+    outputs["scenes"] = [s.to_dict() for s in project.scenes] if project.scenes else []
+    outputs["props"] = [p.to_dict() for p in project.props] if project.props else []
+    outputs["storyboard"] = [s.to_dict() for s in project.shots] if project.shots else []
+    outputs["imagePrompts"] = []
+    outputs["videoPrompts"] = []
+    for shot in (project.shots or []):
+        for ip in (shot.image_prompts or []):
+            outputs["imagePrompts"].append(ip.to_dict())
+        for vp in (shot.video_prompts or []):
+            outputs["videoPrompts"].append(vp.to_dict())
+
+    result = quality_service.score_project(outputs)
+    return result

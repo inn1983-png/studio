@@ -49,6 +49,7 @@ from .generation_history import router as generation_history_router
 from .canvas import router as canvas_router
 from .canvas_assistant import router as canvas_assistant_router
 from .txtovideo_projects import router as txtovideo_projects_router
+from .providers import router as providers_router
 
 # 注册路由
 api_router.include_router(auth_router, prefix="/auth", tags=["认证"])
@@ -87,5 +88,6 @@ api_router.include_router(
     prefix="/txtovideo/projects",
     tags=["Txtovideo项目管理"],
 )
+api_router.include_router(providers_router, prefix="/providers", tags=["Provider管理"])
 
 __all__ = ["api_router"]

@@ -5,6 +5,7 @@ Txtovideo Studio dedicated business models.
 from enum import Enum
 
 from sqlalchemy import (
+    Boolean,
     Column,
     Float,
     ForeignKey,
@@ -93,6 +94,7 @@ class ShortDramaProject(BaseModel):
     quality_reports = relationship("QualityReport", back_populates="project", cascade="all, delete-orphan")
     export_packages = relationship("ExportPackage", back_populates="project", cascade="all, delete-orphan")
     workflow_steps = relationship("WorkflowStep", back_populates="project", cascade="all, delete-orphan")
+    audio_tracks = relationship("AudioTrack", back_populates="project", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index("idx_txtovideo_project_mode", "workflow_mode"),
@@ -322,6 +324,23 @@ class QualityReport(BaseModel):
     )
 
 
+class AudioTrack(BaseModel):
+    __tablename__ = "txtovideo_audio_tracks"
+
+    project_id = Column(PostgreSQLUUID(as_uuid=True), ForeignKey("txtovideo_projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    track_name = Column(String(200), nullable=False, comment="音轨名称")
+    audio_type = Column(String(30), nullable=False, default="bgm", comment="类型: bgm/voice/sfx")
+    file_url = Column(String(500), nullable=True, comment="音频文件URL")
+    duration_seconds = Column(Float, nullable=True, comment="时长(秒)")
+    bpm = Column(Integer, nullable=True, comment="BPM")
+    lyrics_text = Column(Text, nullable=True, comment="歌词/台词文本")
+    lyrics_timestamps = Column(JSON, nullable=True, default=list, comment="时间戳对齐数据")
+    beat_markers = Column(JSON, nullable=True, default=list, comment="节拍标记")
+    is_primary = Column(Boolean, nullable=False, default=False, comment="是否主音轨")
+
+    project = relationship("ShortDramaProject", back_populates="audio_tracks")
+
+
 class StepState(str, Enum):
     PENDING = "pending"
     RUNNING = "running"
@@ -382,6 +401,7 @@ class ExportPackage(BaseModel):
 
 
 __all__ = [
+    "AudioTrack",
     "CharacterAsset",
     "ExportPackage",
     "ImagePrompt",

@@ -360,6 +360,62 @@
               :autosize="{ minRows: 20, maxRows: 28 }"
               :placeholder="currentStep.placeholder"
             />
+
+            <div
+              v-if="currentStep.id === 'quality' && qualityResult"
+              class="quality-score-panel"
+            >
+              <div class="quality-score-header">
+                <div class="quality-score-number">
+                  <span class="score-value">{{ qualityResult.overall_score }}</span>
+                  <span class="score-label">分</span>
+                </div>
+                <el-tag
+                  :type="qualityResult.grade === 'A' || qualityResult.grade === 'B' ? 'success' : qualityResult.grade === 'C' ? 'warning' : 'danger'"
+                  size="large"
+                  effect="dark"
+                >
+                  {{ qualityResult.grade }} 级
+                </el-tag>
+              </div>
+
+              <div
+                v-if="qualityResult.fix_suggestions && qualityResult.fix_suggestions.length > 0"
+                class="quality-fix-list"
+              >
+                <strong>修复建议</strong>
+                <ul>
+                  <li
+                    v-for="(fix, fixIdx) in qualityResult.fix_suggestions"
+                    :key="fixIdx"
+                  >
+                    <el-tag
+                      size="small"
+                      type="warning"
+                      effect="plain"
+                    >
+                      {{ fix.section }}
+                    </el-tag>
+                    {{ fix.check_name }}：{{ fix.suggestion }}
+                  </li>
+                </ul>
+              </div>
+
+              <div class="quality-section-scores">
+                <div
+                  v-for="(section, sectionKey) in qualityResult.sections"
+                  :key="sectionKey"
+                  class="quality-section-item"
+                >
+                  <span class="section-name">{{ sectionKey }}</span>
+                  <el-progress
+                    :percentage="section.score"
+                    :stroke-width="10"
+                    :color="section.score >= 75 ? '#16a34a' : section.score >= 50 ? '#e6a23c' : '#f56c6c'"
+                  />
+                </div>
+              </div>
+            </div>
           </section>
         </main>
 
@@ -456,6 +512,21 @@
               @click="downloadExportZip"
             >
               导出ZIP包
+            </el-button>
+            <el-button
+              v-if="currentStep.id === 'export'"
+              :icon="VideoCamera"
+              @click="generateCanvas"
+            >
+              生成画布
+            </el-button>
+            <el-button
+              v-if="currentStep.id === 'quality'"
+              :icon="Refresh"
+              :loading="qualityScoring"
+              @click="runQualityScore"
+            >
+              重新评分
             </el-button>
           </div>
         </aside>
@@ -656,6 +727,8 @@ const steps = [
 const project = ref(null)
 const projectLoading = ref(false)
 const zipExporting = ref(false)
+const qualityResult = ref(null)
+const qualityScoring = ref(false)
 const stepStates = ref({})
 const activeStepIndex = ref(0)
 const savedStepIds = ref([])
@@ -1457,6 +1530,52 @@ async function downloadExportZip() {
   }
 }
 
+async function generateCanvas() {
+  if (!resolvedProjectId.value) {
+    ElMessage.warning('请先保存项目')
+    return
+  }
+  try {
+    const res = await txtovideoProjectsService.generateCanvas(resolvedProjectId.value)
+    if (res.document_id) {
+      ElMessage.success('画布已生成，即将跳转...')
+      setTimeout(() => {
+        router.push({ name: 'CanvasEditor', params: { documentId: res.document_id } })
+      }, 1000)
+    }
+  } catch (error) {
+    console.error('生成画布失败:', error)
+    ElMessage.error('生成画布失败')
+  }
+}
+
+async function runQualityScore() {
+  if (!resolvedProjectId.value) {
+    ElMessage.warning('请先保存项目')
+    return
+  }
+  qualityScoring.value = true
+  try {
+    const res = await txtovideoProjectsService.scoreProjectQuality(resolvedProjectId.value)
+    qualityResult.value = res
+    workbench.value.outputs.quality = formatJson({
+      status: res.grade === 'F' || res.grade === 'D' ? 'needs_fix' : 'ready',
+      overall_score: res.overall_score,
+      grade: res.grade,
+      checks: res.checks,
+      fix_suggestions: res.fix_suggestions,
+      updated_at: new Date().toISOString()
+    })
+    markStepDirty('quality')
+    ElMessage.success(`质量评分完成：${res.overall_score}分 (${res.grade}级)`)
+  } catch (error) {
+    console.error('质量评分失败:', error)
+    ElMessage.error('质量评分失败，请稍后重试')
+  } finally {
+    qualityScoring.value = false
+  }
+}
+
 function readQualityStatus() {
   const parsed = tryParseJson(workbench.value.outputs.quality)
   return parsed.ok ? parsed.value?.status || 'draft' : 'invalid'
@@ -1888,6 +2007,94 @@ function pickCamera(index) {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-sm);
+}
+
+.quality-score-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  background: var(--bg-primary);
+}
+
+.quality-score-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.quality-score-number {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.quality-score-number .score-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.quality-score-number .score-label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.quality-fix-list {
+  padding: var(--space-sm);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+}
+
+.quality-fix-list strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.quality-fix-list ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.quality-fix-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.quality-section-scores {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.quality-section-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.quality-section-item .section-name {
+  min-width: 100px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.quality-section-item .el-progress {
+  flex: 1;
 }
 
 @media (max-width: 1200px) {
