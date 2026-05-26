@@ -16,7 +16,21 @@ class TxtovideoProjectService:
     async def _verify_ownership(
         self, project_id: str, user_id: str
     ) -> Optional[ShortDramaProject]:
-        stmt = select(ShortDramaProject).where(ShortDramaProject.id == project_id)
+        from sqlalchemy.orm import selectinload
+        from src.models.txtovideo import StoryboardShot
+        stmt = (
+            select(ShortDramaProject)
+            .where(ShortDramaProject.id == project_id)
+            .options(
+                selectinload(ShortDramaProject.scripts),
+                selectinload(ShortDramaProject.characters),
+                selectinload(ShortDramaProject.scenes),
+                selectinload(ShortDramaProject.props),
+                selectinload(ShortDramaProject.shots).selectinload(StoryboardShot.image_prompts),
+                selectinload(ShortDramaProject.shots).selectinload(StoryboardShot.video_prompts),
+                selectinload(ShortDramaProject.quality_reports),
+            )
+        )
         result = await self.db.execute(stmt)
         project = result.scalar_one_or_none()
         if project is None:

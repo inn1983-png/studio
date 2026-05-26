@@ -43,7 +43,7 @@ async def list_providers(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
 ):
-    stmt = select(Provider).order_by(Provider.priority.desc()).offset(skip).limit(limit)
+    stmt = select(Provider).where(Provider.user_id == current_user.id).order_by(Provider.priority.desc()).offset(skip).limit(limit)
     if provider_type is not None:
         stmt = stmt.where(Provider.provider_type == provider_type)
     if is_active is not None:
@@ -62,11 +62,12 @@ async def create_provider(
     db: AsyncSession = Depends(get_db),
     request: CreateProviderRequest,
 ):
+    from src.utils.encryption import encrypt_api_key
     provider = Provider(
         name=request.name,
         provider_type=request.provider_type,
         endpoint_url=request.endpoint_url,
-        api_key_encrypted=request.api_key,
+        api_key_encrypted=encrypt_api_key(request.api_key) if request.api_key else None,
         config=request.config or {},
         capabilities=request.capabilities or [],
         is_active=request.is_active,
@@ -88,7 +89,7 @@ async def get_provider(
     db: AsyncSession = Depends(get_db),
     provider_id: str,
 ):
-    stmt = select(Provider).where(Provider.id == provider_id)
+    stmt = select(Provider).where(Provider.id == provider_id, Provider.user_id == current_user.id)
     result = await db.execute(stmt)
     provider = result.scalar_one_or_none()
     if provider is None:
@@ -104,14 +105,15 @@ async def update_provider(
     provider_id: str,
     request: UpdateProviderRequest,
 ):
-    stmt = select(Provider).where(Provider.id == provider_id)
+    stmt = select(Provider).where(Provider.id == provider_id, Provider.user_id == current_user.id)
     result = await db.execute(stmt)
     provider = result.scalar_one_or_none()
     if provider is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Provider不存在")
     update_data = request.model_dump(exclude_unset=True)
     if "api_key" in update_data:
-        provider.api_key_encrypted = update_data.pop("api_key")
+        from src.utils.encryption import encrypt_api_key
+        provider.api_key_encrypted = encrypt_api_key(update_data.pop("api_key"))
     for key, value in update_data.items():
         setattr(provider, key, value)
     await db.commit()
@@ -126,7 +128,7 @@ async def delete_provider(
     db: AsyncSession = Depends(get_db),
     provider_id: str,
 ):
-    stmt = select(Provider).where(Provider.id == provider_id)
+    stmt = select(Provider).where(Provider.id == provider_id, Provider.user_id == current_user.id)
     result = await db.execute(stmt)
     provider = result.scalar_one_or_none()
     if provider is None:
@@ -142,7 +144,7 @@ async def health_check_provider(
     db: AsyncSession = Depends(get_db),
     provider_id: str,
 ):
-    stmt = select(Provider).where(Provider.id == provider_id)
+    stmt = select(Provider).where(Provider.id == provider_id, Provider.user_id == current_user.id)
     result = await db.execute(stmt)
     provider = result.scalar_one_or_none()
     if provider is None:

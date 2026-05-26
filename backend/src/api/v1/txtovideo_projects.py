@@ -32,6 +32,8 @@ async def create_txtovideo_project(
 ):
     service = TxtovideoProjectService(db)
     project = await service.create_project(str(current_user.id), req.model_dump())
+    await db.commit()
+    await db.refresh(project)
     return project
 
 
@@ -82,6 +84,7 @@ async def update_txtovideo_project(
     project = await service.update_project(project_id, str(current_user.id), data)
     if not project:
         raise HTTPException(status_code=404, detail="项目不存在")
+    await db.commit()
     return project
 
 
@@ -95,6 +98,7 @@ async def delete_txtovideo_project(
     deleted = await service.delete_project(project_id, str(current_user.id))
     if not deleted:
         raise HTTPException(status_code=404, detail="项目不存在")
+    await db.commit()
 
 
 @router.put("/{project_id}/draft", response_model=TxtovideoProjectResponse)
@@ -110,6 +114,7 @@ async def save_txtovideo_draft(
     )
     if not project:
         raise HTTPException(status_code=404, detail="项目不存在")
+    await db.commit()
     return project
 
 

@@ -446,8 +446,7 @@ async def duplicate_project(
     if not project:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="项目不存在")
     try:
-        new_project = await ProjectService.create_project(
-            db_session=db,
+        new_project = await project_service.create_project(
             owner_id=str(current_user.id),
             title=f"{project.title} (副本)",
             description=project.description,

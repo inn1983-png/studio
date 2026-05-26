@@ -201,7 +201,8 @@ class BGMService(BaseService):
         total = total_result.scalar()
 
         # 排序
-        sort_column = getattr(BGM, sort_by, BGM.created_at)
+        _SORT_WHITELIST = {"created_at", "updated_at", "name", "duration", "file_size"}
+        sort_column = getattr(BGM, sort_by, BGM.created_at) if sort_by in _SORT_WHITELIST else BGM.created_at
         if sort_order == "desc":
             query = query.order_by(desc(sort_column))
         else:

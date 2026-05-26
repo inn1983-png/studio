@@ -342,7 +342,8 @@ class ProjectService(BaseService):
         total = total_result.scalar()
 
         # 排序处理
-        if hasattr(Project, sort_by):
+        _SORT_WHITELIST = {"created_at", "updated_at", "title", "status", "word_count", "chapter_count"}
+        if sort_by in _SORT_WHITELIST and hasattr(Project, sort_by):
             sort_column = getattr(Project, sort_by)
             if sort_order.lower() == "desc":
                 query = query.order_by(desc(sort_column))

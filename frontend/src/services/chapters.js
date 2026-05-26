@@ -64,7 +64,7 @@ export const chaptersService = {
    */
   async updateChapter(chapterId, chapterData) {
     const response = await api.put(`/chapters/${chapterId}`, chapterData)
-    return response.data
+    return response
   },
 
   /**

@@ -1,4 +1,6 @@
+from datetime import datetime
 from typing import Any, Dict, List, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -32,7 +34,7 @@ class SaveDraftRequest(BaseModel):
 
 
 class TxtovideoProjectResponse(BaseModel):
-    id: str
+    id: UUID
     title: str
     source_text: str = ""
     source_type: str = "novel"
@@ -41,9 +43,9 @@ class TxtovideoProjectResponse(BaseModel):
     aspect_ratio: str = "9:16"
     target_platform: str = "douyin"
     workflow_mode: str = "txtovideo"
-    project_id: Optional[str] = None
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
+    project_id: Optional[UUID] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

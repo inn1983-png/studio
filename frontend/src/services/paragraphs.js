@@ -40,18 +40,18 @@ export const paragraphsService = {
      */
     async updateParagraph(paragraphId, paragraphData) {
         const response = await api.put(`/paragraphs/${paragraphId}`, paragraphData)
-        return response.data
+        return response
     },
 
     /**
      * 批量更新段落
-     * @param {string} chapterId 章节ID
-     * @param {Object} data 包含paragraphs数组的数据对象
-     * @returns {Promise<Object>}
+     * @param {string} chapterId - 章节ID
+     * @param {Object} data - 更新数据
+     * @returns {Promise} 更新结果
      */
     async batchUpdateParagraphs(chapterId, data) {
         const response = await api.put(`/paragraphs/chapters/${chapterId}/paragraphs/batch`, data)
-        return response.data
+        return response
     },
 
     /**

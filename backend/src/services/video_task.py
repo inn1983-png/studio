@@ -396,7 +396,8 @@ class VideoTaskService(BaseService):
         total = total_result.scalar()
 
         # 排序
-        sort_column = getattr(VideoTask, sort_by, VideoTask.created_at)
+        _SORT_WHITELIST = {"created_at", "updated_at", "status", "task_type"}
+        sort_column = getattr(VideoTask, sort_by, VideoTask.created_at) if sort_by in _SORT_WHITELIST else VideoTask.created_at
         if sort_order == "desc":
             query = query.order_by(desc(sort_column))
         else:

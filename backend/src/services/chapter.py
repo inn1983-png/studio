@@ -326,7 +326,8 @@ class ChapterService(BaseService):
         total = total_result.scalar()
 
         # 排序处理
-        if hasattr(Chapter, sort_by):
+        _SORT_WHITELIST = {"created_at", "updated_at", "title", "order", "status"}
+        if sort_by in _SORT_WHITELIST and hasattr(Chapter, sort_by):
             sort_column = getattr(Chapter, sort_by)
             if sort_order.lower() == "desc":
                 query = query.order_by(desc(sort_column))
