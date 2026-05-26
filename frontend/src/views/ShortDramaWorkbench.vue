@@ -1540,7 +1540,7 @@ async function generateCanvas() {
     if (res.document_id) {
       ElMessage.success('画布已生成，即将跳转...')
       setTimeout(() => {
-        router.push({ name: 'CanvasEditor', params: { documentId: res.document_id } })
+        router.push({ name: 'CanvasEditor', params: { canvasId: res.document_id } })
       }, 1000)
     }
   } catch (error) {

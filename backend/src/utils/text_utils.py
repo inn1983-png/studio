@@ -70,7 +70,7 @@ class SentenceSplitter(TextSplitter):
         cleaned = re.sub(r'[\u3000\t\u200b\ufeff]+', '', cleaned)
 
         # 4. 过滤无意义或过短片段
-        if not cleaned or all(c in '，,、;:;:；：！？!?.…—·"\'《》【】()（）\[\]{}' or c.isspace() for c in cleaned):
+        if not cleaned or all(c in '，,、;:;:；：！？!?.…—·"\'《》【】()（）\\[\\]{}' or c.isspace() for c in cleaned):
             return ""
         if len(cleaned) < 3 and not any('\u4e00' <= c <= '\u9fff' for c in cleaned):
             return ""

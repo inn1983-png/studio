@@ -847,6 +847,6 @@ if __name__ == "__main__":
         async with get_async_db() as db_session:
             transition_service = TransitionService(db_session)
             res = await transition_service.sync_transition_video_status()   
-            print(res)
+            logger.info(f"Sync result: {res}")
 
     asyncio.run(test_sync())

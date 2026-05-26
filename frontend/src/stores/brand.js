@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import axios from 'axios'
+import { get } from '@/services/api'
 
 const DEFAULT_BRAND = {
   appName: 'Txtovideo Studio',
@@ -22,8 +22,8 @@ export const useBrandStore = defineStore('brand', () => {
   const fetchBrand = async () => {
     if (loaded.value) return brand.value
     try {
-      const resp = await axios.get('/brand', { timeout: 3000 })
-      brand.value = { ...DEFAULT_BRAND, ...resp.data }
+      const resp = await get('/brand', { timeout: 3000 })
+      brand.value = { ...DEFAULT_BRAND, ...resp }
       loaded.value = true
     } catch {
       brand.value = { ...DEFAULT_BRAND }

@@ -19,11 +19,7 @@ export const bgmService = {
         formData.append('file', file)
         formData.append('name', name)
 
-        return await post('/bgms/upload', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
+        return await post('/bgms/upload', formData)
     },
 
     /**

@@ -535,7 +535,7 @@ if __name__ == "__main__":
             "test-project-id", file_content
         )
 
-        print(f"解析完成: {len(chapters_data)} 章节, {len(paragraphs_data)} 段落, {len(sentences_data)} 句子")
+        logger.info(f"解析完成: {len(chapters_data)} 章节, {len(paragraphs_data)} 段落, {len(sentences_data)} 句子")
 
 
     asyncio.run(main())

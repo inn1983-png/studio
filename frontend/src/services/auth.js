@@ -47,7 +47,7 @@ export const authService = {
 
   // 删除账户
   async deleteAccount(password) {
-    return await put('/users/me/delete', { password })
+    return await post('/users/me/delete', { password })
   },
 
   // 上传头像

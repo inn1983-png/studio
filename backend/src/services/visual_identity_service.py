@@ -241,16 +241,18 @@ class VisualIdentityService(BaseService):
         stmt = select(MovieCharacter).where(MovieCharacter.project_id == project_id)
         chars = (await self.db_session.execute(stmt)).scalars().all()
         
-        # 收集角色参考图
-        ref_images = _collect_character_references(chars, shot)
-        
         api_key_service = APIKeyService(self.db_session)
         api_key = await api_key_service.get_api_key_by_id(api_key_id, str(user_id))
         
-        storage_client = await get_storage_client()
         semaphore = asyncio.Semaphore(1)
         
-        success = await _generate_keyframe_worker(shot, chars, user_id, api_key, model, semaphore, storage_client, ref_images)
+        previous_keyframe_url = None
+        
+        success = await _generate_keyframe_worker(
+            shot, chars, user_id, api_key, model, semaphore,
+            db_session=self.db_session,
+            previous_keyframe_url=previous_keyframe_url
+        )
         if success:
             await self.db_session.commit()
             return shot.keyframe_url # type: ignore
@@ -628,6 +630,6 @@ if __name__ == "__main__":
             script_id = "cd1b2680-5d39-4b08-8bf1-968ec05a1571"
             api_key_id = "457f4337-8f54-4749-a2d6-78e1febf9028"
             stats = await vis_service.batch_generate_keyframes(script_id, api_key_id, model="gemini-3-pro-image-preview")
-            print(stats)
+            logger.info(f"Batch generate stats: {stats}")
 
     asyncio.run(test())

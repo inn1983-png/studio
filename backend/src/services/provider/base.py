@@ -66,7 +66,7 @@ def _get_response_summary(response: Any) -> str:
             return f"{type(response).__name__} with {len(response)} items"
         else:
             return f"{type(response).__name__}"
-    except:
+    except Exception:
         return "Unknown response type"
 
 

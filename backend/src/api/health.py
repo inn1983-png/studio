@@ -91,7 +91,7 @@ async def redis_health(current_user: User = Depends(get_current_user_required)):
 async def celery_health(current_user: User = Depends(get_current_user_required)):
     """Celery健康检查"""
     try:
-        from src.workers.base import app as celery_app
+        from src.tasks.app import celery_app
 
         # 检查Celery配置
         inspect = celery_app.control.inspect()
@@ -218,7 +218,7 @@ async def detailed_health_check(current_user: User = Depends(get_current_user_re
 
     # Celery检查
     try:
-        from src.workers.base import app as celery_app
+        from src.tasks.app import celery_app
         inspect = celery_app.control.inspect()
         stats = inspect.stats()
         if stats:

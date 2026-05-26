@@ -451,7 +451,7 @@ class SubtitleService:
                 w_str, h_str = resolution.split('x')
                 width = int(w_str)
                 height = int(h_str)
-            except:
+            except (ValueError, AttributeError):
                 width = 1440
                 height = 1080
 

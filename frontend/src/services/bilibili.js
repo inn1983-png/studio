@@ -9,7 +9,7 @@ export const bilibiliService = {
      * 二维码登录
      */
     async loginByQrcode() {
-        return await post('/bilibili/login/qrcode')
+        return await post('/bilibili/accounts/create', { account_name: 'default' })
     },
 
     /**

@@ -495,5 +495,5 @@ Render: Unreal Engine 5, photorealistic, studio lighting, black background. --ar
                 prompt=prompt,
                 style="cinematic"
             )
-            print("Generated Avatar URL:", url)
+            logger.info(f"Generated Avatar URL: {url}")
     asyncio.run(test_generate_avatar())

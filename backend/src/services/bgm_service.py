@@ -103,8 +103,8 @@ class BGMService(BaseService):
             # 尝试清理已上传的文件
             try:
                 if "file_key" in locals():
-                    storage_client.delete_file(file_key)
-            except:
+                    await storage_client.delete_file(file_key)
+            except Exception:
                 pass
             raise
 
@@ -158,7 +158,7 @@ class BGMService(BaseService):
             try:
                 if "tmp_path" in locals():
                     os.unlink(tmp_path)
-            except:
+            except Exception:
                 pass
 
     async def list_user_bgms(

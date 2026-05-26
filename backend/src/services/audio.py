@@ -43,7 +43,7 @@ async def retry_with_backoff(task_fn, max_retries=5):
 
                 # 指数退避 + 随机抖动
                 sleep_time = delay + random.random() * 0.5
-                print(f"[Retry] 限流，{sleep_time:.2f} 秒后重试 attempt={attempt + 1}/{max_retries}")
+                logger.warning(f"[Retry] 限流，{sleep_time:.2f} 秒后重试 attempt={attempt + 1}/{max_retries}")
                 await asyncio.sleep(sleep_time)
 
                 delay = min(delay * 2, 20)  # 最长等待 20 秒

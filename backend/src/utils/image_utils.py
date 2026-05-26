@@ -9,7 +9,8 @@ import aiohttp
 from typing import Any, Tuple, Optional
 
 from src.core.logging import get_logger
-from src.utils.storage import get_storage_client, UploadFile
+from src.utils.storage import get_storage_client
+from fastapi import UploadFile
 
 logger = get_logger(__name__)
 

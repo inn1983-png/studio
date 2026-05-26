@@ -556,4 +556,79 @@ async def check_file_integrity(
     )
 
 
+@router.get("/{file_id}")
+async def get_file_info(
+        *,
+        current_user: User = Depends(get_current_user_required),
+        db: AsyncSession = Depends(get_db),
+        file_id: str
+):
+    from src.models.project import Project
+    from sqlalchemy import select
+    stmt = select(Project).where(Project.id == file_id, Project.owner_id == current_user.id)
+    result = await db.execute(stmt)
+    project = result.scalar_one_or_none()
+    if project:
+        return {
+            "id": str(project.id),
+            "file_name": project.file_name,
+            "file_size": project.file_size,
+            "file_type": project.file_type,
+            "file_path": project.file_path,
+            "created_at": project.created_at.isoformat() if project.created_at else None,
+        }
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="文件不存在")
+
+
+@router.get("/{file_id}/download")
+async def download_file(
+        *,
+        current_user: User = Depends(get_current_user_required),
+        db: AsyncSession = Depends(get_db),
+        file_id: str
+):
+    from src.models.project import Project
+    from sqlalchemy import select
+    stmt = select(Project).where(Project.id == file_id, Project.owner_id == current_user.id)
+    result = await db.execute(stmt)
+    project = result.scalar_one_or_none()
+    if not project or not project.file_path:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="文件不存在")
+    from fastapi.responses import FileResponse, RedirectResponse
+    storage_client = await get_storage_client()
+    if get_storage_type() == "local" and isinstance(storage_client, LocalStorage):
+        file_path = storage_client.get_file_path(project.file_path)
+        if file_path:
+            return FileResponse(file_path, filename=project.file_name)
+    url = storage_client.get_presigned_url(project.file_path)
+    if url:
+        return RedirectResponse(url=url)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="文件下载失败")
+
+
+@router.delete("/{file_id}")
+async def delete_file(
+        *,
+        current_user: User = Depends(get_current_user_required),
+        db: AsyncSession = Depends(get_db),
+        file_id: str
+):
+    from src.models.project import Project
+    from sqlalchemy import select, delete as sql_delete
+    stmt = select(Project).where(Project.id == file_id, Project.owner_id == current_user.id)
+    result = await db.execute(stmt)
+    project = result.scalar_one_or_none()
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="文件不存在")
+    try:
+        storage_client = await get_storage_client()
+        if project.file_path:
+            await storage_client.delete_file(project.file_path)
+    except Exception as e:
+        logger.warning(f"删除存储文件失败: {e}")
+    await db.execute(sql_delete(Project).where(Project.id == file_id))
+    await db.commit()
+    return {"success": True, "message": "文件已删除"}
+
+
 __all__ = ["router"]

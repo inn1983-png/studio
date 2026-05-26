@@ -1,7 +1,7 @@
 """add providers table
 
 Revision ID: 037
-Revises: 035
+Revises: 036
 Create Date: 2026-05-26
 """
 

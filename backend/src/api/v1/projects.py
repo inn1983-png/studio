@@ -387,4 +387,81 @@ async def get_project_status(
         )
 
 
+@router.get("/{project_id}/content")
+async def get_project_content(
+        *,
+        current_user: User = Depends(get_current_user_required),
+        db: AsyncSession = Depends(get_db),
+        project_id: str
+):
+    project_service = ProjectService(db)
+    project = await project_service.get_project_by_id(project_id, current_user.id)
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="项目不存在")
+    from src.utils.storage import get_storage_client
+    storage_client = await get_storage_client()
+    try:
+        content_bytes = await storage_client.download_file(project.file_path)
+        content = content_bytes.decode('utf-8') if content_bytes else ""
+        return {"content": content, "file_name": project.file_name, "file_type": project.file_type}
+    except Exception as e:
+        logger.error(f"获取项目内容失败: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"获取项目内容失败: {str(e)}")
+
+
+@router.get("/{project_id}/download")
+async def download_project_file(
+        *,
+        current_user: User = Depends(get_current_user_required),
+        db: AsyncSession = Depends(get_db),
+        project_id: str
+):
+    project_service = ProjectService(db)
+    project = await project_service.get_project_by_id(project_id, current_user.id)
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="项目不存在")
+    from src.utils.storage import get_storage_client, get_storage_type, LocalStorage
+    from fastapi.responses import FileResponse
+    storage_client = await get_storage_client()
+    if get_storage_type() == "local" and isinstance(storage_client, LocalStorage):
+        file_path = storage_client.get_file_path(project.file_path)
+        if file_path:
+            return FileResponse(file_path, filename=project.file_name)
+    url = storage_client.get_presigned_url(project.file_path)
+    if url:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url=url)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="文件不存在")
+
+
+@router.post("/{project_id}/duplicate", response_model=ProjectResponse)
+async def duplicate_project(
+        *,
+        current_user: User = Depends(get_current_user_required),
+        db: AsyncSession = Depends(get_db),
+        project_id: str
+):
+    project_service = ProjectService(db)
+    project = await project_service.get_project_by_id(project_id, current_user.id)
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="项目不存在")
+    try:
+        new_project = await ProjectService.create_project(
+            db_session=db,
+            owner_id=str(current_user.id),
+            title=f"{project.title} (副本)",
+            description=project.description,
+            file_name=project.file_name,
+            file_size=project.file_size,
+            file_type=project.file_type,
+            file_path=project.file_path,
+            file_hash=project.file_hash,
+            project_type=project.type
+        )
+        return ProjectResponse.from_dict(new_project.to_dict())
+    except Exception as e:
+        logger.error(f"复制项目失败: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"复制项目失败: {str(e)}")
+
+
 __all__ = ["router"]

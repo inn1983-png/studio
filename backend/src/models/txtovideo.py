@@ -7,16 +7,16 @@ from enum import Enum
 from sqlalchemy import (
     Boolean,
     Column,
+    DateTime,
     Float,
     ForeignKey,
     Index,
     Integer,
-    JSON,
     String,
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID as PostgreSQLUUID
 from sqlalchemy.orm import relationship
 
 from src.models.base import BaseModel
@@ -334,8 +334,8 @@ class AudioTrack(BaseModel):
     duration_seconds = Column(Float, nullable=True, comment="时长(秒)")
     bpm = Column(Integer, nullable=True, comment="BPM")
     lyrics_text = Column(Text, nullable=True, comment="歌词/台词文本")
-    lyrics_timestamps = Column(JSON, nullable=True, default=list, comment="时间戳对齐数据")
-    beat_markers = Column(JSON, nullable=True, default=list, comment="节拍标记")
+    lyrics_timestamps = Column(JSONB, nullable=True, default=list, comment="时间戳对齐数据")
+    beat_markers = Column(JSONB, nullable=True, default=list, comment="节拍标记")
     is_primary = Column(Boolean, nullable=False, default=False, comment="是否主音轨")
 
     project = relationship("ShortDramaProject", back_populates="audio_tracks")
@@ -369,8 +369,8 @@ class WorkflowStep(BaseModel):
     retry_count = Column(Integer, nullable=False, default=0, comment="重试次数")
     model_used = Column(String(100), nullable=True, comment="使用的模型")
     prompt_used = Column(Text, nullable=True, comment="使用的提示词")
-    started_at = Column(None, nullable=True, comment="开始时间")
-    finished_at = Column(None, nullable=True, comment="完成时间")
+    started_at = Column(DateTime(timezone=True), nullable=True, comment="开始时间")
+    finished_at = Column(DateTime(timezone=True), nullable=True, comment="完成时间")
 
     project = relationship("ShortDramaProject", back_populates="workflow_steps")
 
