@@ -459,6 +459,7 @@ import {
 } from '@element-plus/icons-vue'
 import { useProjectsStore } from '@/stores/projects'
 import { txtovideoPromptsService } from '@/services/txtovideoPrompts'
+import { txtovideoProjectsService } from '@/services/txtovideoProjects'
 import { post } from '@/services/api'
 
 const props = defineProps({
@@ -801,6 +802,25 @@ async function initialiseWorkbench() {
 
   try {
     project.value = await projectsStore.getProject(resolvedProjectId.value)
+
+    try {
+      const serverDraft = await txtovideoProjectsService.getDraft(resolvedProjectId.value)
+      if (serverDraft && serverDraft.outputs) {
+        workbench.value.source = serverDraft.source || workbench.value.source
+        if (serverDraft.outputs.script) workbench.value.outputs.script = serverDraft.outputs.script
+        if (serverDraft.outputs.characters) workbench.value.outputs.characters = formatJson(serverDraft.outputs.characters)
+        if (serverDraft.outputs.scenes) workbench.value.outputs.scenes = formatJson(serverDraft.outputs.scenes)
+        if (serverDraft.outputs.props) workbench.value.outputs.props = formatJson(serverDraft.outputs.props)
+        if (serverDraft.outputs.storyboard) workbench.value.outputs.storyboard = formatJson(serverDraft.outputs.storyboard)
+        if (serverDraft.outputs.imagePrompts) workbench.value.outputs.imagePrompts = formatJson(serverDraft.outputs.imagePrompts)
+        if (serverDraft.outputs.videoPrompts) workbench.value.outputs.videoPrompts = formatJson(serverDraft.outputs.videoPrompts)
+        if (serverDraft.outputs.quality) workbench.value.outputs.quality = formatJson(serverDraft.outputs.quality)
+        persistDraft()
+      }
+    } catch (draftError) {
+      console.warn('服务端草稿加载失败，使用本地草稿:', draftError)
+    }
+
     if (!workbench.value.source.text) {
       await hydrateSourceFromProject()
     }
@@ -868,7 +888,16 @@ function persistDraft() {
     }))
   } catch (error) {
     console.error('保存本地草稿失败:', error)
-    ElMessage.error('本地草稿保存失败')
+  }
+
+  if (resolvedProjectId.value) {
+    txtovideoProjectsService.saveDraft(resolvedProjectId.value, {
+      source: workbench.value.source,
+      outputs: workbench.value.outputs,
+      prompt_used: workbench.value.promptUsed || null
+    }).catch(err => {
+      console.warn('服务端草稿保存失败:', err)
+    })
   }
 }
 

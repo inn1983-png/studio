@@ -48,6 +48,7 @@ from .movie_props import router as movie_props_router
 from .generation_history import router as generation_history_router
 from .canvas import router as canvas_router
 from .canvas_assistant import router as canvas_assistant_router
+from .txtovideo_projects import router as txtovideo_projects_router
 
 # 注册路由
 api_router.include_router(auth_router, prefix="/auth", tags=["认证"])
@@ -81,5 +82,10 @@ api_router.include_router(movie_props_router, prefix="/movie", tags=["电影-道
 api_router.include_router(generation_history_router, prefix="/movie", tags=["电影-生成历史"])
 api_router.include_router(canvas_router, tags=["Canvas"])
 api_router.include_router(canvas_assistant_router, tags=["Canvas Assistant"])
+api_router.include_router(
+    txtovideo_projects_router,
+    prefix="/txtovideo/projects",
+    tags=["Txtovideo项目管理"],
+)
 
 __all__ = ["api_router"]
