@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { canvasAssistantService } from '@/services/canvasAssistant'
 import { apiKeysService } from '@/services/apiKeys'
 import { reduceCanvasAssistantEventLog } from '@/composables/useCanvasAssistantTimeline'
@@ -259,6 +259,10 @@ export function useCanvasAssistant({
 
   loadApiKeys().catch(() => {
     runtimeError.value = '加载 assistant 对话模型失败'
+  })
+
+  onBeforeUnmount(() => {
+    abortController.value?.abort?.()
   })
 
   return {

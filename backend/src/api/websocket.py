@@ -10,7 +10,8 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 import asyncio
 
 from src.core.logging import logger
-from src.core.security import verify_websocket_token
+from src.core.security import verify_websocket_token, get_current_user_required
+from src.models.user import User
 # TODO: 在完成Celery配置后启用
 # from src.workers.base import app as celery_app
 
@@ -312,7 +313,9 @@ async def periodic_ping():
 
 # 获取WebSocket统计信息
 @router.get("/stats")
-async def get_websocket_stats():
+async def get_websocket_stats(
+    current_user: User = Depends(get_current_user_required)
+):
     """获取WebSocket连接统计"""
     return manager.get_stats()
 

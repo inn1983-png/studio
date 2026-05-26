@@ -5,7 +5,7 @@ Txtovideo Studio - FastAPI应用入口
 import time
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
@@ -191,7 +191,7 @@ async def root():
 
 
 @app.get("/info")
-async def app_info():
+async def app_info(current_user: User = Depends(get_current_user_required)):
     """应用信息"""
     return {
         "name": settings.APP_NAME,
