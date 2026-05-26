@@ -88,8 +88,7 @@ class TxtovideoExportService:
         ) or "txtovideo_export"
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         zip_filename = f"{safe_name}_{timestamp}.zip"
-        temp_dir = tempfile.mkdtemp(prefix="txtovideo_export_")
-        zip_path = os.path.join(temp_dir, zip_filename)
+        zip_path = os.path.join(tempfile.gettempdir(), zip_filename)
 
         manifest = self._build_manifest(
             package_name, project_id, source, outputs, prompt_used
