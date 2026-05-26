@@ -426,6 +426,15 @@
             >
               下载清单
             </el-button>
+            <el-button
+              v-if="currentStep.id === 'export'"
+              type="primary"
+              :icon="Download"
+              :loading="zipExporting"
+              @click="downloadExportZip"
+            >
+              导出ZIP包
+            </el-button>
           </div>
         </aside>
       </section>
@@ -450,6 +459,7 @@ import {
 } from '@element-plus/icons-vue'
 import { useProjectsStore } from '@/stores/projects'
 import { txtovideoPromptsService } from '@/services/txtovideoPrompts'
+import { post } from '@/services/api'
 
 const props = defineProps({
   projectId: {
@@ -607,6 +617,7 @@ const steps = [
 
 const project = ref(null)
 const projectLoading = ref(false)
+const zipExporting = ref(false)
 const activeStepIndex = ref(0)
 const savedStepIds = ref([])
 const promptTemplates = ref([])
@@ -1311,6 +1322,35 @@ function downloadExportDraft() {
   link.download = `${payload.package_name || 'txtovideo_manifest'}.json`
   link.click()
   URL.revokeObjectURL(url)
+}
+
+async function downloadExportZip() {
+  zipExporting.value = true
+  try {
+    const manifest = tryParseJson(workbench.value.outputs.export)
+    const payload = manifest.ok ? manifest.value : buildExportManifest()
+    const res = await post('/export/txtovideo', {
+      package_name: payload.package_name || 'txtovideo-project_asset_package',
+      project_id: resolvedProjectId.value || null,
+      source: workbench.value.source,
+      outputs: workbench.value.outputs,
+      prompt_used: workbench.value.promptUsed || null
+    })
+    if (res.download_url) {
+      const link = document.createElement('a')
+      link.href = res.download_url
+      link.download = res.filename || 'txtovideo_export.zip'
+      link.click()
+      ElMessage.success('ZIP包导出成功')
+    } else {
+      ElMessage.warning('导出响应异常，请重试')
+    }
+  } catch (error) {
+    console.error('ZIP导出失败:', error)
+    ElMessage.error('ZIP导出失败，请稍后重试')
+  } finally {
+    zipExporting.value = false
+  }
 }
 
 function readQualityStatus() {

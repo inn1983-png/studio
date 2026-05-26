@@ -1,1420 +1,1197 @@
-是的，**必须加入“软件名称、LOGO、品牌信息、版权声明、默认域名、页面标题、安装包名称”这些改造项**。
-
-原因很简单：你不是只做一个技术分支，而是要把 `ai-moive-studio / AICON` 改成你自己的 **Txtovideo Studio**。原项目是 Apache-2.0 license，通常允许修改、分发和商用，但需要保留原版权与许可证声明；同时你要避免继续使用原项目的品牌标识、官网名、产品名，尤其未来如果你要给别人用或商用，这一步必须提前做。项目公开说明里也明确它当前品牌是 AICON，并定位为从剧本拆解、分镜、素材生成、视频合成到分发的一整套能力，所以品牌层要和功能改造一起规划。([GitHub][1])
-
-下面给你一份**全面规划版**。这不是一步步执行指令，而是给 Codex 作为总蓝图，让它自己按项目结构选择执行顺序。
-
----
-
-# ai-moive-studio → Txtovideo Studio 全面改造计划
-
-## 0. 改造定位
-
-原项目：
+下面这份你可以直接复制给 Codex / Claude Code 使用。
 
 ```text
-AICON / ai-moive-studio
-自然语言驱动的无限画布 AI 视频创作工作流
-```
+# Txtovideo Studio 长期改造规划
 
-目标项目：
+仓库：inn1983-png/studio
+当前定位：基于 ai-moive-studio / AICON 改造的小说短剧工作站
+最终目标：把它改造成一个面向个人生产的 AI 短剧工作台，用于小说/文案 → 剧本 → 角色/场景/道具 → 分镜 → 图片提示词 → 视频提示词 → 导出 → 接 ComfyUI / RunningHub / 剪映。
 
-```text
+重要原则：
+1. 不推倒重来。
+2. 不追求一开始就做成万能平台。
+3. 当前项目作为 Txtovideo Studio V1。
+4. 先跑通生产链路，再做画布增强。
+5. 所有改动必须小步提交，每次提交必须能启动、能构建、能回退。
+6. 不删除原有核心功能，先隐藏无关入口。
+7. 先做导出型工作台，再做自动生成型工作台。
+8. 先保证数据结构稳定，再接复杂模型和 ComfyUI。
+9. 不要把九宫格方案作为默认主线。
+10. 默认主线为：每个分镜生成一张独立图片提示词。
+
+==================================================
+一、项目总定位
+==================================================
+
+项目名称：
 Txtovideo Studio
-小说短剧自动生产工作站
-```
 
-核心定位：
-
-```text
-小说 / 文案
-→ 分集
-→ 剧本改编
-→ 角色/场景/道具资产库
-→ 分镜 JSON
-→ 批量分镜图
-→ 批量视频
-→ 配音字幕
-→ 粗剪导出
-```
-
-产品方向不是通用 AI 画布，而是垂直的：
-
-```text
-古风短剧 / 小说短剧 / 账号矩阵内容生产工具
-```
-
----
-
-# 1. 品牌与外观改造
-
-这个必须做，而且要提前做。
-
-## 1.1 软件名称替换
-
-需要把项目中所有面向用户的旧名称统一替换。
-
-重点搜索关键词：
-
-```text
-AICON
-AICon
-ai-moive-studio
-ai-movie-studio
-Movie Studio
-AICON Studio
-aicon-studio
-aicon-studio.com
-```
-
-目标替换为：
-
-```text
-Txtovideo Studio
-Txtovideo
-Txtovideo Studio Desktop
-Txtovideo Short Drama Studio
-```
-
-中文显示名可以用：
-
-```text
+项目描述：
 小说短剧工作站
-Txtovideo 短剧工作站
-古风短剧工作站
-```
 
-建议最终品牌：
+核心目标：
+将小说、短文案、剧情设定，转换为适合 AI 视频生产的结构化素材包。
 
-```text
-Txtovideo Studio
-```
-
-副标题：
-
-```text
-小说短剧自动生产工作站
-```
-
-不要叫“白菜AI替代版”或“Reframe替代版”，这些只用于内部参考，不要写进软件里。
-
----
-
-## 1.2 LOGO 替换
-
-需要检查并替换：
-
-```text
-favicon.ico
-logo.svg
-logo.png
-app-icon.png
-public/logo.*
-public/favicon.*
-frontend/src/assets/logo.*
-frontend/public/*
-electron/icon.*
-desktop/icon.*
-manifest icons
-PWA icons
-```
-
-如果项目有桌面端，还要改：
-
-```text
-Windows .ico
-macOS .icns
-Linux .png
-installer icon
-tray icon
-splash screen
-```
-
-LOGO 设计建议：
-
-```text
-主图形：文字 T + 电影胶片 / 分镜框 / 播放按钮
-主色：深黑 + 暖金 / 暗红
-气质：古风短剧、电影感、工具感
-避免：直接沿用 AICON 原图形
-```
-
-临时开发阶段可以先用纯文字 LOGO：
-
-```text
-TXT
-VIDEO
-STUDIO
-```
-
-等功能稳定后再生成正式 LOGO。
-
----
-
-## 1.3 页面标题与 Meta 信息
-
-需要改：
-
-```text
-index.html title
-manifest.json name
-manifest.json short_name
-package.json name
-package.json productName
-app description
-SEO description
-OpenGraph title
-OpenGraph image
-```
-
-建议：
-
-```json
-{
-  "name": "txtovideo-studio",
-  "productName": "Txtovideo Studio",
-  "description": "小说短剧自动生产工作站"
-}
-```
-
----
-
-## 1.4 默认官网、帮助链接、GitHub 链接
-
-原项目里如果有：
-
-```text
-aicon-studio.com
-GitHub 原仓库链接
-文档链接
-反馈链接
-Discord / 微信群 / 社群链接
-```
-
-要统一处理。
-
-建议做成配置项：
-
-```json
-{
-  "brand": {
-    "name": "Txtovideo Studio",
-    "website": "",
-    "docs_url": "",
-    "github_url": "",
-    "support_url": ""
-  }
-}
-```
-
-开发阶段可以留空，不要误导用户。
-
----
-
-## 1.5 版权与许可证声明
-
-这里要谨慎。
-因为原项目是 Apache-2.0，通常可以修改和分发，但你要保留原许可证、版权声明和 NOTICE 要求。项目 GitHub 页面显示其 license 为 Apache-2.0。([GitHub][1])
-
-建议保留：
-
-```text
-Original project: ai-moive-studio / AICON
-Original license: Apache License 2.0
-Modified project: Txtovideo Studio
-```
-
-新增文件：
-
-```text
-NOTICE
-THIRD_PARTY_NOTICES.md
-LICENSE
-LICENSE.original
-```
-
-软件“关于”页面建议写：
-
-```text
-Txtovideo Studio is a modified project based on ai-moive-studio / AICON.
-Original project is licensed under Apache License 2.0.
-```
-
-不要删除原作者版权声明。
-不要伪装成完全从零开发。
-
----
-
-# 2. 产品功能改造总目标
-
-最终目标不是简单换皮，而是形成你的专用工作站。
-
-## 2.1 从“无限画布 AI 创作”改为“小说短剧生产线”
-
-原来的核心可能是：
-
-```text
-画布节点
-自然语言 Agent
-文本 / 图片 / 视频节点编排
-```
-
-你的核心应该是：
-
-```text
-项目
-分集
-剧本
-资产库
-分镜
-批量任务
-视频片段
-成片导出
-```
-
----
-
-## 2.2 新增 Txtovideo 工作流
-
-核心流程：
-
-```text
-导入小说
-↓
-自动分章 / 分集
-↓
-剧本改编
-↓
-音频剧本 / 对白 OS 留白
-↓
-角色提取
-↓
-场景提取
-↓
-道具提取
-↓
-资产图生成
-↓
-分镜 JSON 生成
-↓
-分镜图批量生成
-↓
-视频片段批量生成
-↓
-配音 / 字幕
-↓
-粗剪导出
-```
-
----
-
-# 3. Provider 可替换架构
-
-这是整个项目最重要的改造。
-
-你不想重蹈白菜AI的问题：**API 被作者写死，不能换。**
-
-所以所有模型能力都要抽象成 Provider。
-
-## 3.1 Provider 类型
-
-```text
-LLMProvider
-ImageProvider
-VideoProvider
-TTSProvider
-ASRProvider
-ComfyUIProvider
-StorageProvider
-PublishProvider
-```
-
----
-
-## 3.2 LLM Provider
-
-支持：
-
-```text
-DeepSeek
-Kimi
-豆包
-Qwen
-OpenAI-compatible
-Ollama / 本地模型，后续预留
-```
-
-用途：
-
-```text
-小说分集
-剧本改编
-音频剧本
-资产提取
-分镜生成
-分镜修复
-图片提示词优化
-视频提示词优化
-质量评分
-```
-
----
-
-## 3.3 Image Provider
-
-优先支持：
-
-```text
-ComfyUI
-```
-
-预留：
-
-```text
-即梦
-Qwen Image
-Flux
-SDXL
-Seedream
-```
-
-用途：
-
-```text
-角色定妆图
-场景图
-道具图
-分镜图
-封面图
-```
-
----
-
-## 3.4 Video Provider
-
-优先支持：
-
-```text
-LTX2.3 via ComfyUI
-Wan via ComfyUI
-```
-
-预留：
-
-```text
-可灵
-Seedance
-Veo
-Runway
-Pika
-```
-
-用途：
-
-```text
-分镜图生视频
-首尾帧视频
-场景参考 + 角色参考视频
-```
-
----
-
-## 3.5 TTS Provider
-
-优先支持：
-
-```text
-EdgeTTS
-```
-
-预留：
-
-```text
-IndexTTS
-CosyVoice
-GPT-SoVITS
-Fish Audio
-Qwen TTS
-```
-
-用途：
-
-```text
-旁白
-角色对白
-OS
-音频驱动视频版本
-```
-
----
-
-# 4. 配置系统改造
-
-新增统一配置：
-
-```text
-config/providers.json
-config/brand.json
-config/txtovideo.json
-config/comfyui.json
-config/export.json
-```
-
----
-
-## 4.1 providers.json
-
-负责模型供应商。
-
-```json
-{
-  "default_llm": "deepseek",
-  "default_image": "comfyui",
-  "default_video": "ltx_comfyui",
-  "default_tts": "edge_tts",
-
-  "llm": {
-    "deepseek": {
-      "enabled": true,
-      "base_url": "https://api.deepseek.com",
-      "api_key_env": "DEEPSEEK_API_KEY",
-      "model": "deepseek-chat",
-      "compatible": "openai"
-    },
-    "kimi": {
-      "enabled": true,
-      "base_url": "https://api.moonshot.cn/v1",
-      "api_key_env": "KIMI_API_KEY",
-      "model": "kimi-k2-0905-preview",
-      "compatible": "openai"
-    },
-    "doubao": {
-      "enabled": true,
-      "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-      "api_key_env": "DOUBAO_API_KEY",
-      "model": "doubao-seed-1-6",
-      "compatible": "openai"
-    },
-    "qwen": {
-      "enabled": true,
-      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-      "api_key_env": "QWEN_API_KEY",
-      "model": "qwen-plus",
-      "compatible": "openai"
-    }
-  },
-
-  "image": {
-    "comfyui": {
-      "enabled": true,
-      "base_url": "http://127.0.0.1:8188",
-      "workflow_path": "workflows/comfyui_image_workflow.json",
-      "output_dir": "outputs/images"
-    }
-  },
-
-  "video": {
-    "ltx_comfyui": {
-      "enabled": true,
-      "base_url": "http://127.0.0.1:8188",
-      "workflow_path": "workflows/comfyui_ltx_video_workflow.json",
-      "output_dir": "outputs/videos"
-    },
-    "wan_comfyui": {
-      "enabled": false,
-      "base_url": "http://127.0.0.1:8188",
-      "workflow_path": "workflows/comfyui_wan_video_workflow.json",
-      "output_dir": "outputs/videos"
-    },
-    "kling": {
-      "enabled": false,
-      "base_url": "",
-      "api_key_env": "KLING_API_KEY",
-      "model": "kling-video"
-    },
-    "seedance": {
-      "enabled": false,
-      "base_url": "",
-      "api_key_env": "SEEDANCE_API_KEY",
-      "model": "seedance"
-    }
-  },
-
-  "tts": {
-    "edge_tts": {
-      "enabled": true
-    },
-    "index_tts": {
-      "enabled": false,
-      "base_url": "http://127.0.0.1:7860"
-    },
-    "cosyvoice": {
-      "enabled": false,
-      "base_url": "http://127.0.0.1:50000"
-    }
-  }
-}
-```
-
----
-
-## 4.2 brand.json
-
-负责软件名称、LOGO、关于页面。
-
-```json
-{
-  "app_name": "Txtovideo Studio",
-  "app_name_cn": "小说短剧工作站",
-  "short_name": "Txtovideo",
-  "description": "小说短剧自动生产工作站",
-  "slogan": "从小说到短剧成片的可控生产线",
-  "logo": "assets/brand/logo.svg",
-  "favicon": "assets/brand/favicon.ico",
-  "website": "",
-  "docs_url": "",
-  "support_url": "",
-  "copyright": "Copyright © 2026 Txtovideo Studio Contributors",
-  "based_on": {
-    "name": "ai-moive-studio / AICON",
-    "license": "Apache License 2.0",
-    "repository": "https://github.com/869413421/ai-moive-studio"
-  }
-}
-```
-
----
-
-## 4.3 txtovideo.json
-
-负责你的短剧规则。
-
-```json
-{
-  "default_style": "电视剧电影真人写实风格",
-  "default_era": "中国古代",
-  "default_language": "zh-CN",
-  "default_shot_duration": 6,
-  "episode_target_duration": 600,
-  "storyboard": {
-    "min_shots_for_1200_2500_chars": 50,
-    "max_shots_per_episode": 100,
-    "cap_must_be_original": true,
-    "theme_length": 2,
-    "first_shot_no_character": true,
-    "desc_field_name": "desc_promopt"
-  },
-  "negative_prompt": "现代物品，欧美人，卡通，动漫，3D渲染，游戏风，眼镜，手表，拉链，塑料，电灯，手机，电脑，汽车，西式建筑，低清晰度，畸形，多肢体，多人错误，性别错误"
-}
-```
-
----
-
-# 5. 数据结构改造
-
-## 5.1 项目结构
-
-```text
-projects/
-└── {project_id}/
-    ├── project.json
-    ├── novel/
-    │   └── source.txt
-    ├── scripts/
-    │   ├── episode_001_script.txt
-    │   └── episode_001_audio_script.txt
-    ├── assets/
-    │   ├── characters.json
-    │   ├── scenes.json
-    │   ├── props.json
-    │   ├── character_images/
-    │   ├── scene_images/
-    │   └── prop_images/
-    ├── storyboards/
-    │   ├── episode_001_shots.json
-    │   └── episode_001_shots_review.json
-    ├── prompts/
-    │   ├── script_prompt.md
-    │   ├── audio_script_prompt.md
-    │   ├── asset_extract_prompt.md
-    │   ├── storyboard_prompt.md
-    │   ├── image_prompt_template.md
-    │   └── video_prompt_template.md
-    ├── workflows/
-    │   ├── comfyui_image_workflow.json
-    │   └── comfyui_ltx_video_workflow.json
-    ├── outputs/
-    │   ├── images/
-    │   ├── videos/
-    │   ├── audio/
-    │   ├── subtitles/
-    │   └── final/
-    ├── tasks/
-    │   ├── task_queue.json
-    │   └── task_history.json
-    └── status.json
-```
-
----
-
-## 5.2 分镜 JSON 标准
-
-必须保留 `desc_promopt`。
-
-```json
-[
-  {
-    "shot_id": "ep001_s001",
-    "episode_id": "ep001",
-    "cap": "严格来自原文的连续文本片段",
-    "theme": "压迫",
-    "scene_id": "scene_001",
-    "characters": ["char_001"],
-    "props": ["prop_001"],
-    "desc_promopt": "电视剧电影真人写实风格，中国古代宋代绸缎庄内，昏黄油灯下，张横站在库房门口，神色阴沉。",
-    "negative_prompt": "现代物品，欧美人，卡通，动漫，3D渲染，游戏风，眼镜，手表，拉链，塑料，电灯，手机，电脑，汽车，西式建筑，低清晰度，畸形，多肢体，多人错误，性别错误",
-    "duration": 6,
-    "image_path": "",
-    "video_path": "",
-    "status": "pending"
-  }
-]
-```
-
----
-
-# 6. 资产库改造
-
-资产库是你超过普通 ai movie studio 的关键。
-
-## 6.1 角色库
-
-```json
-[
-  {
-    "id": "char_001",
-    "name": "张横",
-    "gender": "男",
-    "age": "三十五岁",
-    "identity": "宋代捕快",
-    "appearance": "方脸，浓眉，左颧骨黑痣，下颌短须",
-    "costume": "青黑色皂服，黑纱帽，腰挂铁尺令牌",
-    "personality": "沉稳，世故，压抑贪婪",
-    "reference_image": "assets/character_images/char_001.png",
-    "status": "pending"
-  }
-]
-```
-
-规则：
-
-```text
-同一角色只允许一个 ID
-性别一旦确认不得变化
-角色名必须来自角色库
-不在角色库的人统一叫“龙套”
-支持人工编辑
-支持替换参考图
-```
-
----
-
-## 6.2 场景库
-
-```json
-[
-  {
-    "id": "scene_001",
-    "name": "绸缎庄内",
-    "era": "宋代",
-    "description": "木梁、纸窗、雕花木门、布匹堆叠、昏黄油灯",
-    "reference_image": "assets/scene_images/scene_001.png",
-    "status": "pending"
-  }
-]
-```
-
-规则：
-
-```text
-同一场景复用同一个 ID
-不要重复生成相似场景
-场景必须带时代、光源、空间结构
-```
-
----
-
-## 6.3 道具库
-
-```json
-[
-  {
-    "id": "prop_001",
-    "name": "铁尺令牌",
-    "description": "宋代捕快腰间铁尺与令牌",
-    "reference_image": "assets/prop_images/prop_001.png",
-    "status": "pending"
-  }
-]
-```
-
-规则：
-
-```text
-道具必须符合古代语境
-禁止现代物品
-重要道具要单独生成参考图
-```
-
----
-
-# 7. 剧本与音频驱动改造
-
-你现在有两条线：
-
-```text
-Txtovideo 分镜图驱动
-音频驱动生成视频
-```
-
-所以项目里要预留双模式。
-
-## 7.1 Txtovideo 模式
-
-```text
-剧本 → 分镜 JSON → 分镜图 → 视频
-```
-
-适合：
-
-```text
-多参考图
-人物一致性
-场景控制
-LTX2.3 / Wan
-```
-
----
-
-## 7.2 Audio-driven 模式
-
-```text
-小说 → 完整音频剧本 → TTS → 按 12 秒切段 → 视频
-```
-
-音频脚本格式：
-
-```text
-【OS】……
-【角色名】……
-【留白】2秒
-【OS】……
-```
-
-这一块先预留，不要第一阶段就做完整。
-
----
-
-# 8. 任务队列与状态机
-
-这是解决你以前“返回 0 / 不等待 / 没有等图像生成完”的核心。
-
-## 8.1 任务类型
-
-```text
-create_project
-split_novel
-generate_script
-generate_audio_script
-extract_assets
-generate_storyboard
-validate_storyboard
-repair_storyboard
-generate_character_image
-generate_scene_image
-generate_prop_image
-generate_shot_image
-generate_shot_video
-generate_audio
-generate_subtitle
-export_rough_cut
-```
-
----
-
-## 8.2 任务状态
-
-```text
-pending
-running
-success
-failed
-retrying
-skipped
-cancelled
-```
-
----
-
-## 8.3 必须支持
-
-```text
-单镜重跑
-失败重跑
-整集断点续跑
-跳过已成功任务
-force 覆盖重跑
-错误日志保存
-输出文件真实存在检查
-```
-
----
-
-# 9. ComfyUI 接入计划
-
-ComfyUI 是后端执行器，不是用户界面。
-
-## 9.1 生图
-
-支持：
-
-```text
-角色定妆图
-场景图
-道具图
-分镜图
-封面图
-```
-
-必须能注入：
-
-```text
-正向提示词
-负向提示词
-参考图
-输出路径
-shot_id
-seed
-尺寸
-```
-
----
-
-## 9.2 视频
-
-优先：
-
-```text
-LTX2.3 ComfyUI workflow
-Wan ComfyUI workflow
-```
-
-必须能注入：
-
-```text
-首帧图
-尾帧图，可选
-视频提示词
-负向提示词
-时长
-帧率
-场景参考图
-角色参考图
-```
-
----
-
-## 9.3 等待机制
-
-不能只提交任务。
-
-必须：
-
-```text
-提交任务
-↓
-获得 prompt_id / task_id
-↓
-轮询队列
-↓
-检查历史
-↓
-确认文件落盘
-↓
-写回 image_path / video_path
-```
-
----
-
-# 10. 分镜工作台改造
-
-这是前端最重要页面。
-
-字段：
-
-```text
-shot_id
-cap
-theme
-scene_id
-characters
-props
-desc_promopt
-negative_prompt
-duration
-image_path
-video_path
-status
-error
-```
-
-功能：
-
-```text
-查看分镜
-编辑 desc_promopt
-编辑 negative_prompt
-替换 scene_id
-替换角色
-单镜生图
-单镜生视频
-重跑失败
-批量生成
-导出 JSON
-导入 JSON
-```
-
----
-
-# 11. 前端页面规划
-
-## 11.1 必须新增页面
-
-```text
-Txtovideo 首页
-项目列表
-项目详情
-小说导入
-剧本页
-音频剧本页
-资产库页
-分镜表页
-任务队列页
-输出结果页
-设置页
-关于页
-```
-
----
-
-## 11.2 最小可用按钮
-
-第一版只需要这些：
-
-```text
-新建项目
-导入小说
-生成剧本
-提取资产库
-生成分镜 JSON
-批量生成分镜图
-批量生成视频
-重跑失败项
-导出粗剪
-打开项目文件夹
-```
-
----
-
-# 12. 设置页规划
-
-必须有设置页，否则又会变成白菜AI那种不可控。
-
-## 12.1 模型设置
-
-```text
-LLM Provider
-Image Provider
-Video Provider
-TTS Provider
-API Key
-Base URL
-Model
-测试连接
-```
-
----
-
-## 12.2 ComfyUI 设置
-
-```text
-ComfyUI 地址
-图片工作流路径
-视频工作流路径
-输出目录
-测试连接
-```
-
----
-
-## 12.3 品牌设置
-
-开发版可以内置，后续可改：
-
-```text
-软件名称
-LOGO
-主题色
-关于页面
-文档链接
-```
-
----
-
-# 13. 导出与剪辑规划
-
-第一阶段只做粗剪，不做复杂剪映。
-
-## 13.1 粗剪导出
-
-```text
-按分镜顺序拼接视频
-可选添加音频
-可选添加字幕
-输出 mp4
-```
-
-## 13.2 后续增强
-
-```text
-剪映草稿导出
-CapCut XML
-Premiere XML
-时间线 JSON
-BGM
-音效
-字幕样式
-```
-
----
-
-# 14. 发布与打包规划
-
-如果项目要变成你自己的软件，需要处理：
-
-```text
-package name
-desktop app name
-installer name
-auto update channel
-Windows 安装包图标
-macOS app name
-Linux AppImage name
-版本号
-更新日志
-```
-
-建议版本命名：
-
-```text
-Txtovideo Studio v0.1.0-dev
-Txtovideo Studio v0.2.0-alpha
-Txtovideo Studio v0.5.0-beta
-Txtovideo Studio v1.0.0
-```
-
----
-
-# 15. 法务与合规计划
-
-必须做，尤其你要改 LOGO 和软件名。
-
-## 15.1 保留内容
-
-```text
-原 LICENSE
-原版权声明
-Apache-2.0 许可证文本
-第三方依赖声明
-```
-
-## 15.2 替换内容
-
-```text
-原软件名称
-原 LOGO
-原官网链接
-原品牌宣传语
-原截图
-原社群链接
-```
-
-## 15.3 新增内容
-
-```text
-NOTICE
-THIRD_PARTY_NOTICES.md
-About 页面
-修改说明
-```
-
----
-
-# 16. Codex 总规划指令
-
-你可以直接把下面这段给 Codex：
-
-```text
-我要把 GitHub 项目 https://github.com/869413421/ai-moive-studio 改造成 Txtovideo Studio。
-
-这不是简单换模型，也不是简单换皮，而是全面改造成“小说短剧自动生产工作站”。
-
-请你先整体分析项目，然后自行制定分步执行方案。不要一次性重写项目，要按风险从低到高逐步改造。
-
-总目标：
-1. 保留原项目可用功能。
-2. 新增 Txtovideo Studio 模式。
-3. 将产品定位从通用 AI 视频画布，扩展/改造成小说短剧生产线。
-4. 所有 API 都必须可替换。
-5. 支持 DeepSeek、Kimi、豆包、Qwen。
-6. 支持本地 ComfyUI 生图。
-7. 支持本地 ComfyUI LTX2.3 视频生成。
-8. 预留 Wan、可灵、Seedance Provider。
-9. 支持 EdgeTTS，预留 IndexTTS、CosyVoice、GPT-SoVITS。
-10. 支持项目级资产库。
-11. 支持角色、场景、道具参考图。
-12. 支持分镜 JSON。
-13. 支持任务队列、失败重跑、断点续跑。
-14. 支持单镜重跑、整集重跑失败项。
-15. 支持粗剪导出。
-16. 支持品牌替换：软件名、LOGO、页面标题、关于页面、manifest、安装包名称。
-17. 保留原项目 Apache-2.0 license、原作者版权声明和第三方依赖声明。
-18. 不要删除原项目版权信息，不要伪装成完全原创。
-19. 不要一开始大改前端。
-20. 每次只改一个模块，并给出测试方式。
-
-品牌目标：
-- 新软件名：Txtovideo Studio
-- 中文名：小说短剧工作站
-- 副标题：从小说到短剧成片的可控生产线
-- 不再使用 AICON 作为用户可见产品名
-- 不再使用原项目 LOGO
-- 保留 About 页面中的原项目来源和 Apache-2.0 license 声明
-
-请检查并规划替换：
-1. package.json name/productName/description
-2. 前端页面 title
-3. favicon
-4. logo
-5. manifest.json
-6. app icon
-7. desktop/electron 图标，如果有
-8. about 页面
-9. docs/help/support 链接
-10. 默认官网链接
-11. README 中的产品名称
-12. 安装包名称
-13. 更新日志名称
-14. 环境变量前缀，如果有必要
-
-Txtovideo 核心流程：
-小说/文案
-→ 分集
+主流程：
+小说/文案输入
 → 剧本改编
-→ 音频剧本
-→ 角色/场景/道具资产库
-→ 资产图生成
-→ 分镜 JSON
-→ 分镜图批量生成
-→ 视频片段批量生成
-→ 配音字幕
-→ 粗剪导出
+→ 角色资产提取
+→ 场景资产提取
+→ 道具资产提取
+→ 分镜 JSON 生成
+→ 图片提示词生成
+→ 视频提示词生成
+→ 质量评分与修复
+→ 导出素材包
+→ 外部 ComfyUI / RunningHub / 剪映 使用
+
+V1 不追求：
+- 自动全链路出视频
+- 多人协作
+- 云端商业 SaaS
+- 复杂权限系统
+- 自动发布平台
+- 复杂视频剪辑
+- 完整素材市场
+- 通用 AI Agent 平台
+
+V1 只追求：
+- 输入文本
+- 生成结构化内容
+- 保证格式稳定
+- 导出可用文件
+- 支持用户手动介入和修正
+- 方便后续接入 ComfyUI / RunningHub / 剪映
+
+==================================================
+二、阶段总览
+==================================================
+
+Phase 0：安全整理与品牌收口
+Phase 1：短剧业务数据结构固化
+Phase 2：短剧主流程 MVP
+Phase 3：提示词模板体系重建
+Phase 4：导出中心
+Phase 5：任务状态机与步骤重试
+Phase 6：画布工作台收口
+Phase 7：ComfyUI / RunningHub 对接
+Phase 8：音频驱动版本
+Phase 9：质量评分与自动修复
+Phase 10：桌面版与本地部署优化
+Phase 11：生产效率优化
+Phase 12：长期 V2 画布化重构评估
+
+每个 Phase 必须独立完成，不要跨阶段乱改。
+
+==================================================
+Phase 0：安全整理与品牌收口
+==================================================
+
+目标：
+把当前仓库从 AICON / AICG / ai-moive-studio 的泛化描述，收口成 Txtovideo Studio。
+
+不要改核心业务逻辑。
+不要删除数据库模型。
+不要删除后端路由。
+不要删除 Canvas。
+不要删除 Movie 相关服务。
+只做品牌、入口、说明和结构收口。
+
+任务：
+
+1. 统一用户可见品牌
+- 所有用户可见名称统一为：Txtovideo Studio
+- 中文描述统一为：小说短剧工作站
+- 清理前端页面中的 AICON、AICG、Movie Studio 泛化宣传文案
+- 清理 README 中的旧站点、中转站、招聘、泛平台宣传内容
+- package.json 中保留 txtovideo-studio
+- Electron productName 保留 Txtovideo Studio
+
+2. README 重写
+README 内容改为：
+- 项目简介
+- 当前定位
+- V1 主流程
+- 技术栈
+- 本地启动方式
+- Docker 启动方式
+- 当前已完成功能
+- 当前未完成功能
+- 开发路线图
+- License
+
+README 必须明确：
+本项目当前是个人生产工具/实验版本，不承诺商用稳定。
+
+3. 隐藏无关入口
+前端主导航 V1 只保留：
+- 项目管理
+- 短剧工作台
+- 画布工作台
+- API 密钥设置
+- 导出中心
+- 系统设置
+
+以下功能先隐藏到“实验功能”：
+- Bilibili 发布
+- Distribution
+- 复杂仪表盘
+- 非短剧相关内容分发
+- 过于泛化的内容平台入口
+
+4. License 一致性检查
+- 根目录 LICENSE 使用 Apache License 2.0
+- README 中写 Apache License 2.0
+- backend/pyproject.toml 中 license 信息改成 Apache License 2.0
+- 不要出现 MIT 与 Apache 混用
+
+5. 构建检查
+完成后必须执行：
+- frontend: npm run build
+- backend: uv run python -m compileall src
+- backend: uv run alembic current 或确保迁移配置不被破坏
+
+验收标准：
+- 打开前端后用户看到的是 Txtovideo Studio
+- 主入口清晰
+- README 不再像通用 AI 平台宣传页
+- 原有后端接口不被破坏
+
+==================================================
+Phase 1：短剧业务数据结构固化
+==================================================
+
+目标：
+新增 Txtovideo 专用业务数据结构，不直接破坏旧 Movie Studio 数据结构。
+
+新增数据概念：
+1. ShortDramaProject
+2. ScriptVersion
+3. CharacterAsset
+4. SceneAsset
+5. PropAsset
+6. StoryboardShot
+7. ImagePrompt
+8. VideoPrompt
+9. QualityReport
+10. ExportPackage
+
+如果当前已有类似表，可以复用，但必须新增 Txtovideo 专用字段或模式标识，不要强行覆盖旧逻辑。
 
 核心数据结构：
-1. project.json
-2. characters.json
-3. scenes.json
-4. props.json
-5. episode_001_script.txt
-6. episode_001_audio_script.txt
-7. episode_001_shots.json
-8. status.json
-9. task_queue.json
-10. task_history.json
 
-分镜 JSON 必须包含：
-- shot_id
-- episode_id
-- cap
-- theme
-- scene_id
-- characters
-- props
-- desc_promopt
-- negative_prompt
-- duration
-- image_path
-- video_path
+1. 短剧项目 ShortDramaProject
+字段建议：
+- id
+- project_id
+- title
+- source_text
+- source_type: novel / short_text / script
+- era
+- style
+- aspect_ratio
+- target_platform: douyin / shipinhao / bilibili / custom
+- workflow_mode: txtovideo
+- created_at
+- updated_at
+
+2. 剧本版本 ScriptVersion
+字段建议：
+- id
+- project_id
+- version
+- script_text
+- format_type: os_dialogue_blank
+- prompt_used
+- model_used
 - status
+- created_at
 
-注意：字段名必须是 desc_promopt，不要改成 desc_prompt。
+剧本格式必须支持：
+【OS】
+【角色名】
+【留白】
 
-分镜规则：
-1. cap 必须严格来自原文连续文本。
-2. cap 不允许改写、删减、重排。
-3. theme 必须是 2 个汉字。
-4. 第一镜默认只出背景，不出现人物，除非原文强制要求。
-5. 角色必须来自 characters.json。
-6. 不在角色库的人统一称为“龙套”。
-7. 场景必须来自 scenes.json。
-8. 道具必须来自 props.json。
-9. 性别必须与角色库一致。
-10. 同一场景内光源、服装、人物位置要尽量连续。
-11. desc_promopt 使用电视剧电影真人写实风格。
-12. 必须避免欧美人、现代物品、卡通、动漫、3D渲染、游戏风。
-13. 文案 1200–2500 字时，分镜数量建议 50–100 条。
-14. 如果超过 100 条，自动提示分集或合并。
-15. 如果低于 50 条，检查是否切分过粗。
+3. 角色资产 CharacterAsset
+字段建议：
+- id
+- project_id
+- name
+- gender
+- age
+- identity
+- appearance
+- costume
+- personality
+- relation
+- stable_prompt
+- negative_prompt
+- reference_image_url
+- created_at
 
-默认负向提示词：
-现代物品，欧美人，卡通，动漫，3D渲染，游戏风，眼镜，手表，拉链，塑料，电灯，手机，电脑，汽车，西式建筑，低清晰度，畸形，多肢体，多人错误，性别错误
+强规则：
+- 性别必须稳定
+- 同一角色姓名不得重复创建多个冲突设定
+- 角色名必须可被分镜引用
+- 未识别角色统一称为“龙套”
 
-Provider 架构：
-1. BaseProvider
-2. LLMProvider
-3. ImageProvider
-4. VideoProvider
-5. TTSProvider
-6. ComfyUIProvider
-7. ProviderFactory
+4. 场景资产 SceneAsset
+字段建议：
+- id
+- project_id
+- name
+- era
+- location_type
+- description
+- lighting
+- mood
+- props
+- stable_prompt
+- negative_prompt
+- reference_image_url
+- created_at
 
-配置文件：
-1. config/providers.json
-2. config/brand.json
-3. config/txtovideo.json
-4. config/comfyui.json
-5. config/export.json
+5. 道具资产 PropAsset
+字段建议：
+- id
+- project_id
+- name
+- type
+- era
+- description
+- visual_prompt
+- negative_prompt
+- created_at
 
-任务队列必须支持：
+6. 分镜 StoryboardShot
+字段必须支持：
+- id
+- project_id
+- order_index
+- theme
+- cap
+- desc_promopt
+- characters
+- scene
+- props
+- camera
+- duration_seconds
+- status
+- created_at
+
+注意：
+字段名必须是 desc_promopt，不要自动纠正成 desc_prompt。
+这是项目兼容字段，必须保留。
+
+7. 图片提示词 ImagePrompt
+字段建议：
+- id
+- project_id
+- shot_id
+- positive_prompt
+- negative_prompt
+- model_hint
+- aspect_ratio
+- seed
+- reference_assets
+- created_at
+
+8. 视频提示词 VideoPrompt
+字段建议：
+- id
+- project_id
+- shot_id
+- engine: ltx / seedance / runninghub / custom
+- duration_seconds
+- prompt
+- camera_motion
+- character_motion
+- scene_motion
+- avoid
+- first_frame_ref
+- last_frame_ref
+- created_at
+
+9. 质量评分 QualityReport
+字段建议：
+- id
+- project_id
+- target_type: script / character / scene / storyboard / image_prompt / video_prompt
+- target_id
+- score
+- issues
+- suggestions
+- fixed_output
+- created_at
+
+10. 导出包 ExportPackage
+字段建议：
+- id
+- project_id
+- package_type
+- file_path
+- manifest
+- created_at
+
+验收标准：
+- 不破坏旧数据结构
+- 新增 Txtovideo 模式
+- 后续所有短剧功能可以围绕这些结构开发
+- 数据结构文档写入 docs/txtovideo-data-schema.md
+
+==================================================
+Phase 2：短剧主流程 MVP
+==================================================
+
+目标：
+先做一个不依赖复杂画布的“线性短剧工作台”。
+
+页面路径建议：
+/txtovideo/projects/:projectId/workbench
+
+页面布局：
+左侧：步骤导航
+中间：当前步骤编辑区
+右侧：结果预览 / JSON 预览 / 操作按钮
+
+步骤如下：
+1. 原文输入
+2. 剧本改编
+3. 角色资产
+4. 场景资产
+5. 道具资产
+6. 分镜生成
+7. 图片提示词
+8. 视频提示词
+9. 质量检查
+10. 导出
+
+每一步都必须：
+- 可查看输入
+- 可查看输出
+- 可手动编辑输出
+- 可重新生成
+- 可保存
+- 可进入下一步
+
+不要一开始就自动跑完全流程。
+V1 默认用户手动点击每一步运行。
+
+具体任务：
+
+1. 新建短剧工作台入口
+- 项目详情页增加按钮：进入短剧工作台
+- 导航增加：短剧工作台
+
+2. 原文输入页
+支持：
+- 粘贴文本
+- 上传 TXT
+- 显示字数
+- 显示预计分镜数量
+- 设置时代
+- 设置风格
+- 设置目标平台
+- 设置画面比例
+
+默认参数：
+- 画面比例：9:16
+- 风格：古风真人写实
+- 平台：抖音/视频号
+- 单镜头时长：8-12 秒
+
+3. 剧本改编页
+输出格式：
+【OS】
+【角色名】
+【留白】
+
+要求：
+- 支持一键生成
+- 支持手动编辑
+- 支持保存版本
+- 支持对比版本
+
+4. 角色资产页
+功能：
+- 从剧本提取角色
+- 显示角色卡片
+- 支持编辑角色名称、性别、年龄、身份、外貌、服装
+- 支持生成角色定妆照提示词
+- 支持锁定角色
+
+5. 场景资产页
+功能：
+- 从剧本提取场景
+- 显示场景卡片
+- 支持编辑场景名称、时代、光线、氛围、道具
+- 支持生成场景图提示词
+- 支持锁定场景
+
+6. 道具资产页
+功能：
+- 提取重要道具
+- 支持编辑
+- 支持标记是否必须出现在画面中
+
+7. 分镜生成页
+输出数组，每项必须包含：
+{
+  "theme": "两个汉字",
+  "cap": "原文连续片段",
+  "desc_promopt": "画面描述"
+}
+
+要求：
+- 允许手动编辑 JSON
+- 提供表格视图
+- 提供逐条预览
+- 检查 cap 是否为空
+- 检查 desc_promopt 是否为空
+- 检查 theme 是否为两个汉字
+
+8. 图片提示词页
+每个分镜生成：
+- positive_prompt
+- negative_prompt
+
+默认负向词必须包含：
+现代物品、现代建筑、现代服装、手机、电脑、电灯、眼镜、手表、拉链、塑料、欧美人、卡通、动漫、3D渲染、游戏风、低质量、模糊、畸形、多肢体、多人错误、性别错误
+
+9. 视频提示词页
+每个分镜生成：
+- duration_seconds
+- camera_motion
+- character_motion
+- scene_motion
+- prompt
+- avoid
+
+LTX 默认控制原则：
+- 动作轻
+- 镜头慢
+- 角色不大幅移动
+- 场景不跳变
+- 光线不突变
+- 避免快速转身
+- 避免多人复杂交互
+- 避免人物出画再入画
+
+10. 导出页
+导出 ZIP 包，内容见 Phase 4。
+
+验收标准：
+- 用户可以从一段文本完整走到导出
+- 每一步可以手动保存
+- 不要求真实生成图片/视频
+- 重点是结构化内容稳定
+
+==================================================
+Phase 3：提示词模板体系重建
+==================================================
+
+目标：
+把提示词从散落文档，升级成系统内可维护的模板。
+
+目录建议：
+backend/src/prompts/txtovideo/
+backend/docs/prompts/txtovideo/
+
+模板文件：
+1. script_adapt_v1.md
+2. character_extract_v1.md
+3. scene_extract_v1.md
+4. prop_extract_v1.md
+5. storyboard_cap_desc_promopt_v1.md
+6. image_prompt_v1.md
+7. video_prompt_ltx_v1.md
+8. video_prompt_seedance_v1.md
+9. quality_score_v1.md
+10. rewrite_fix_v1.md
+
+提示词必须支持变量：
+- source_text
+- script_text
+- characters
+- scenes
+- props
+- era
+- style
+- platform
+- aspect_ratio
+- shot_count_min
+- shot_count_max
+- duration_seconds
+- negative_rules
+
+核心提示词规则：
+
+1. 剧本改编
+输出：
+【OS】
+【角色名】
+【留白】
+
+风格：
+- 短句
+- 口播友好
+- 电视剧感
+- 节奏清晰
+- 对白尊重原文
+- 不要过度文艺
+- 不要大段解释
+
+2. 角色提取
+必须输出 JSON。
+必须明确：
+- name
+- gender
+- age
+- identity
+- appearance
+- costume
+- stable_prompt
+
+强规则：
+- 一旦确认性别，后续必须一致
+- 主角不能被错误生成年龄
+- 不能把一个人拆成两个人
+
+3. 场景提取
+必须输出 JSON。
+必须强调：
+- 中国古代语境
+- 场景可视化
+- 光线
+- 道具
+- 空间结构
+- 时代一致性
+
+4. 分镜生成
+必须输出：
+[
+  {
+    "theme": "两个汉字",
+    "cap": "原文连续片段",
+    "desc_promopt": "画面描述"
+  }
+]
+
+硬规则：
+- cap 必须严格取自原文连续文本
+- 不允许改写 cap
+- 不允许重组 cap
+- 不允许创造剧情
+- 第一个分镜默认不出现人物
+- 角色必须来自角色库
+- 未识别人物统一称为“龙套”
+- 按文本顺序生成
+- 1200-2500 字文案，分镜数量 50-100
+- desc_promopt 要能直接生成图像
+
+5. 图片提示词
+正向风格默认：
+电视剧电影真人写实风格，东方人物，中国古代服饰，真实纹理，自然颜色，电影级摄影，浅景深，真实光照，古代建筑，画面清晰，情绪明确。
+
+负向默认：
+现代、21世纪、现代建筑、现代服饰、手机、电脑、电灯、眼镜、手表、拉链、塑料、欧美人、卡通、动漫、3D、游戏风、低质、模糊、畸形、多肢体、多人错误、性别错误。
+
+6. 视频提示词
+默认适配 LTX：
+- 保持人物身份一致
+- 保持场景一致
+- 保持服装一致
+- 镜头缓慢推进/轻微横移
+- 人物轻微动作
+- 烛火/衣袖/发丝/雪/雨/尘埃可轻微运动
+- 禁止快速动作
+- 禁止跳切
+- 禁止换脸
+- 禁止场景突变
+
+验收标准：
+- 所有模板集中管理
+- 前端可选择模板版本
+- 生成结果保存 prompt_used
+- 方便后续迭代 V2/V3/V4
+
+==================================================
+Phase 4：导出中心
+==================================================
+
+目标：
+先让系统成为“素材包生产器”。
+
+导出 ZIP 内容：
+
+1. project_manifest.json
+包含：
+- project_id
+- title
+- created_at
+- era
+- style
+- platform
+- aspect_ratio
+- workflow_version
+- model_config
+- prompt_template_versions
+
+2. source.txt
+原文
+
+3. script.txt
+剧本
+
+4. characters.json
+角色资产
+
+5. scenes.json
+场景资产
+
+6. props.json
+道具资产
+
+7. storyboard.json
+分镜数组：
+[
+  {
+    "theme": "",
+    "cap": "",
+    "desc_promopt": ""
+  }
+]
+
+8. image_prompts.json
+图片提示词
+
+9. video_prompts_ltx.json
+LTX 视频提示词
+
+10. video_prompts_runninghub.json
+预留 RunningHub 格式
+
+11. subtitles.srt
+字幕文件
+
+12. jianying_import_notes.txt
+剪映导入说明
+
+13. comfyui_notes.txt
+ComfyUI 使用说明
+
+导出功能要求：
+- 项目详情页有“导出 Txtovideo 包”
+- 短剧工作台最后一步有“导出”
+- 支持选择导出内容
+- 支持只导出 storyboard.json
+- 支持只导出 subtitles.srt
+- 支持只导出 image_prompts.json
+- 支持只导出 video_prompts.json
+
+验收标准：
+- ZIP 可以下载
+- JSON 格式合法
+- 中文不乱码
+- SRT 时间轴格式正确
+- 文件名包含项目名和日期
+
+==================================================
+Phase 5：任务状态机与步骤重试
+==================================================
+
+目标：
+解决长任务执行顺序混乱、上游未完成下游先跑、失败后无法定位的问题。
+
+新增统一步骤状态：
 - pending
 - running
 - success
 - failed
-- retrying
 - skipped
-- cancelled
+- waiting_dependency
 
-任务必须支持：
-1. 提交任务
-2. 轮询任务
-3. 检查输出文件真实存在
-4. 写回 image_path / video_path
-5. 记录 error
-6. 单镜重跑
-7. 重跑 failed
-8. 整集断点续跑
-9. force=true 覆盖重跑
-10. 跳过已成功项
+每个步骤保存：
+- step_name
+- input_hash
+- input_snapshot
+- output_snapshot
+- status
+- error_message
+- started_at
+- finished_at
+- retry_count
+- model_used
+- prompt_used
 
-ComfyUI 接入要求：
-1. 只作为后端执行器。
-2. 不暴露节点给普通用户。
-3. 支持图片 workflow。
-4. 支持 LTX2.3 视频 workflow。
-5. 支持注入正向提示词、负向提示词、参考图、输出路径。
-6. 必须等待任务完成。
-7. 必须检查文件是否真实落盘。
-8. 失败要写入任务日志。
+短剧流程步骤：
+1. script_adapt
+2. character_extract
+3. scene_extract
+4. prop_extract
+5. storyboard_generate
+6. image_prompt_generate
+7. video_prompt_generate
+8. quality_score
+9. export_package
 
-前端规划：
-新增 Txtovideo Studio 工作台页面，但不要第一步大改前端。
-最终需要：
-1. 项目列表
-2. 项目详情
-3. 小说导入
-4. 剧本页
-5. 音频剧本页
-6. 资产库页
-7. 分镜表页
-8. 任务队列页
-9. 输出结果页
-10. 设置页
-11. 关于页
+执行规则：
+- 下游必须等待上游 success
+- 上游 failed 时下游进入 waiting_dependency
+- 用户可以重试当前步骤
+- 用户修改上游内容后，下游标记为 stale
+- stale 的下游需要提示用户重新生成
 
-最小按钮：
-1. 新建项目
-2. 导入小说
-3. 生成剧本
-4. 提取资产库
-5. 生成分镜 JSON
-6. 批量生成分镜图
-7. 批量生成视频
-8. 重跑失败项
-9. 导出粗剪
-10. 打开项目文件夹
+前端显示：
+- 每一步状态图标
+- 成功/失败/等待/过期
+- 错误信息可展开
+- 支持重试按钮
 
-请你先输出完整改造方案和推荐执行顺序。
-然后从低风险部分开始执行：
-优先顺序建议：
-1. 项目体检
-2. 品牌信息定位与可替换配置规划
-3. Provider 骨架
-4. LLMProvider 最小接入
-5. Txtovideo 项目目录
-6. 资产库
-7. 分镜 JSON
-8. ComfyUI 生图
-9. LTX2.3 视频
-10. 任务队列完善
-11. 音频字幕粗剪
-12. 前端工作台
-13. 打包与安装包品牌替换
+验收标准：
+- 不会出现图像没生成完就跑视频提示词的问题
+- 每一步失败能看到错误
+- 每一步能独立重试
 
-每次修改后必须输出：
-【本次完成】
-【修改文件】
-【新增文件】
-【核心逻辑】
-【测试方法】
-【运行命令】
-【风险点】
-【下一步建议】
+==================================================
+Phase 6：画布工作台收口
+==================================================
 
-现在不要直接全量修改。
-先分析项目结构、现有功能、品牌信息位置、Provider 插入点、任务队列位置，然后给出可执行的阶段计划。
+目标：
+不是重做画布，而是把已有 Canvas 收口成短剧可用。
+
+Canvas V1 不做复杂自动执行。
+只做：
+- 展示短剧流程
+- 展示节点关系
+- 允许从工作台结果生成节点
+- 允许用户查看每个节点内容
+
+短剧节点类型：
+1. SourceTextNode
+2. ScriptNode
+3. CharacterAssetNode
+4. SceneAssetNode
+5. PropAssetNode
+6. StoryboardNode
+7. ImagePromptNode
+8. VideoPromptNode
+9. QualityScoreNode
+10. ExportNode
+
+节点功能：
+- 显示摘要
+- 点击查看详情
+- 支持跳转到对应工作台步骤
+- 支持显示状态
+- 支持手动刷新
+
+暂时不要做：
+- 复杂拖拽生成逻辑
+- 节点自动执行全链路
+- 多分支复杂依赖
+- 自动调用 ComfyUI
+
+验收标准：
+- 画布能看到短剧流程
+- 节点状态和线性工作台一致
+- 不影响原有 Canvas 功能
+
+==================================================
+Phase 7：ComfyUI / RunningHub 对接
+==================================================
+
+目标：
+在导出稳定后，再做外部生成对接。
+
+优先级：
+1. RunningHub
+2. ComfyUI HTTP API
+3. 本地文件夹监听
+4. 其他视频模型
+
+不要一开始就深度绑定。
+先做 Provider 抽象。
+
+Provider 配置结构：
+- provider_id
+- display_name
+- type: llm / image / video / workflow
+- base_url
+- api_key
+- models
+- enabled
+- default_params
+
+RunningHub 对接：
+- 保存 API Key
+- 保存 workflow_id
+- 支持上传图片
+- 支持提交任务
+- 支持轮询状态
+- 支持下载结果
+- 支持失败重试
+
+ComfyUI 对接：
+- 配置 ComfyUI 地址
+- 支持上传图片
+- 支持提交 workflow JSON
+- 支持读取历史结果
+- 支持下载输出文件
+
+第一版只做：
+- 手动选择若干分镜
+- 手动提交生成
+- 显示任务状态
+- 下载结果
+
+不要做：
+- 全自动 100 张图批量生成
+- 自动视频合成
+- 自动评分重跑
+
+验收标准：
+- 能提交一条图片生成任务
+- 能提交一条视频生成任务
+- 能显示任务状态
+- 能下载结果
+- 失败时不影响项目数据
+
+==================================================
+Phase 8：音频驱动版本
+==================================================
+
+目标：
+支持用户当前的音频驱动视频流程。
+
+音频驱动模式：
+- 一章文本生成一段完整音频
+- 工作流按 12 秒切段
+- 每段生成对应视频
+- 最后拼接成完整 MV/短剧片段
+
+新增模式：
+workflow_mode:
+- txtovideo_storyboard
+- audio_driven_video
+
+音频驱动流程：
+1. 输入文本
+2. 生成 OS/对白/留白剧本
+3. 生成完整音频文本
+4. 生成 TTS / 外部音频
+5. 上传音频
+6. 自动切分 12 秒段落
+7. 为每段生成画面描述
+8. 为每段生成图片提示词
+9. 为每段生成视频提示词
+10. 导出音频驱动包
+
+音频驱动导出：
+- audio_script.txt
+- audio_segments.json
+- segment_image_prompts.json
+- segment_video_prompts.json
+- subtitles.srt
+- manifest.json
+
+重要规则：
+- 不额外强制复杂时间轴
+- 以音频切段为主
+- 每段默认 12 秒
+- 支持用户调整每段文本和提示词
+- 支持 OS / 对白 / 留白结构
+
+验收标准：
+- 用户可以上传一段音频
+- 系统能按 12 秒切段
+- 每段能生成对应视频提示词
+- 能导出给现有工作流使用
+
+==================================================
+Phase 9：质量评分与自动修复
+==================================================
+
+目标：
+先做文本和 JSON 层面的评分，不直接做视频评分。
+
+评分对象：
+1. 剧本
+2. 角色资产
+3. 场景资产
+4. 分镜 JSON
+5. 图片提示词
+6. 视频提示词
+
+评分维度：
+
+剧本评分：
+- 是否保留原文核心信息
+- 是否有 OS / 对白 / 留白
+- 是否口播友好
+- 是否节奏清晰
+- 是否过度改写
+
+角色评分：
+- 是否性别明确
+- 是否年龄合理
+- 是否服装符合时代
+- 是否存在角色重复
+- 是否存在现代元素
+
+场景评分：
+- 是否符合时代
+- 是否可视化
+- 是否光线明确
+- 是否道具合理
+- 是否现代元素污染
+
+分镜评分：
+- cap 是否连续取自原文
+- theme 是否两个汉字
+- desc_promopt 是否为空
+- 角色是否来自角色库
+- 第一镜是否避免人物
+- 数量是否符合要求
+
+图片提示词评分：
+- 是否真人写实
+- 是否古风
+- 是否避免现代元素
+- 是否避免欧美人
+- 是否避免卡通/3D
+- 人数是否明确
+- 性别是否明确
+
+视频提示词评分：
+- 是否动作过大
+- 是否镜头过快
+- 是否容易导致换脸
+- 是否场景跳变
+- 是否符合 LTX 稳定策略
+
+自动修复：
+- 评分低于阈值时，生成修复建议
+- 用户点击“应用修复”
+- 保留修复前版本
+- 不自动覆盖用户手动编辑内容
+
+验收标准：
+- 能对 storyboard.json 打分
+- 能指出具体第几条有问题
+- 能生成修复建议
+- 能应用修复并保存新版本
+
+==================================================
+Phase 10：桌面版与本地部署优化
+==================================================
+
+目标：
+让用户可以像桌面软件一样使用。
+
+当前已有 Electron 相关配置，继续完善。
+
+桌面版要求：
+- 一键启动前端
+- 检测后端是否运行
+- 检测 Docker 服务
+- 显示本地服务状态
+- 打开本地工作台
+- 支持选择工作目录
+- 支持导出文件到指定目录
+
+不要一开始把 PostgreSQL/Redis/MinIO 全部内嵌进 Electron。
+先采用：
+- Docker Compose 管理后端依赖
+- Electron 只作为桌面壳
+- 后续再考虑简化部署
+
+本地部署优化：
+- 提供 start-windows.bat
+- 提供 start-linux.sh
+- 提供 start-mac.sh
+- 提供 docker-compose.local.yml
+- 提供 .env.local.example
+
+验收标准：
+- Windows 用户能按文档启动
+- 前端能访问后端
+- 登录/项目/导出正常
+- Electron 能打开页面
+
+==================================================
+Phase 11：生产效率优化
+==================================================
+
+目标：
+真正让用户每天能生产内容。
+
+优化方向：
+
+1. 模板预设
+新增预设：
+- 古代逆袭短剧
+- 捕快题材
+- 县令师爷题材
+- 女性觉醒题材
+- 民间奇案题材
+- 古风歌曲 MV
+- 图文说
+- 音频驱动 MV
+
+每个预设包含：
+- era
+- style
+- negative_prompt
+- script prompt
+- storyboard rules
+- video prompt rules
+
+2. 批量处理
+支持：
+- 一次导入多篇短文案
+- 批量生成剧本
+- 批量生成分镜
+- 批量导出
+
+3. 版本管理
+每次生成保留版本：
+- v1
+- v2
+- v3
+支持回滚。
+
+4. 人工审稿体验
+- JSON 表格编辑
+- 一键复制某条提示词
+- 一键复制全部提示词
+- 按分镜查看角色/场景/道具
+- 搜索分镜
+- 标记问题分镜
+
+5. 字幕导出
+支持：
+- SRT
+- ASS
+- 剪映文本导入格式
+- 歌词字幕 LRC
+
+验收标准：
+- 用户可以更快编辑
+- 不需要每次复制粘贴一大堆 JSON
+- 可以稳定导出给剪映/ComfyUI
+
+==================================================
+Phase 12：长期 V2 画布化重构评估
+==================================================
+
+目标：
+等 V1 生产链路稳定后，再决定是否升级为真正画布式工作台。
+
+评估对象：
+1. 当前 studio 自带 Canvas
+2. T8-penguin-canvas
+3. 自研 React Flow 画布
+4. 继续 Vue + Konva / 当前 Canvas
+
+评估时间：
+只有当 V1 满足以下条件后才评估：
+- 至少完整生产 10 个短剧项目
+- 导出流程稳定
+- 分镜 JSON 稳定
+- 图片提示词稳定
+- 视频提示词稳定
+- 用户明确知道哪些步骤需要画布化
+
+V2 目标：
+- 画布成为主入口
+- 每个节点可运行
+- 节点有状态
+- 节点可重试
+- 节点可引用上游结果
+- 支持多分支版本
+- 支持人工审阅节点
+- 支持外部生成节点
+
+V2 不在当前阶段开发。
+
+==================================================
+三、开发纪律
+==================================================
+
+每次让 Codex 改代码，必须遵守：
+
+1. 一次只做一个阶段中的一个小任务。
+2. 修改前先阅读相关文件。
+3. 不允许大面积重写无关文件。
+4. 不允许删除现有功能代码，除非明确要求。
+5. 不允许修改数据库迁移历史，新增迁移必须新建版本。
+6. 前端改动后必须 npm run build。
+7. 后端改动后必须至少做语法检查。
+8. 每次完成后输出：
+   - 修改文件列表
+   - 新增文件列表
+   - 删除文件列表
+   - 影响范围
+   - 测试结果
+   - 已知问题
+   - 下一步建议
+
+==================================================
+四、立即执行顺序
+==================================================
+
+现在不要做 Phase 7、8、9。
+现在只做：
+
+第一轮：
+Phase 0：品牌统一与入口收口
+
+第二轮：
+Phase 1：短剧数据结构文档和最小数据模型
+
+第三轮：
+Phase 2：短剧工作台 MVP 页面
+
+第四轮：
+Phase 3：Txtovideo 专用提示词模板
+
+第五轮：
+Phase 4：导出 ZIP 包
+
+只有完成前五轮，才考虑接 ComfyUI / RunningHub。
+
+==================================================
+五、给 Codex 的当前第一条任务
+==================================================
+
+请先执行 Phase 0：安全整理与品牌收口。
+
+要求：
+- 不新增复杂功能
+- 不改生成逻辑
+- 不改数据库结构
+- 不删除后端路由
+- 不删除 Canvas
+- 不删除 Movie 相关服务
+- 只做品牌统一、入口收口、README 重写、License 一致性检查
+
+具体做：
+1. 全局搜索用户可见的 AICON、AICG、Movie Studio 泛化宣传文案。
+2. 用户可见名称统一为 Txtovideo Studio。
+3. 中文定位统一为 小说短剧工作站。
+4. README 改写为 Txtovideo Studio 项目说明。
+5. 前端主导航收口，只保留：
+   - 项目管理
+   - 短剧工作台
+   - 画布工作台
+   - API 密钥设置
+   - 导出中心
+   - 系统设置
+6. Bilibili 发布、Distribution、复杂仪表盘等入口先隐藏到实验功能，不删除代码。
+7. 检查 LICENSE、README、backend/pyproject.toml 中的协议描述统一为 Apache License 2.0。
+8. 确保 frontend npm run build 通过。
+9. 确保后端基础启动不被破坏。
+10. 完成后输出修改报告。
 ```
 
----
-
-# 17. 我建议的最终执行优先级
-
-让 Codex 自己选择细节可以，但大方向别让它乱跑。你只管盯住这条主线：
-
-```text
-先拿回 API 控制权
-再建立 Txtovideo 数据结构
-再接资产库和分镜 JSON
-再接 ComfyUI
-再接视频
-最后才改前端和打包
-```
-
-品牌替换建议放在两个阶段：
-
-```text
-早期：改配置、标题、LOGO、关于页，避免一直用 AICON 名字开发
-后期：改安装包、桌面图标、自动更新、发布包名称
-```
-
-不要一开始就把所有 AICON 字符串暴力替换。
-正确做法是：
-
-```text
-先加 brand.json
-再让前端和后端读取 brand 配置
-最后逐步清理硬编码品牌名
-```
-
-这样最稳。
-
-[1]: https://github.com/869413421/ai-moive-studio?utm_source=chatgpt.com "869413421/ai-moive-studio: 自然语言驱动的无限画布工作 ..."
